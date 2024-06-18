@@ -1,0 +1,19 @@
+# Ignore specific file types in the /8_Ball_Pool/src/ directory
+/8_Ball_Pool/src/*.o
+/8_Ball_Pool/src/*.so
+/8_Ball_Pool/src/*.i
+/8_Ball_Pool/src/*.db
+/8_Ball_Pool/src/*.svg
+
+# Ignore generated SWIG files
+/8_Ball_Pool/src/phylib_wrap.c
+/8_Ball_Pool/src/phylib.py
+
+# Ignore Python cache
+/8_Ball_Pool/__pycache__/
+
+# Ignore Visual Studio Code settings
+.vscode/
+
+# Ignore tutorials directory
+/8_Ball_Pool/tutorials/
