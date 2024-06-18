@@ -1,0 +1,20 @@
+#svg-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+svg {
+    width: 100vw;
+    height: 75vh;
+    display: block;
+    transform: rotate(-90deg);
+}
+
+/* line {
+    stroke: #000;
+    stroke-width: 6;
+    visibility: visible;
+} */
