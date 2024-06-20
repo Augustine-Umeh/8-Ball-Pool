@@ -7,10 +7,10 @@
 }
 
 svg {
-    width: 100vw;
+    /* width: 100vw; */
     height: 75vh;
-    display: block;
-    transform: rotate(-90deg);
+    /* display: block; */
+    transform: rotate(-90deg); 
 }
 
 /* line {

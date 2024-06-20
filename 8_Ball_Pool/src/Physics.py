@@ -407,7 +407,7 @@ class Table( phylib.phylib_table ):
                         svg_str += obj.svg()
                 else:
                     svg_str += obj.svg()
-        
+
         # svg_str += "<line id='cue_line' x1='675' y1='2025' x2='900' y2='2025' stroke='black' stroke-width='2' visibility='hidden' />"
         svg_str += FOOTER
 
