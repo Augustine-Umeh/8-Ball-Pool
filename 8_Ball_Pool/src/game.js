@@ -16,7 +16,8 @@ $(document).ready(function () {
             document.getElementById("svg-container").innerHTML = response;
 
             // Now that the SVG is loaded, select it
-            let svgElement = document.querySelector("#svg-container svg");
+            let tableSVG = document.querySelector("#svg-container svg");
+            let cueLineSVG = document.querySelector("#cue_line");
 
             // Make sure svgElement is not null
             if (!svgElement) {
@@ -24,7 +25,7 @@ $(document).ready(function () {
                 return;
             }
 
-            setupEventListeners(svgElement); // Call a function to setup event listeners
+            setupEventListeners(tableSVG, cueLineSVG); // Call a function to setup event listeners
             displayCueLine();
         },
         error: function () {
@@ -40,9 +41,9 @@ function displayCueLine() {
     let cueBallY = parseFloat(cueBall.attr("cy"));
 
     if (cueBallY < 1375) {
-        cueBallY -= 56;  // Move cue line above the cue ball
+        cueBallY -= 56; // Move cue line above the cue ball
     } else {
-        cueBallY += 56;  // Move cue line below the cue ball
+        cueBallY += 56; // Move cue line below the cue ball
     }
 
     // Length of the cue line
@@ -67,7 +68,7 @@ function displayCueLine() {
 
 }
 
-function setupEventListeners(svgElement) {
+function setupEventListeners(tableSVG, cueLineSVG) {
     let isDragging = false;
     let initialPosition = { x: 0, y: 0 };
 
@@ -182,7 +183,6 @@ function setupEventListeners(svgElement) {
     //         });
     //     }
     // });
-    
 
     function getSVGCoordinates(svg, event) {
         var pt = svg.createSVGPoint();
