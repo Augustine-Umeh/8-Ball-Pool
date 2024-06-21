@@ -9,6 +9,8 @@
 /8_Ball_Pool/src/phylib_wrap.c
 /8_Ball_Pool/src/phylib.py
 
+/8_Ball_Pool/src/prop.js
+
 # Ignore Python cache
 /8_Ball_Pool/__pycache__/
 

@@ -39,7 +39,6 @@ function displayCueLine() {
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
 
-    // Adjust cueBallY based on your logic
     if (cueBallY < 1375) {
         cueBallY -= 56;  // Move cue line above the cue ball
     } else {
@@ -65,12 +64,14 @@ function displayCueLine() {
 
     // Append the line to the SVG container
     svg.appendChild(line);
+
 }
 
 function setupEventListeners(svgElement) {
     let isDragging = false;
     let initialPosition = { x: 0, y: 0 };
 
+    
     // $("#svg-container").on("mousedown", "#cue_ball", function (e) {
     //     e.preventDefault();
     //     isDragging = true;
