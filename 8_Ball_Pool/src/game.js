@@ -17,15 +17,14 @@ $(document).ready(function () {
 
             // Now that the SVG is loaded, select it
             let tableSVG = document.querySelector("#svg-container svg");
-            let cueLineSVG = document.querySelector("#cue_line");
 
             // Make sure svgElement is not null
-            if (!svgElement) {
+            if (!tableSVG) {
                 console.error("SVG Element not found!");
                 return;
             }
 
-            setupEventListeners(tableSVG, cueLineSVG); // Call a function to setup event listeners
+            setupEventListeners(tableSVG); // Call a function to setup event listeners
             displayCueLine();
         },
         error: function () {
@@ -33,6 +32,12 @@ $(document).ready(function () {
         },
     });
 });
+
+// Global Variables
+
+let isDragging = false;
+
+
 
 function displayCueLine() {
     let cueBall = $("#cue_ball");
@@ -47,7 +52,7 @@ function displayCueLine() {
     }
 
     // Length of the cue line
-    let cueLineLength = 300;
+    let cueLineLength = 400;
 
     // Select the SVG container where you want to append the line
     let svg = $("#svg-container svg")[0];
@@ -60,19 +65,77 @@ function displayCueLine() {
     line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
     line.setAttribute("y2", cueBallY + cueLineLength); // Keep y2 the same as y1 initially
     line.setAttribute("stroke", "black");
-    line.setAttribute("stroke-width", "8");
+    line.setAttribute("stroke-width", "25");
     line.setAttribute("visibility", "visible");
 
     // Append the line to the SVG container
     svg.appendChild(line);
-
 }
 
-function setupEventListeners(tableSVG, cueLineSVG) {
+function rotatePoolCue(angle) {
+    let cueBall = $("#cue_ball");
+    const poolCue = $("#cue_line");
+
+    let cueBallX = parseFloat(cueBall.attr("cx"));
+    let cueBallY = parseFloat(cueBall.attr("cy"));
+
+
+    const length = Math.sqrt(
+        Math.pow(poolCue.attr("x2") - poolCue.attr("x1"), 2) +
+            Math.pow(poolCue.attr("y2") - poolCue.attr("y1"), 2)
+    );
+    const angleDegrees = angle * (180 / Math.PI); // Convert angle to degrees
+
+    console.log("Degree: ", angleDegrees);
+
+    poolCue.attr("transform-origin", `${cueBallX} ${cueBallY}`);
+    poolCue.attr("transform", `rotate(${angleDegrees})`);
+}
+
+function setupEventListeners(tableSVG) {
     let isDragging = false;
     let initialPosition = { x: 0, y: 0 };
 
-    
+    let cueBall = $("#cue_ball");
+    const poolCue = $("#cue_line");
+
+    let cueBallX = parseFloat(cueBall.attr("cx"));
+    let cueBallY = parseFloat(cueBall.attr("cy"));
+
+    $("#svg-container svg").on("mousedown", "#cue_line", function (e) {
+        isDragging = true;
+    });
+
+    $("#svg-container svg").on("mousemove", function (e) {
+        if (isDragging) {
+            console.log("Dragging");
+            const rect = $("#svg-container svg")[0].getBoundingClientRect();
+            // const mouseX = e.clientX - rect.left;
+            // const mouseY = e.clientY - rect.top;
+
+            let svg = document.querySelector("#svg-container svg");
+            let svgPoint = getSVGCoordinates(svg, e);
+            let mouseX = svgPoint.x;
+            let mouseY = svgPoint.y;
+
+            const dx = mouseX - cueBallX;
+            const dy = mouseY - cueBallY;
+
+            console.log("mouseX: ", mouseX);
+
+            const angle = Math.atan2(dy, dx);
+            rotatePoolCue(angle);
+        }
+    });
+
+    $("#svg-container svg").on("mouseup", function (e) {
+        isDragging = false;
+    });
+
+    $("#svg-container svg").on("mouseleave", function (e) {
+        isDragging = false;
+    });
+
     // $("#svg-container").on("mousedown", "#cue_ball", function (e) {
     //     e.preventDefault();
     //     isDragging = true;
