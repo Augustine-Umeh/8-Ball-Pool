@@ -100,10 +100,24 @@ function calculateAngle(x1, y1, x2, y2) {
     return Math.atan2(y2 - y1, x2 - x1);
 }
 
+function getCueAngle() {
+    const poolCue = $("#cue_line");
+
+    const transform = poolCue.attr("transform");
+    if (transform) {
+        const match = /rotate\(([^)]+)\)/.exec(transform);
+        if (match) {
+            const angle = parseFloat(match[1]);
+            return angle * (Math.PI / 180); // Convert degrees to radians
+        }
+    }
+    return 0;
+}
+
 function setupEventListeners(tableSVG) {
     let isDragging = false;
-    let initialPosition = { x: 0, y: 0 };
-    let initialAngle = 0;
+    let initialMouseAngle;
+    let initialCueAngle;
 
     let cueBall = $("#cue_ball");
     const poolCue = $("#cue_line");
@@ -111,17 +125,6 @@ function setupEventListeners(tableSVG) {
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
 
-    function getCueAngle() {
-        const transform = poolCue.attr("transform");
-        if (transform) {
-            const match = /rotate\(([^)]+)\)/.exec(transform);
-            if (match) {
-                const angle = parseFloat(match[1]);
-                return angle * (Math.PI / 180); // Convert degrees to radians
-            }
-        }
-        return 0;
-    }
 
     $("#svg-container svg").on("mousedown", "#cue_line", function (e) {
         let svg = document.querySelector("#svg-container svg");
@@ -132,14 +135,13 @@ function setupEventListeners(tableSVG) {
         isDragging = true;
         initialMouseAngle = calculateAngle(cueBallX, cueBallY, mouseX, mouseY);
         initialCueAngle = getCueAngle();
+        console.log(initialCueAngle, initialMouseAngle); // Debugging log
+
     });
 
     $("#svg-container svg").on("mousemove", function (e) {
         if (isDragging) {
             console.log("Dragging");
-            const rect = $("#svg-container svg")[0].getBoundingClientRect();
-            // const mouseX = e.clientX - rect.left;
-            // const mouseY = e.clientY - rect.top;
 
             let svg = document.querySelector("#svg-container svg");
             let svgPoint = getSVGCoordinates(svg, e);
@@ -157,9 +159,9 @@ function setupEventListeners(tableSVG) {
                 mouseX,
                 mouseY
             );
+            // console.log(initialCueAngle, currentMouseAngle, initialMouseAngle); // Debugging log
             const angle =
                 initialCueAngle + (currentMouseAngle - initialMouseAngle);
-            console.log("Angle (radians):", angle); // Debugging log
             rotatePoolCue(angle);
         }
     });
