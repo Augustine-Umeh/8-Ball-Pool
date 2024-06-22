@@ -37,8 +37,6 @@ $(document).ready(function () {
 
 let isDragging = false;
 
-
-
 function displayCueLine() {
     let cueBall = $("#cue_ball");
 
@@ -79,11 +77,6 @@ function rotatePoolCue(angle) {
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
 
-
-    const length = Math.sqrt(
-        Math.pow(poolCue.attr("x2") - poolCue.attr("x1"), 2) +
-            Math.pow(poolCue.attr("y2") - poolCue.attr("y1"), 2)
-    );
     const angleDegrees = angle * (180 / Math.PI); // Convert angle to degrees
 
     console.log("Degree: ", angleDegrees);
@@ -92,9 +85,25 @@ function rotatePoolCue(angle) {
     poolCue.attr("transform", `rotate(${angleDegrees})`);
 }
 
+function getRotation($element) {
+    const transform = $element.attr("transform");
+    if (transform) {
+        const rotateMatch = transform.match(/rotate\(([-\d.]+)\)/);
+        if (rotateMatch) {
+            return parseFloat(rotateMatch[1]);
+        }
+    }
+    return 0; // Default rotation if no rotate transformation is found
+}
+
+function calculateAngle(x1, y1, x2, y2) {
+    return Math.atan2(y2 - y1, x2 - x1);
+}
+
 function setupEventListeners(tableSVG) {
     let isDragging = false;
     let initialPosition = { x: 0, y: 0 };
+    let initialAngle = 0;
 
     let cueBall = $("#cue_ball");
     const poolCue = $("#cue_line");
@@ -102,8 +111,27 @@ function setupEventListeners(tableSVG) {
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
 
+    function getCueAngle() {
+        const transform = poolCue.attr("transform");
+        if (transform) {
+            const match = /rotate\(([^)]+)\)/.exec(transform);
+            if (match) {
+                const angle = parseFloat(match[1]);
+                return angle * (Math.PI / 180); // Convert degrees to radians
+            }
+        }
+        return 0;
+    }
+
     $("#svg-container svg").on("mousedown", "#cue_line", function (e) {
+        let svg = document.querySelector("#svg-container svg");
+        let svgPoint = getSVGCoordinates(svg, e);
+        let mouseX = svgPoint.x;
+        let mouseY = svgPoint.y;
+
         isDragging = true;
+        initialMouseAngle = calculateAngle(cueBallX, cueBallY, mouseX, mouseY);
+        initialCueAngle = getCueAngle();
     });
 
     $("#svg-container svg").on("mousemove", function (e) {
@@ -118,12 +146,20 @@ function setupEventListeners(tableSVG) {
             let mouseX = svgPoint.x;
             let mouseY = svgPoint.y;
 
+            console.log("Mouse Move Coordinates:", mouseX, mouseY); // Debugging log
+
             const dx = mouseX - cueBallX;
             const dy = mouseY - cueBallY;
 
-            console.log("mouseX: ", mouseX);
-
-            const angle = Math.atan2(dy, dx);
+            const currentMouseAngle = calculateAngle(
+                cueBallX,
+                cueBallY,
+                mouseX,
+                mouseY
+            );
+            const angle =
+                initialCueAngle + (currentMouseAngle - initialMouseAngle);
+            console.log("Angle (radians):", angle); // Debugging log
             rotatePoolCue(angle);
         }
     });
