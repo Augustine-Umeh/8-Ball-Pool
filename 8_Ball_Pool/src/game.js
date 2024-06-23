@@ -42,37 +42,56 @@ function displayCueLine() {
 
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
+    let aimLineY = 0;
+    let cueLineY = 0;
 
+    // Check if the cue ball is above the center of the table
     if (cueBallY < 1375) {
-        cueBallY -= 56; // Move cue line above the cue ball
+        aimLineY = cueBallY + 56; // Move cue line above the cue ball
+        cueLineY = cueBallY - 56; // Move cue line below the cue ball
+
     } else {
-        cueBallY += 56; // Move cue line below the cue ball
+        aimLineY = cueBallY - 56; // Move cue line below the cue ball
+        cueLineY = cueBallY + 56; // Move cue line above the cue ball
     }
 
     // Length of the cue line
-    let cueLineLength = 400;
+    let cueLineLength = 500;
+    let aimLineLength = 1000;
 
     // Select the SVG container where you want to append the line
     let svg = $("#svg-container svg")[0];
 
     // Create a new SVG line element
-    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("id", "cue_line");
-    line.setAttribute("x1", cueBallX);
-    line.setAttribute("y1", cueBallY);
-    line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
-    line.setAttribute("y2", cueBallY + cueLineLength); // Keep y2 the same as y1 initially
-    line.setAttribute("stroke", "black");
-    line.setAttribute("stroke-width", "25");
-    line.setAttribute("visibility", "visible");
+    let cue_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    cue_line.setAttribute("class", "cue_line");
+    cue_line.setAttribute("x1", cueBallX);
+    cue_line.setAttribute("y1", cueLineY);
+    cue_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
+    cue_line.setAttribute("y2", cueLineY + cueLineLength); // Keep y2 the same as y1 initially
+    cue_line.setAttribute("stroke", "black");
+    cue_line.setAttribute("stroke-width", "25");
+    cue_line.setAttribute("visibility", "visible");
+
+    // Create a new SVG line element
+    let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    aim_line.setAttribute("class", "cue_line");
+    aim_line.setAttribute("x1", cueBallX);
+    aim_line.setAttribute("y1", aimLineY);
+    aim_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
+    aim_line.setAttribute("y2", aimLineY - aimLineLength); // Keep y2 the same as y1 initially
+    aim_line.setAttribute("stroke", "grey");
+    aim_line.setAttribute("stroke-width", "10");
+    aim_line.setAttribute("visibility", "visible");
 
     // Append the line to the SVG container
-    svg.appendChild(line);
+    svg.appendChild(cue_line);
+    svg.appendChild(aim_line);
 }
 
 function rotatePoolCue(angle) {
     let cueBall = $("#cue_ball");
-    const poolCue = $("#cue_line");
+    const poolCue = $(".cue_line");
 
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
@@ -85,23 +104,12 @@ function rotatePoolCue(angle) {
     poolCue.attr("transform", `rotate(${angleDegrees})`);
 }
 
-function getRotation($element) {
-    const transform = $element.attr("transform");
-    if (transform) {
-        const rotateMatch = transform.match(/rotate\(([-\d.]+)\)/);
-        if (rotateMatch) {
-            return parseFloat(rotateMatch[1]);
-        }
-    }
-    return 0; // Default rotation if no rotate transformation is found
-}
-
 function calculateAngle(x1, y1, x2, y2) {
     return Math.atan2(y2 - y1, x2 - x1);
 }
 
 function getCueAngle() {
-    const poolCue = $("#cue_line");
+    const poolCue = $(".cue_line");
 
     const transform = poolCue.attr("transform");
     if (transform) {
@@ -120,13 +128,13 @@ function setupEventListeners(tableSVG) {
     let initialCueAngle;
 
     let cueBall = $("#cue_ball");
-    const poolCue = $("#cue_line");
+    const poolCue = $(".cue_line");
 
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
 
 
-    $("#svg-container svg").on("mousedown", "#cue_line", function (e) {
+    $("#svg-container svg").on("mousedown", ".cue_line", function (e) {
         let svg = document.querySelector("#svg-container svg");
         let svgPoint = getSVGCoordinates(svg, e);
         let mouseX = svgPoint.x;
@@ -184,7 +192,7 @@ function setupEventListeners(tableSVG) {
 
     //     initialPosition = { x: ballCenterX, y: ballCenterY };
 
-    //     let cueLine = $("#cue_line");
+    //     let cueLine = $(".cue_line");
     //     if (cueLine.length === 0) {
     //         let svg = $("#svg-container svg")[0]; // Assuming there's only one SVG element inside #svg-container
     //         let line = document.createElementNS(
@@ -218,7 +226,7 @@ function setupEventListeners(tableSVG) {
     //     let svgPoint = getSVGCoordinates(svg, e);
 
     //     // Update line's end point to the mouse position
-    //     $("#cue_line").attr({
+    //     $(".cue_line").attr({
     //         x2: svgPoint.x,
     //         y2: svgPoint.y,
     //     });
@@ -245,7 +253,7 @@ function setupEventListeners(tableSVG) {
 
     //         const svgPoint = getSVGCoordinates(svgElement, e);
     //         isDragging = false;
-    //         $("#cue_line").attr("visibility", "hidden");
+    //         $(".cue_line").attr("visibility", "hidden");
     //         console.log(
     //             `Dragged from (${initialPosition.x}, ${initialPosition.y}) to (${svgPoint.x}, ${svgPoint.y})`
     //         );

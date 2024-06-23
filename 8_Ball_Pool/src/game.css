@@ -1,16 +1,19 @@
 #svg-container {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
+    width: 80vw;
+    height: 80vh;
+    position: relative;
+    margin: auto;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; */
 }
 
 svg {
-    /* width: 100vw; */
-    height: 75vh;
-    /* display: block; */
-    transform: rotate(-90deg); 
+    width: 50%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    transform: rotate(-90deg);
 }
 
 /* line {
