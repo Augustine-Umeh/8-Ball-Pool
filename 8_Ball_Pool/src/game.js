@@ -109,58 +109,45 @@ function rotatePoolCue(angle) {
 
 function checkAimLineOverBalls(cueBallX, cueBallY) {
     const balls = $("circle").not("#cue_ball");
-    const aimLine = $(".cue_line")[1]; // Assuming the aim line is the second line created
-
-    let x1 = parseFloat(aimLine.getAttribute("x1"));
-    let y1 = parseFloat(aimLine.getAttribute("y1"));
-    let x2 = parseFloat(aimLine.getAttribute("x2"));
-    let y2 = parseFloat(aimLine.getAttribute("y2"));
-
-    let intersectionFound = false;
-
-    let aimLineY = 0;
-    let aimLineOriginalLength = 2200; // Set the original length of the aim line
-    let aimLineEndX = x1;
-    let aimLineEndY = 0;
-
-    // Check if the cue ball is above the center of the table
-    if (cueBallY < 1375) {
-        aimLineY = cueBallY + 56; // Move aim line below the cue ball
-    } else {
-        aimLineY = cueBallY - 56; // Move aim line above the cue ball
-    }
-
-    aimLineEndY = aimLineY - aimLineOriginalLength;
 
     balls.each(function () {
+
+        const aimLine = $(".cue_line")[1]; // Assuming the aim line is the second line created
+
+        let x1 = parseFloat(aimLine.getAttribute("x1"));
+        let y1 = parseFloat(aimLine.getAttribute("y1"));
+        let x2 = parseFloat(aimLine.getAttribute("x2"));
+        let y2 = parseFloat(aimLine.getAttribute("y2"));
+
         let ball = $(this);
         if (parseFloat(ball.attr("r")) == 28.00) {
             let ballX = parseFloat(ball.attr("cx"));
             let ballY = parseFloat(ball.attr("cy"));
             let ballRadius = parseFloat(ball.attr("r"));
-            let color = ball.attr("fill");
+            // let color = ball.attr("fill");
 
             if (isPointOnLine(x1, y1, x2, y2, ballX, ballY, ballRadius)) {
-                console.log(`Ball at (${ballX}, ${ballY}, ${color}) is under the aim line.`);
+                console.log(`Ball is under the aim line.`);
 
                 // Calculate the intersection point of the aim line and the ball
-                let intersectionX = ballX + (ballRadius * (x2 - x1) / Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
-                let intersectionY = ballY + (ballRadius * (y2 - y1) / Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
+                // let intersectionX = ballX + (ballRadius * (x2 - x1) / Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
+                // let intersectionY = ballY + (ballRadius * (y2 - y1) / Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
+                let intersectionX = ballX
+                let intersectionY = ballY + 28
 
                 // Update the aim line's end point to the intersection point
                 aimLine.setAttribute("x2", intersectionX);
                 aimLine.setAttribute("y2", intersectionY);
 
-                intersectionFound = true;
+                // intersectionFound = true;
+            }else{
+                aimLine.setAttribute("x2", x2);
+                aimLine.setAttribute("y2", y2);
             }
         }
     });
 
-    // If no intersection is found, reset the aim line to its original length
-    if (!intersectionFound) {
-        aimLine.setAttribute("x2", aimLineEndX);
-        aimLine.setAttribute("y2", aimLineEndY);
-    }
+    
 }
 
 function isPointOnLine(x1, y1, x2, y2, cx, cy, r) {
