@@ -110,51 +110,57 @@ function rotatePoolCue(angle) {
 function checkAimLineOverBalls(cueBallX, cueBallY) {
     const balls = $("circle").not("#cue_ball");
 
+    const aimLine = $(".cue_line")[1]; // Assuming the aim line is the second line created
+
+    let x1 = parseFloat(aimLine.getAttribute("x1"));
+    let y1 = parseFloat(aimLine.getAttribute("y1"));
+    let x2 = parseFloat(aimLine.getAttribute("x2"));
+    let y2 = parseFloat(aimLine.getAttribute("y2"));
+
+
+    let intersectionFound = false;
+
     balls.each(function () {
-
-        const aimLine = $(".cue_line")[1]; // Assuming the aim line is the second line created
-
-        let x1 = parseFloat(aimLine.getAttribute("x1"));
-        let y1 = parseFloat(aimLine.getAttribute("y1"));
-        let x2 = parseFloat(aimLine.getAttribute("x2"));
-        let y2 = parseFloat(aimLine.getAttribute("y2"));
-
         let ball = $(this);
         if (parseFloat(ball.attr("r")) == 28.00) {
             let ballX = parseFloat(ball.attr("cx"));
             let ballY = parseFloat(ball.attr("cy"));
             let ballRadius = parseFloat(ball.attr("r"));
-            // let color = ball.attr("fill");
 
             if (isPointOnLine(x1, y1, x2, y2, ballX, ballY, ballRadius)) {
                 console.log(`Ball is under the aim line.`);
 
                 // Calculate the intersection point of the aim line and the ball
-                // let intersectionX = ballX + (ballRadius * (x2 - x1) / Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
-                // let intersectionY = ballY + (ballRadius * (y2 - y1) / Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
-                let intersectionX = ballX
-                let intersectionY = ballY + 28
+                let intersectionX = ballX;
+                let intersectionY = ballY + ballRadius;
 
                 // Update the aim line's end point to the intersection point
                 aimLine.setAttribute("x2", intersectionX);
                 aimLine.setAttribute("y2", intersectionY);
 
-                // intersectionFound = true;
-            }else{
-                aimLine.setAttribute("x2", x2);
-                aimLine.setAttribute("y2", y2);
+                intersectionFound = true;
             }
         }
     });
 
-    
+    // If no intersection is found, reset aim line to original length
+    if (!intersectionFound) {
+        const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); // Original length of the aim line
+        const angle = Math.atan2(y2 - y1, x2 - x1); // Angle of the aim line
+
+        x2 = x1 + length * Math.cos(angle);
+        y2 = y1 + length * Math.sin(angle);
+        console.log(x1, y1, x2, y2);
+        aimLine.setAttribute("x2", x2);
+        aimLine.setAttribute("y2", y2);
+    }
 }
 
 function isPointOnLine(x1, y1, x2, y2, cx, cy, r) {
-    // Calculate the distance of the point from the line segment
-    let dist = Math.abs((y2 - y1) * cx - (x2 - x1) * cy + x2 * y1 - y2 * x1) /
-        Math.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2);
-    return dist <= r;
+    if (y2 < cy && (cx - r <= x2 && x2 <= cx + r)) {
+        return true;
+    }
+    return false;
 }
 
 function calculateAngle(x1, y1, x2, y2) {
@@ -221,7 +227,7 @@ function setupEventListeners(tableSVG) {
             );
             // console.log(initialCueAngle, currentMouseAngle, initialMouseAngle); // Debugging log
             const angle = initialCueAngle + (currentMouseAngle - initialMouseAngle);
-
+            
             rotatePoolCue(angle);
         }
     });
