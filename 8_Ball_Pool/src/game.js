@@ -64,6 +64,7 @@ function displayCueLine() {
 
     // Create a new SVG cueline element
     let cue_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    cue_line.setAttribute("id", "pool_cue");
     cue_line.setAttribute("class", "cue_line");
     cue_line.setAttribute("x1", cueBallX);
     cue_line.setAttribute("y1", cueLineY);
@@ -75,7 +76,9 @@ function displayCueLine() {
 
     // Create a new SVG aimline element
     let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    // checkLinePath()
     aim_line.setAttribute("class", "cue_line");
+    aim_line.setAttribute("id", "aim_line");
     aim_line.setAttribute("x1", cueBallX);
     aim_line.setAttribute("y1", aimLineY);
     aim_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
@@ -91,74 +94,86 @@ function displayCueLine() {
 }
 
 function rotatePoolCue(angle) {
-    let cueBall = $("#cue_ball");
-    const poolCue = $(".cue_line");
 
+    let cueBall = $("#cue_ball");
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
 
-    const angleDegrees = angle * (180 / Math.PI); // Convert angle to degrees
+    // Lengths of the cue line and aim line
+    let poolCueLength = 500;
+    let aimLineLength = 2200;
 
-    // console.log("Degree: ", angleDegrees);
+    // Calculate new coordinates for cue line
+    let cueLineEndX = cueBallX * Math.cos(angle);
+    let cueLineEndY = cueBallY * Math.sin(angle);
 
-    poolCue.attr("transform-origin", `${cueBallX} ${cueBallY}`);
-    poolCue.attr("transform", `rotate(${angleDegrees})`);
+    // Calculate new coordinates for aim line
+    let aimLineEndX = cueBallX * Math.cos(angle);
+    let aimLineEndY = cueBallY * Math.sin(angle);
 
-    checkAimLineOverBalls(cueBallX, cueBallY);
+    // Update the cue line's position
+    $("#pool_cue")
+        .attr("x1", cueBallX)
+        .attr("y1", cueBallY)
+        .attr("x2", cueLineEndX)
+        .attr("y2", cueLineEndY + poolCueLength);
+
+    // Update the aim line's position
+    $("#aim_line")
+        .attr("x1", cueBallX)
+        .attr("y1", cueBallY)
+        .attr("x2", aimLineEndX)
+        .attr("y2", aimLineEndY - aimLineLength);
+
+    checkLinePath();
 }
 
-function checkAimLineOverBalls(cueBallX, cueBallY) {
-    const balls = $("circle").not("#cue_ball");
 
-    const aimLine = $(".cue_line")[1]; // Assuming the aim line is the second line created
+function checkLinePath() {
+    const balls = $(".ball");
+    const aimLine = $("#aim_line");
 
-    let x1 = parseFloat(aimLine.getAttribute("x1"));
-    let y1 = parseFloat(aimLine.getAttribute("y1"));
-    let x2 = parseFloat(aimLine.getAttribute("x2"));
-    let y2 = parseFloat(aimLine.getAttribute("y2"));
-
-
-    let intersectionFound = false;
+    let x1 = parseFloat(aimLine.attr("x1"));
+    let y1 = parseFloat(aimLine.attr("y1"));
+    let x2 = parseFloat(aimLine.attr("x2"));
+    let y2 = parseFloat(aimLine.attr("y2"));
 
     balls.each(function () {
         let ball = $(this);
-        if (parseFloat(ball.attr("r")) == 28.00) {
-            let ballX = parseFloat(ball.attr("cx"));
-            let ballY = parseFloat(ball.attr("cy"));
-            let ballRadius = parseFloat(ball.attr("r"));
+        let ballX = parseFloat(ball.attr("cx"));
+        let ballY = parseFloat(ball.attr("cy"));
+        let ballRadius = parseFloat(ball.attr("r"));
 
-            if (isPointOnLine(x1, y1, x2, y2, ballX, ballY, ballRadius)) {
-                console.log(`Ball is under the aim line.`);
-
-                // Calculate the intersection point of the aim line and the ball
-                let intersectionX = ballX;
-                let intersectionY = ballY + ballRadius;
-
-                // Update the aim line's end point to the intersection point
-                aimLine.setAttribute("x2", intersectionX);
-                aimLine.setAttribute("y2", intersectionY);
-
-                intersectionFound = true;
-            }
+        if (lineIntersectsCircle(x1, y1, x2, y2, ballX, ballY, ballRadius)) {
+            console.log(`Ball at (${ballX}, ${ballY}) intersects with the aim line.`);
         }
     });
-
-    // If no intersection is found, reset aim line to original length
-    if (!intersectionFound) {
-        const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); // Original length of the aim line
-        const angle = Math.atan2(y2 - y1, x2 - x1); // Angle of the aim line
-
-        x2 = x1 + length * Math.cos(angle);
-        y2 = y1 + length * Math.sin(angle);
-        console.log(x1, y1, x2, y2);
-        aimLine.setAttribute("x2", x2);
-        aimLine.setAttribute("y2", y2);
-    }
 }
 
-function isPointOnLine(x1, y1, x2, y2, cx, cy, r) {
-    if (y2 < cy && (cx - r <= x2 && x2 <= cx + r)) {
-        return true;
+function lineIntersectsCircle(x1, y1, x2, y2, cx, cy, r) {
+    // Line segment from (x1, y1) to (x2, y2)
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+
+    // Vector from (x1, y1) to the circle center (cx, cy)
+    let fx = x1 - cx;
+    let fy = y1 - cy;
+
+    let a = dx * dx + dy * dy;
+    let b = 2 * (fx * dx + fy * dy);
+    let c = (fx * fx + fy * fy) - r * r;
+
+    let discriminant = b * b - 4 * a * c;
+
+    if (discriminant >= 0) {
+        discriminant = Math.sqrt(discriminant);
+
+        let t1 = (-b - discriminant) / (2 * a);
+        let t2 = (-b + discriminant) / (2 * a);
+
+        if ((t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1)) {
+            return true;
+        }
     }
     return false;
 }
@@ -168,9 +183,9 @@ function calculateAngle(x1, y1, x2, y2) {
 }
 
 function getCueAngle() {
-    const poolCue = $(".cue_line");
+    const cue = $(".cue_line");
 
-    const transform = poolCue.attr("transform");
+    const transform = cue.attr("transform");
     if (transform) {
         const match = /rotate\(([^)]+)\)/.exec(transform);
         if (match) {
@@ -187,23 +202,16 @@ function setupEventListeners(tableSVG) {
     let initialCueAngle;
 
     let cueBall = $("#cue_ball");
-    // const poolCue = $(".cue_line");
 
-    let cueBallX = parseFloat(cueBall.attr("cx"));
-    let cueBallY = parseFloat(cueBall.attr("cy"));
-
-
-    $("#svg-container svg").on("mousedown", ".cue_line", function (e) {
+    $("#svg-container svg").on("mousedown", "#pool_cue", function (e) {
         let svg = document.querySelector("#svg-container svg");
         let svgPoint = getSVGCoordinates(svg, e);
         let mouseX = svgPoint.x;
         let mouseY = svgPoint.y;
 
         isDragging = true;
-        initialMouseAngle = calculateAngle(cueBallX, cueBallY, mouseX, mouseY);
+        initialMouseAngle = calculateAngle(parseFloat(cueBall.attr("cx")), parseFloat(cueBall.attr("cy")), mouseX, mouseY);
         initialCueAngle = getCueAngle();
-        // console.log(initialCueAngle, initialMouseAngle); // Debugging log
-
     });
 
     $("#svg-container svg").on("mousemove", function (e) {
@@ -220,12 +228,12 @@ function setupEventListeners(tableSVG) {
             // const dy = mouseY - cueBallY;
 
             const currentMouseAngle = calculateAngle(
-                cueBallX,
-                cueBallY,
+                parseFloat(cueBall.attr("cx")),
+                parseFloat(cueBall.attr("cy")),
                 mouseX,
                 mouseY
             );
-            // console.log(initialCueAngle, currentMouseAngle, initialMouseAngle); // Debugging log
+            
             const angle = initialCueAngle + (currentMouseAngle - initialMouseAngle);
             
             rotatePoolCue(angle);

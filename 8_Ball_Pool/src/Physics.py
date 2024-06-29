@@ -93,7 +93,7 @@ class StillBall( phylib.phylib_object ):
 
     # add an svg method here
     def svg(self):
-        return """ <circle cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (
+        return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (
             self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number])
 
 
