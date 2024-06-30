@@ -384,22 +384,6 @@ class Table( phylib.phylib_table ):
         table += StillBall(13, Coordinate(675, 400))
         table += StillBall(14, Coordinate(735, 400))
         table += StillBall(15, Coordinate(795, 400))
-        # table += StillBall(1, Coordinate(675, 400))
-        # table += StillBall(2, Coordinate(735, 400))
-        # table += StillBall(3, Coordinate(795, 400))
-        # table += StillBall(4, Coordinate(615, 400))
-        # table += StillBall(5, Coordinate(555, 400))
-        # table += StillBall(6, Coordinate(705,460))
-        # table += StillBall(7, Coordinate(765,460))
-        # table += StillBall(8, Coordinate(645,460))
-        # table += StillBall(9, Coordinate(585, 460))
-        # table += StillBall(10, Coordinate(675, 520))
-        # table += StillBall(11, Coordinate(735, 520))
-        # table += StillBall(12, Coordinate(615, 520))
-        # table += StillBall(13, Coordinate(705, 580))
-        # table += StillBall(14, Coordinate(645, 580))
-        # table += StillBall(15, Coordinate(675, 640))
-
         return table.custom_svg(table)
 
     def custom_svg(self, table):
