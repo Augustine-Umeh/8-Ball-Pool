@@ -317,7 +317,7 @@ function setupEventListeners() {
             );
             
             const angle = initialCueAngle + (currentMouseAngle - initialMouseAngle);
-            
+            console.log(angle);
             rotatePoolCue(angle);
         }
     });
