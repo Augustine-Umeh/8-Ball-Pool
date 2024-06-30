@@ -33,7 +33,12 @@ $(document).ready(function () {
     });
 });
 
-// Global Variables
+function PoolCuePowerShot() {
+    
+    let PowerShot = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    svg
+}
+
 function displayCueLine() {
     let cueBall = $("#cue_ball");
 
@@ -53,7 +58,7 @@ function displayCueLine() {
     }
 
     // Length of the cue line
-    let cueLineLength = 500;
+    let cueLineLength = 1500;
     let aimLineLength = 2200;
 
     // Select the SVG container where you want to append the line
@@ -99,7 +104,7 @@ function rotatePoolCue(angle) {
     let offset = 56;
 
     // Lengths of the cue line and aim line
-    let poolCueLength = 500;
+    let poolCueLength = 1500;
     let aimLineLength = 2200;
 
     // Calculate the offset coordinates
@@ -280,8 +285,6 @@ function setupEventListeners() {
     let initialMouseAngle = 0;
     let initialCueAngle = 0;
 
-    let cueBall = $("#cue_ball");
-
     $("#svg-container svg").on("mousedown", "#pool_cue", function (e) {
         let svg = document.querySelector("#svg-container svg");
         let svgPoint = getSVGCoordinates(svg, e);
@@ -289,6 +292,7 @@ function setupEventListeners() {
         let mouseY = svgPoint.y;
 
         isDragging = true;
+        let cueBall = $("#cue_ball");
         initialMouseAngle = calculateAngle(
             parseFloat(cueBall.attr("cx")), 
             parseFloat(cueBall.attr("cy")), 
@@ -309,6 +313,7 @@ function setupEventListeners() {
             let mouseX = svgPoint.x;
             let mouseY = svgPoint.y;
             
+            let cueBall = $("#cue_ball");
             const currentMouseAngle = calculateAngle(
                 parseFloat(cueBall.attr("cx")),
                 parseFloat(cueBall.attr("cy")),
