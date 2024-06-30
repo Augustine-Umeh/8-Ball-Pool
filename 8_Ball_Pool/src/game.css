@@ -1,8 +1,8 @@
 #svg-container {
-    width: 80vw;
+    /* width: 80vw;
     height: 80vh;
     position: relative;
-    margin: auto;
+    margin: auto; */
     /* display: flex;
     justify-content: center;
     align-items: center; */
@@ -16,6 +16,20 @@ svg {
     transform: rotate(-90deg);
 }
 
+.parent {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+.div1 {
+    grid-area: 1 / 1 / 2 / 3;
+}
+.div2 {
+    grid-area: 1 / 2 / 2 / 3;
+}
 /* line {
     stroke: #000;
     stroke-width: 6;
