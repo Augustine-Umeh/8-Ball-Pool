@@ -53,7 +53,6 @@ class MyHandler(BaseHTTPRequestHandler):
             # File not found, send 404
             self.send_error(404, f"{self.path} not found")
 
-
     def do_POST(self):
         global gameID, db, curTable, curGame, gameName, p1Name, p2Name, curTableID
 

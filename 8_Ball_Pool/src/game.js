@@ -91,51 +91,6 @@ function displayCueLine() {
     checkLinePath(aimLineY - aimLineLength, aimLineLength, cueBallX, cueBallY)
 }
 
-// function rotatePoolCue(angle) {
-
-//     let cueBall = $("#cue_ball");
-//     let cueBallX = parseFloat(cueBall.attr("cx"));
-//     let cueBallY = parseFloat(cueBall.attr("cy"));
-
-//     let offset = 56;
-
-//     // Lengths of the cue line and aim line
-//     let poolCueLength = 500;
-//     let aimLineLength = 2200;
-
-//     // Calculate the offset coordinates
-//     let offsetX = offset * Math.cos(angle);
-//     let offsetY = offset * Math.sin(angle);
-
-//     // Calculate new coordinates for cue line
-//     let cueLineStartX = cueBallX - offsetX;
-//     let cueLineStartY = cueBallY - offsetY;
-//     let cueLineEndX = cueLineStartX - poolCueLength * Math.cos(angle);
-//     let cueLineEndY = cueLineStartY - poolCueLength * Math.sin(angle);
-
-//     // Calculate new coordinates for aim line
-//     let aimLineStartX = cueBallX + offsetX;
-//     let aimLineStartY = cueBallY + offsetY;
-//     let aimLineEndX = aimLineStartX + aimLineLength * Math.cos(angle);
-//     let aimLineEndY = aimLineStartY + aimLineLength * Math.sin(angle);
-
-//     // Update the cue line's position
-//     $("#pool_cue")
-//         .attr("x1", cueLineStartX)
-//         .attr("y1", cueLineStartY)
-//         .attr("x2", cueLineEndX)
-//         .attr("y2", cueLineEndY);
-
-//     // Update the aim line's position
-//     $("#aim_line")
-//         .attr("x1", aimLineStartX)
-//         .attr("y1", aimLineStartY)
-//         .attr("x2", aimLineEndX)
-//         .attr("y2", aimLineEndY);
-
-//     checkLinePath();
-// }
-
 function rotatePoolCue(angle) {
     let cueBall = $("#cue_ball");
     let cueBallX = parseFloat(cueBall.attr("cx"));
@@ -309,17 +264,15 @@ function calculateAngle(x1, y1, x2, y2) {
 }
 
 function getCueAngle() {
-    const cue = $(".cue_line");
+    const cue = $("#pool_cue");
 
-    const transform = cue.attr("transform");
-    if (transform) {
-        const match = /rotate\(([^)]+)\)/.exec(transform);
-        if (match) {
-            const angle = parseFloat(match[1]);
-            return angle * (Math.PI / 180); // Convert degrees to radians
-        }
-    }
-    return 0;
+    const x1 = parseFloat(cue.attr("x1"));
+    const y1 = parseFloat(cue.attr("y1"));
+    const x2 = parseFloat(cue.attr("x2"));
+    const y2 = parseFloat(cue.attr("y2"));
+
+    const angle = calculateAngle(x1, y1, x2, y2);
+    return angle;
 }
 
 function setupEventListeners() {
@@ -355,7 +308,7 @@ function setupEventListeners() {
             let svgPoint = getSVGCoordinates(svg, e);
             let mouseX = svgPoint.x;
             let mouseY = svgPoint.y;
-
+            
             const currentMouseAngle = calculateAngle(
                 parseFloat(cueBall.attr("cx")),
                 parseFloat(cueBall.attr("cy")),
