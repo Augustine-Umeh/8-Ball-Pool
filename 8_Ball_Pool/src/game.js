@@ -24,7 +24,7 @@ $(document).ready(function () {
                 return;
             }
 
-            setupEventListeners(tableSVG); // Call a function to setup event listeners
+            setupEventListeners(); // Call a function to setup event listeners
             displayCueLine();
         },
         error: function () {
@@ -34,9 +34,6 @@ $(document).ready(function () {
 });
 
 // Global Variables
-
-let isDragging = false;
-
 function displayCueLine() {
     let cueBall = $("#cue_ball");
 
@@ -76,7 +73,6 @@ function displayCueLine() {
 
     // Create a new SVG aimline element
     let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    // checkLinePath()
     aim_line.setAttribute("class", "cue_line");
     aim_line.setAttribute("id", "aim_line");
     aim_line.setAttribute("x1", cueBallX);
@@ -85,51 +81,107 @@ function displayCueLine() {
     aim_line.setAttribute("y2", aimLineY - aimLineLength); // Keep y2 the same as y1 initially
     aim_line.setAttribute("length", aimLineLength);
     aim_line.setAttribute("stroke", "grey");
-    aim_line.setAttribute("stroke-width", "10");
+    aim_line.setAttribute("stroke-width", "5");
     aim_line.setAttribute("visibility", "visible");
 
     // Append the line to the SVG container
     svg.appendChild(cue_line);
     svg.appendChild(aim_line);
+
+    checkLinePath(aimLineY - aimLineLength, aimLineLength, cueBallX, cueBallY)
 }
 
-function rotatePoolCue(angle) {
+// function rotatePoolCue(angle) {
 
+//     let cueBall = $("#cue_ball");
+//     let cueBallX = parseFloat(cueBall.attr("cx"));
+//     let cueBallY = parseFloat(cueBall.attr("cy"));
+
+//     let offset = 56;
+
+//     // Lengths of the cue line and aim line
+//     let poolCueLength = 500;
+//     let aimLineLength = 2200;
+
+//     // Calculate the offset coordinates
+//     let offsetX = offset * Math.cos(angle);
+//     let offsetY = offset * Math.sin(angle);
+
+//     // Calculate new coordinates for cue line
+//     let cueLineStartX = cueBallX - offsetX;
+//     let cueLineStartY = cueBallY - offsetY;
+//     let cueLineEndX = cueLineStartX - poolCueLength * Math.cos(angle);
+//     let cueLineEndY = cueLineStartY - poolCueLength * Math.sin(angle);
+
+//     // Calculate new coordinates for aim line
+//     let aimLineStartX = cueBallX + offsetX;
+//     let aimLineStartY = cueBallY + offsetY;
+//     let aimLineEndX = aimLineStartX + aimLineLength * Math.cos(angle);
+//     let aimLineEndY = aimLineStartY + aimLineLength * Math.sin(angle);
+
+//     // Update the cue line's position
+//     $("#pool_cue")
+//         .attr("x1", cueLineStartX)
+//         .attr("y1", cueLineStartY)
+//         .attr("x2", cueLineEndX)
+//         .attr("y2", cueLineEndY);
+
+//     // Update the aim line's position
+//     $("#aim_line")
+//         .attr("x1", aimLineStartX)
+//         .attr("y1", aimLineStartY)
+//         .attr("x2", aimLineEndX)
+//         .attr("y2", aimLineEndY);
+
+//     checkLinePath();
+// }
+
+function rotatePoolCue(angle) {
     let cueBall = $("#cue_ball");
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
+
+    let offset = 56;
 
     // Lengths of the cue line and aim line
     let poolCueLength = 500;
     let aimLineLength = 2200;
 
+    // Calculate the offset coordinates
+    let offsetX = offset * Math.cos(angle);
+    let offsetY = offset * Math.sin(angle);
+
     // Calculate new coordinates for cue line
-    let cueLineEndX = cueBallX * Math.cos(angle);
-    let cueLineEndY = cueBallY * Math.sin(angle);
+    let cueLineStartX = cueBallX - offsetX;
+    let cueLineStartY = cueBallY - offsetY;
+    let cueLineEndX = cueLineStartX - poolCueLength * Math.cos(angle);
+    let cueLineEndY = cueLineStartY - poolCueLength * Math.sin(angle);
 
     // Calculate new coordinates for aim line
-    let aimLineEndX = cueBallX * Math.cos(angle);
-    let aimLineEndY = cueBallY * Math.sin(angle);
+    let aimLineStartX = cueBallX + offsetX;
+    let aimLineStartY = cueBallY + offsetY;
+    let aimLineEndX = aimLineStartX + aimLineLength * Math.cos(angle);
+    let aimLineEndY = aimLineStartY + aimLineLength * Math.sin(angle);
 
     // Update the cue line's position
     $("#pool_cue")
-        .attr("x1", cueBallX)
-        .attr("y1", cueBallY)
+        .attr("x1", cueLineStartX)
+        .attr("y1", cueLineStartY)
         .attr("x2", cueLineEndX)
-        .attr("y2", cueLineEndY + poolCueLength);
+        .attr("y2", cueLineEndY);
 
-    // Update the aim line's position
     $("#aim_line")
-        .attr("x1", cueBallX)
-        .attr("y1", cueBallY)
+        .attr("x1", aimLineStartX)
+        .attr("y1", aimLineStartY)
         .attr("x2", aimLineEndX)
-        .attr("y2", aimLineEndY - aimLineLength);
+        .attr("y2", aimLineEndY);
 
-    checkLinePath();
+
+    checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY);
+    
 }
 
-
-function checkLinePath() {
+function checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY) {
     const balls = $(".ball");
     const aimLine = $("#aim_line");
 
@@ -138,6 +190,9 @@ function checkLinePath() {
     let x2 = parseFloat(aimLine.attr("x2"));
     let y2 = parseFloat(aimLine.attr("y2"));
 
+    let closestIntersection = null;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
     balls.each(function () {
         let ball = $(this);
         let ballX = parseFloat(ball.attr("cx"));
@@ -145,9 +200,29 @@ function checkLinePath() {
         let ballRadius = parseFloat(ball.attr("r"));
 
         if (lineIntersectsCircle(x1, y1, x2, y2, ballX, ballY, ballRadius)) {
-            console.log(`Ball at (${ballX}, ${ballY}) intersects with the aim line.`);
+            // Calculate intersection point
+            let intersectionPoint = calculateIntersectionPoint(x1, y1, x2, y2, ballX, ballY, ballRadius);
+                
+            // Calculate distance from cue ball
+            let distance = Math.sqrt((cueBallX - intersectionPoint.x) ** 2 + (cueBallY - intersectionPoint.y) ** 2);
+
+            // Update closest intersection if this one is closer
+            if (distance < closestDistance) {
+                closestIntersection = intersectionPoint;
+                closestDistance = distance;
+            }
         }
     });
+
+    // If intersection found, adjust aim line to closest intersection point
+    if (closestIntersection) {
+        aimLine.attr("x2", closestIntersection.x);
+        aimLine.attr("y2", closestIntersection.y);
+    } else {
+        // If no intersection found, reset aim line to normal length
+        aimLine.attr("x2", aimLineEndX);
+        aimLine.attr("y2", aimLineEndY);
+    }
 }
 
 function lineIntersectsCircle(x1, y1, x2, y2, cx, cy, r) {
@@ -178,6 +253,57 @@ function lineIntersectsCircle(x1, y1, x2, y2, cx, cy, r) {
     return false;
 }
 
+function calculateIntersectionPoint(x1, y1, x2, y2, cx, cy, r) {
+    // Vector from (x1, y1) to (x2, y2)
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+
+    // Vector from (x1, y1) to the circle center (cx, cy)
+    let fx = x1 - cx;
+    let fy = y1 - cy;
+
+    let a = dx * dx + dy * dy;
+    let b = 2 * (fx * dx + fy * dy);
+    let c = (fx * fx + fy * fy) - r * r;
+
+    let discriminant = b * b - 4 * a * c;
+
+    if (discriminant >= 0) {
+        discriminant = Math.sqrt(discriminant);
+
+        // Calculate intersection points
+        let t1 = (-b - discriminant) / (2 * a);
+        let t2 = (-b + discriminant) / (2 * a);
+
+        // Use the parameter t to find intersection coordinates
+        let intersection1 = {
+            x: x1 + t1 * dx,
+            y: y1 + t1 * dy
+        };
+
+        let intersection2 = {
+            x: x1 + t2 * dx,
+            y: y1 + t2 * dy
+        };
+
+        // Return the closest intersection point to (x1, y1)
+        if (t1 >= 0 && t1 <= 1) {
+            return intersection1;
+        } else if (t2 >= 0 && t2 <= 1) {
+            return intersection2;
+        } else {
+            // This case should not normally happen if there is an intersection
+            return intersection1; // Fallback to intersection1
+        }
+    }
+
+    // No intersection found (should not normally happen in this context)
+    return {
+        x: x2,
+        y: y2
+    };
+}
+
 function calculateAngle(x1, y1, x2, y2) {
     return Math.atan2(y2 - y1, x2 - x1);
 }
@@ -196,10 +322,10 @@ function getCueAngle() {
     return 0;
 }
 
-function setupEventListeners(tableSVG) {
+function setupEventListeners() {
     let isDragging = false;
-    let initialMouseAngle;
-    let initialCueAngle;
+    let initialMouseAngle = 0;
+    let initialCueAngle = 0;
 
     let cueBall = $("#cue_ball");
 
@@ -210,8 +336,16 @@ function setupEventListeners(tableSVG) {
         let mouseY = svgPoint.y;
 
         isDragging = true;
-        initialMouseAngle = calculateAngle(parseFloat(cueBall.attr("cx")), parseFloat(cueBall.attr("cy")), mouseX, mouseY);
+        initialMouseAngle = calculateAngle(
+            parseFloat(cueBall.attr("cx")), 
+            parseFloat(cueBall.attr("cy")), 
+            mouseX, 
+            mouseY
+        );
+
         initialCueAngle = getCueAngle();
+
+        e.preventDefault();
     });
 
     $("#svg-container svg").on("mousemove", function (e) {
@@ -221,11 +355,6 @@ function setupEventListeners(tableSVG) {
             let svgPoint = getSVGCoordinates(svg, e);
             let mouseX = svgPoint.x;
             let mouseY = svgPoint.y;
-
-            // console.log("Mouse Move Coordinates:", mouseX, mouseY); // Debugging log
-
-            // const dx = mouseX - cueBallX;
-            // const dy = mouseY - cueBallY;
 
             const currentMouseAngle = calculateAngle(
                 parseFloat(cueBall.attr("cx")),
