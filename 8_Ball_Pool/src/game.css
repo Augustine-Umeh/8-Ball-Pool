@@ -1,5 +1,5 @@
 #svg-container {
-    width: 80vw;
+    width: 75vw;
     height: 112vh;
     position: relative;
     margin: auto;
@@ -17,11 +17,11 @@ svg {
     transform: rotate(-90deg);
 }
 
-.parent {
+.parent-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1.1fr 0.34fr;
     grid-template-rows: 1fr;
-    grid-column-gap: 0px;
+    grid-column-gap: 2px;
     grid-row-gap: 0px;
 }
 
