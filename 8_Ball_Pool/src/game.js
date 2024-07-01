@@ -26,6 +26,7 @@ $(document).ready(function () {
 
             setupEventListeners(); // Call a function to setup event listeners
             createCueAndAimLine();
+            displayPoolCuePowerShot();
         },
         error: function () {
             console.error("Error initializing game");
@@ -33,7 +34,9 @@ $(document).ready(function () {
     });
 });
 
-function PoolCuePowerShot() {
+function displayPoolCuePowerShot() {
+    let div2 = $(".div2")
+
     
 }
 

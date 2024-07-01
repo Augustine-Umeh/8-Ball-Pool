@@ -9,7 +9,12 @@
     align-items: center;
 }
 
-svg {
+.container {
+    display: flex;
+    align-items: center;
+}
+
+#table {
     width: 46%;
     height: auto;
     display: block;
@@ -23,6 +28,7 @@ svg {
     grid-template-rows: 1fr;
     grid-column-gap: 2px;
     grid-row-gap: 0px;
+    align-items: center;
 }
 
 .div1 {
