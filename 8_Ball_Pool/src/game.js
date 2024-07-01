@@ -25,7 +25,7 @@ $(document).ready(function () {
             }
 
             setupEventListeners(); // Call a function to setup event listeners
-            displayCueLine();
+            createCueAndAimLine();
         },
         error: function () {
             console.error("Error initializing game");
@@ -35,11 +35,9 @@ $(document).ready(function () {
 
 function PoolCuePowerShot() {
     
-    let PowerShot = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    svg
 }
 
-function displayCueLine() {
+function createCueAndAimLine() {
     let cueBall = $("#cue_ball");
 
     let cueBallX = parseFloat(cueBall.attr("cx"));
@@ -50,50 +48,54 @@ function displayCueLine() {
     // Check if the cue ball is above the center of the table
     if (cueBallY < 1375) {
         aimLineY = cueBallY + 56; // Move cue line above the cue ball
-        cueLineY = cueBallY - 56; // Move cue line below the cue ball
+        cueLineY = cueBallY - 56;
 
     } else {
         aimLineY = cueBallY - 56; // Move cue line below the cue ball
-        cueLineY = cueBallY + 56; // Move cue line above the cue ball
+        cueLineY = cueBallY + 56;
     }
 
-    // Length of the cue line
-    let cueLineLength = 1500;
+    let poolCueLength = 1500;
     let aimLineLength = 2200;
 
     // Select the SVG container where you want to append the line
     let svg = $("#svg-container svg")[0];
 
-    // Create a new SVG cueline element
-    let cue_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    cue_line.setAttribute("id", "pool_cue");
-    cue_line.setAttribute("class", "cue_line");
-    cue_line.setAttribute("x1", cueBallX);
-    cue_line.setAttribute("y1", cueLineY);
-    cue_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
-    cue_line.setAttribute("y2", cueLineY + cueLineLength); // Keep y2 the same as y1 initially
-    cue_line.setAttribute("stroke", "black");
-    cue_line.setAttribute("stroke-width", "25");
-    cue_line.setAttribute("visibility", "visible");
+    let pool_cue = poolcueCreation(cueBallX, cueBallX, cueLineY, cueLineY + poolCueLength);
 
     // Create a new SVG aimline element
     let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    aim_line.setAttribute("class", "cue_line");
     aim_line.setAttribute("id", "aim_line");
+    aim_line.setAttribute("class", "cue_line");
     aim_line.setAttribute("x1", cueBallX);
     aim_line.setAttribute("y1", aimLineY);
     aim_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
     aim_line.setAttribute("y2", aimLineY - aimLineLength); // Keep y2 the same as y1 initially
     aim_line.setAttribute("length", aimLineLength);
     aim_line.setAttribute("stroke", "grey");
-    aim_line.setAttribute("stroke-width", "5");
+    aim_line.setAttribute("stroke-width", "4");
     aim_line.setAttribute("visibility", "visible");
 
     // Append the line to the SVG container
-    svg.appendChild(cue_line);
+    svg.appendChild(pool_cue);
     svg.appendChild(aim_line);
 
     checkLinePath(aimLineY - aimLineLength, aimLineLength, cueBallX, cueBallY)
+}
+
+function poolcueCreation(x1, x2, y1, y2) {
+    let pool_cue = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    pool_cue.setAttribute("id", "pool_cue");
+    pool_cue.setAttribute("class", "cue_line");
+    pool_cue.setAttribute("x1", x1);
+    pool_cue.setAttribute("y1", y1);
+    pool_cue.setAttribute("x2", x2); // Set x2 based on desired length from cue ball position
+    pool_cue.setAttribute("y2", y2); // Keep y2 the same as y1 initially
+    pool_cue.setAttribute("stroke", "black");
+    pool_cue.setAttribute("stroke-width", "25");
+    pool_cue.setAttribute("visibility", "visible");
+
+    return pool_cue;
 }
 
 function rotatePoolCue(angle) {
@@ -138,7 +140,7 @@ function rotatePoolCue(angle) {
 
 
     checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY);
-    
+
 }
 
 function checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY) {
@@ -162,7 +164,7 @@ function checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY) {
         if (lineIntersectsCircle(x1, y1, x2, y2, ballX, ballY, ballRadius)) {
             // Calculate intersection point
             let intersectionPoint = calculateIntersectionPoint(x1, y1, x2, y2, ballX, ballY, ballRadius);
-                
+
             // Calculate distance from cue ball
             let distance = Math.sqrt((cueBallX - intersectionPoint.x) ** 2 + (cueBallY - intersectionPoint.y) ** 2);
 
@@ -294,9 +296,9 @@ function setupEventListeners() {
         isDragging = true;
         let cueBall = $("#cue_ball");
         initialMouseAngle = calculateAngle(
-            parseFloat(cueBall.attr("cx")), 
-            parseFloat(cueBall.attr("cy")), 
-            mouseX, 
+            parseFloat(cueBall.attr("cx")),
+            parseFloat(cueBall.attr("cy")),
+            mouseX,
             mouseY
         );
 
@@ -312,7 +314,7 @@ function setupEventListeners() {
             let svgPoint = getSVGCoordinates(svg, e);
             let mouseX = svgPoint.x;
             let mouseY = svgPoint.y;
-            
+
             let cueBall = $("#cue_ball");
             const currentMouseAngle = calculateAngle(
                 parseFloat(cueBall.attr("cx")),
@@ -320,7 +322,7 @@ function setupEventListeners() {
                 mouseX,
                 mouseY
             );
-            
+
             const angle = initialCueAngle + (currentMouseAngle - initialMouseAngle);
             console.log(angle);
             rotatePoolCue(angle);
@@ -437,7 +439,7 @@ function setupEventListeners() {
     //                 console.log("Received SVG data: ");
 
     //                 displayNextSVG(svgArray); // Call the function to display SVGs one by one
-    //                 displayCueLine();
+    //                 createCueAndAimLine();
     //             },
     //             error: function (xhr, status, error) {
     //                 console.error("Error sending data:", error);
@@ -466,3 +468,37 @@ function setupEventListeners() {
         }
     }
 }
+
+/**
+ * code for later
+ * 
+ * function createPoolCueGradient(svg) {
+    let gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+    gradient.setAttribute("id", "poolCueGradient");
+    gradient.setAttribute("x1", "0%");
+    gradient.setAttribute("y1", "0%");
+    gradient.setAttribute("x2", "100%");
+    gradient.setAttribute("y2", "0%");
+
+    // Define the gradient colors
+    let stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop1.setAttribute("offset", "0%");
+    stop1.setAttribute("style", "stop-color:brown;stop-opacity:1");
+    gradient.appendChild(stop1);
+
+    let stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop2.setAttribute("offset", "80%");
+    stop2.setAttribute("style", "stop-color:lightbrown;stop-opacity:1");
+    gradient.appendChild(stop2);
+
+    let stop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop3.setAttribute("offset", "100%");
+    stop3.setAttribute("style", "stop-color:darkbrown;stop-opacity:1");
+    gradient.appendChild(stop3);
+
+    // Append the gradient to the SVG's defs section
+    let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.appendChild(gradient);
+    svg.appendChild(defs);
+}
+ */

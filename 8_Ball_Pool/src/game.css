@@ -1,15 +1,16 @@
 #svg-container {
-    /* width: 80vw;
-    height: 80vh;
+    width: 80vw;
+    height: 112vh;
     position: relative;
-    margin: auto; */
-    /* display: flex;
+    margin: auto;
+    margin-left: 1vw;
+    display: flex;
     justify-content: center;
-    align-items: center; */
+    align-items: center;
 }
 
 svg {
-    width: 50%;
+    width: 46%;
     height: auto;
     display: block;
     margin: 0 auto;
