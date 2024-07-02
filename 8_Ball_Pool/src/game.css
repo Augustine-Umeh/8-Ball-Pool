@@ -1,4 +1,33 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 350px; /* Adjust as needed */
+}
+
 #svg-container {
+    transform: rotate(-90deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.shot-meter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* #svg-container {
     width: 75vw;
     height: 112vh;
     position: relative;
@@ -36,7 +65,7 @@
 }
 .div2 {
     grid-area: 1 / 2 / 2 / 3;
-}
+} */
 /* line {
     stroke: #000;
     stroke-width: 6;

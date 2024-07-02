@@ -13,14 +13,28 @@
             <p>Player 2: <span id="player2Name"></span></p>
             <p><span id="playerTurn"></span>'s Turn</p>
         </div> -->
-        <div class="parent-grid">
-            <div id="svg-container" class="div1">
-            
-            </div>
-            <div class="div2">
+        <div class="container">
+            <div id="svg-container" class="div1"></div>
+            <div class="shot-meter-container">
                 <svg width="75" height="700" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="75" height="700" x="0" y="0" rx="20" ry="20" style="fill:#996633; opacity:60%" />
-                  </svg>
+                    <rect
+                        width="75"
+                        height="700"
+                        x="0"
+                        y="0"
+                        rx="20"
+                        ry="20"
+                        style="fill: #996633; opacity: 60%"
+                    />
+                    <line
+                        id="shot-line"
+                        x1="37.5"
+                        y1="100"
+                        x2="37.5"
+                        y2="600"
+                        style="stroke: black; stroke-width: 6"
+                    />
+                </svg>
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
