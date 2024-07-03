@@ -26,7 +26,7 @@ $(document).ready(function () {
 
             setupEventListeners(); // Call a function to setup event listeners
             createCueAndAimLine();
-            displayPoolCuePowerShot();
+            shotpowerEventListeners();
         },
         error: function () {
             console.error("Error initializing game");
@@ -285,6 +285,70 @@ function getCueAngle() {
     return angle;
 }
 
+function getSVGCoordinates(svg, event) {
+    var pt = svg.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+function shotpowerEventListeners(){
+    let isDragging = false;
+    let initialY = 0;
+
+    let shotLine = document.querySelector("#shot_line");
+    let startY1 = parseFloat(shotLine.getAttribute("y1"));
+    let startY2 = parseFloat(shotLine.getAttribute("y2"));
+
+    $(".shot-meter-container svg").on("mousedown", "#shot_line", function (e) {
+        let svg = document.querySelector(".shot-meter-container svg");
+        let svgPoint = getSVGCoordinates(svg, e);
+
+        initialY = svgPoint.y;
+        isDragging = true;
+
+        e.preventDefault();
+    });
+
+    $(".shot-meter-container svg").on("mousemove", function (e) {
+        if (isDragging) {
+            let svg = document.querySelector(".shot-meter-container svg");
+            let svgPoint = getSVGCoordinates(svg, e);
+            let mouseY = svgPoint.y;
+
+            let deltaY = mouseY - initialY;
+
+            let currentY1 = parseFloat(shotLine.getAttribute("y1"));
+            let currentY2 = parseFloat(shotLine.getAttribute("y2"));
+
+            let newY1 = currentY1 + deltaY;
+            let newY2 = currentY2 + deltaY;
+
+            if (newY1 >= startY1 && newY1 <= startY2) {
+                shotLine.setAttribute("y1", newY1);
+                shotLine.setAttribute("y2", newY2);
+
+                // Update the initialY for continuous dragging
+                initialY = mouseY;
+            }
+        }
+    });
+
+    $(".shot-meter-container svg").on("mouseup", function (e) {
+        isDragging = false;
+
+        shotLine.setAttribute("x1", "37.5");
+        shotLine.setAttribute("y1", "80");
+        shotLine.setAttribute("x2", "37.5");
+        shotLine.setAttribute("y2", "620");
+
+    });
+
+    $(".shot-meter-containersvg").on("mouseleave", function (e) {
+        isDragging = false;
+    });
+}
+
 function setupEventListeners() {
     let isDragging = false;
     let initialMouseAngle = 0;
@@ -450,13 +514,6 @@ function setupEventListeners() {
     //         });
     //     }
     // });
-
-    function getSVGCoordinates(svg, event) {
-        var pt = svg.createSVGPoint();
-        pt.x = event.clientX;
-        pt.y = event.clientY;
-        return pt.matrixTransform(svg.getScreenCTM().inverse());
-    }
 
     function changeTurn() {
         var spanText = $("#playerTurn").text();
