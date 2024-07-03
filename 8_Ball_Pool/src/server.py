@@ -101,17 +101,13 @@ class MyHandler(BaseHTTPRequestHandler):
 
             # Parse the data from JSON
             data = json.loads(post_data.decode('utf-8'))
-            initialPosition = data['initialPosition']
-            svgPoint = data['svgPoint']
-
-            print(f"Dragged from {initialPosition} to {svgPoint}")
-
-            # Calculate the velocity
-            vx, vy = calculate_velocity_components(initialPosition['x'], initialPosition['y'], svgPoint['x'], svgPoint['y'])
+            vectorData = data['vectorData']
+  
+            print(f"Recieved data: {vectorData}")
 
             curTable = db.readTable(db.getLatestTableID())
 
-            curGame.shoot(gameName, p1Name, curTable, vx, vy)
+            curGame.shoot(gameName, p1Name, curTable, vectorData['x'], vectorData['y'])
 
             svg_dict = {}
             curTableID_temp = curTableID  # Use a temporary variable to avoid changing the global curTableID unintentionally

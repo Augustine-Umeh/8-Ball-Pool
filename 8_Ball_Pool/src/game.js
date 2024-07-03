@@ -35,9 +35,7 @@ $(document).ready(function () {
 });
 
 function displayPoolCuePowerShot() {
-    let div2 = $(".div2")
-
-    
+    let div2 = $(".div2");
 }
 
 function createCueAndAimLine() {
@@ -52,7 +50,6 @@ function createCueAndAimLine() {
     if (cueBallY < 1375) {
         aimLineY = cueBallY + 56; // Move cue line above the cue ball
         cueLineY = cueBallY - 56;
-
     } else {
         aimLineY = cueBallY - 56; // Move cue line below the cue ball
         cueLineY = cueBallY + 56;
@@ -64,10 +61,18 @@ function createCueAndAimLine() {
     // Select the SVG container where you want to append the line
     let svg = $("#svg-container svg")[0];
 
-    let pool_cue = poolcueCreation(cueBallX, cueBallX, cueLineY, cueLineY + poolCueLength);
+    let pool_cue = poolcueCreation(
+        cueBallX,
+        cueBallX,
+        cueLineY,
+        cueLineY + poolCueLength
+    );
 
     // Create a new SVG aimline element
-    let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    let aim_line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+    );
     aim_line.setAttribute("id", "aim_line");
     aim_line.setAttribute("class", "cue_line");
     aim_line.setAttribute("x1", cueBallX);
@@ -83,11 +88,14 @@ function createCueAndAimLine() {
     svg.appendChild(pool_cue);
     svg.appendChild(aim_line);
 
-    checkLinePath(aimLineY - aimLineLength, aimLineLength, cueBallX, cueBallY)
+    checkLinePath(aimLineY - aimLineLength, aimLineLength, cueBallX, cueBallY);
 }
 
 function poolcueCreation(x1, x2, y1, y2) {
-    let pool_cue = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    let pool_cue = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+    );
     pool_cue.setAttribute("id", "pool_cue");
     pool_cue.setAttribute("class", "cue_line");
     pool_cue.setAttribute("x1", x1);
@@ -141,9 +149,7 @@ function rotatePoolCue(angle) {
         .attr("x2", aimLineEndX)
         .attr("y2", aimLineEndY);
 
-
     checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY);
-
 }
 
 function checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY) {
@@ -166,10 +172,21 @@ function checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY) {
 
         if (lineIntersectsCircle(x1, y1, x2, y2, ballX, ballY, ballRadius)) {
             // Calculate intersection point
-            let intersectionPoint = calculateIntersectionPoint(x1, y1, x2, y2, ballX, ballY, ballRadius);
+            let intersectionPoint = calculateIntersectionPoint(
+                x1,
+                y1,
+                x2,
+                y2,
+                ballX,
+                ballY,
+                ballRadius
+            );
 
             // Calculate distance from cue ball
-            let distance = Math.sqrt((cueBallX - intersectionPoint.x) ** 2 + (cueBallY - intersectionPoint.y) ** 2);
+            let distance = Math.sqrt(
+                (cueBallX - intersectionPoint.x) ** 2 +
+                    (cueBallY - intersectionPoint.y) ** 2
+            );
 
             // Update closest intersection if this one is closer
             if (distance < closestDistance) {
@@ -201,7 +218,7 @@ function lineIntersectsCircle(x1, y1, x2, y2, cx, cy, r) {
 
     let a = dx * dx + dy * dy;
     let b = 2 * (fx * dx + fy * dy);
-    let c = (fx * fx + fy * fy) - r * r;
+    let c = fx * fx + fy * fy - r * r;
 
     let discriminant = b * b - 4 * a * c;
 
@@ -229,7 +246,7 @@ function calculateIntersectionPoint(x1, y1, x2, y2, cx, cy, r) {
 
     let a = dx * dx + dy * dy;
     let b = 2 * (fx * dx + fy * dy);
-    let c = (fx * fx + fy * fy) - r * r;
+    let c = fx * fx + fy * fy - r * r;
 
     let discriminant = b * b - 4 * a * c;
 
@@ -243,12 +260,12 @@ function calculateIntersectionPoint(x1, y1, x2, y2, cx, cy, r) {
         // Use the parameter t to find intersection coordinates
         let intersection1 = {
             x: x1 + t1 * dx,
-            y: y1 + t1 * dy
+            y: y1 + t1 * dy,
         };
 
         let intersection2 = {
             x: x1 + t2 * dx,
-            y: y1 + t2 * dy
+            y: y1 + t2 * dy,
         };
 
         // Return the closest intersection point to (x1, y1)
@@ -265,7 +282,7 @@ function calculateIntersectionPoint(x1, y1, x2, y2, cx, cy, r) {
     // No intersection found (should not normally happen in this context)
     return {
         x: x2,
-        y: y2
+        y: y2,
     };
 }
 
@@ -292,11 +309,14 @@ function getSVGCoordinates(svg, event) {
     return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
-function shotpowerEventListeners(){
+function shotpowerEventListeners() {
     let isDragging = false;
     let initialY = 0;
-
+    let maxSpeed = 10; // Max speed in mph
+    let maxDragDistance = 540; // Distance in pixels (from 80 to 620)
     let shotLine = document.querySelector("#shot_line");
+    let aimLine = document.querySelector("#aim_line");
+
     let startY1 = parseFloat(shotLine.getAttribute("y1"));
     let startY2 = parseFloat(shotLine.getAttribute("y2"));
 
@@ -337,16 +357,100 @@ function shotpowerEventListeners(){
     $(".shot-meter-container svg").on("mouseup", function (e) {
         isDragging = false;
 
+        // Getting Speed
+        let currentY1 = parseFloat(shotLine.getAttribute("y1"));
+        console.log(`Current Y1: ${currentY1}`);
+        let dragDistance = currentY1 - startY1; // Calculate how much the line was dragged back
+
+        // Convert drag distance to speed (mph)
+        let speed = (dragDistance / maxDragDistance) * maxSpeed;
+
+        //Getting Direction/Angle
+        // Get the direction from the aim_line
+        let x1 = parseFloat(aimLine.getAttribute("x1"));
+        let y1 = parseFloat(aimLine.getAttribute("y1"));
+        let x2 = parseFloat(aimLine.getAttribute("x2"));
+        let y2 = parseFloat(aimLine.getAttribute("y2"));
+
+        // Calculate the direction vector
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+        let magnitude = Math.sqrt(dx * dx + dy * dy);
+
+        // Normalize the direction vector
+        let directionX = dx / magnitude;
+        let directionY = dy / magnitude;
+
+        // Calculate velocity components
+        let vx = directionX * speed;
+        let vy = directionY * speed;
+
+        console.log(`Shot speed: ${speed.toFixed(2)} mph`);
+        console.log(
+            `Shot direction: (${directionX.toFixed(2)}, ${directionY.toFixed(
+                2
+            )})`
+        );
+        console.log(
+            `Velocity vector: (vx: ${vx.toFixed(2)}, vy: ${vy.toFixed(2)})`
+        );
+
+        // Send the shot data to the server
+
+        // Prepare the data
+        const dataToSend = {
+            vectorData: {
+                x: vx,
+                y: vy,
+            },
+        };
+
+        // Send the data using AJAX
+        $.ajax({
+            type: "POST",
+            url: "/processDrag", // This URL should match your server endpoint
+            contentType: "application/json",
+            data: JSON.stringify(dataToSend),
+            success: function (response) {
+                // Assuming the response is already parsed into an object
+                let svgData = response.svgData; // Get the SVG data from the response
+                let svgArray = Object.values(svgData); // Convert SVG data object to an array
+
+                console.log("Received SVG data: ");
+
+                displayNextSVG(svgArray); // Call the function to display SVGs one by one
+                createCueAndAimLine();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error sending data:", error);
+            },
+        });
+
+        // Reset the line position
         shotLine.setAttribute("x1", "37.5");
         shotLine.setAttribute("y1", "80");
         shotLine.setAttribute("x2", "37.5");
         shotLine.setAttribute("y2", "620");
-
     });
 
-    $(".shot-meter-containersvg").on("mouseleave", function (e) {
+    $(".shot-meter-container svg").on("mouseleave", function (e) {
         isDragging = false;
     });
+}
+
+function displayNextSVG(svgArray) {
+    let currentIndex = 0; // Start from the first SVG
+    console.log("Received SVG data: ", svgArray[currentIndex]);
+
+    function updateSVG() {
+        if (currentIndex < svgArray.length) {
+            $("#svg-container").html(svgArray[currentIndex]); // Update the SVG container
+            currentIndex++; // Move to the next SVG
+            setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
+        }
+    }
+
+    updateSVG(); // Start the SVG update loop
 }
 
 function setupEventListeners() {
@@ -376,7 +480,6 @@ function setupEventListeners() {
 
     $("#svg-container svg").on("mousemove", function (e) {
         if (isDragging) {
-
             let svg = document.querySelector("#svg-container svg");
             let svgPoint = getSVGCoordinates(svg, e);
             let mouseX = svgPoint.x;
@@ -390,8 +493,8 @@ function setupEventListeners() {
                 mouseY
             );
 
-            const angle = initialCueAngle + (currentMouseAngle - initialMouseAngle);
-            console.log(angle);
+            const angle =
+                initialCueAngle + (currentMouseAngle - initialMouseAngle);
             rotatePoolCue(angle);
         }
     });
@@ -453,21 +556,6 @@ function setupEventListeners() {
     //         y2: svgPoint.y,
     //     });
     // });
-
-    function displayNextSVG(svgArray) {
-        let currentIndex = 0; // Start from the first SVG
-        console.log("Received SVG data: ", svgArray[currentIndex]);
-
-        function updateSVG() {
-            if (currentIndex < svgArray.length) {
-                $("#svg-container").html(svgArray[currentIndex]); // Update the SVG container
-                currentIndex++; // Move to the next SVG
-                setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
-            }
-        }
-
-        updateSVG(); // Start the SVG update loop
-    }
 
     // $(document).on("mouseup", function (e) {
     //     if (isDragging) {
