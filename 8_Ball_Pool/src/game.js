@@ -34,10 +34,6 @@ $(document).ready(function () {
     });
 });
 
-function displayPoolCuePowerShot() {
-    let div2 = $(".div2");
-}
-
 function createCueAndAimLine() {
     let cueBall = $("#cue_ball");
 
@@ -414,9 +410,8 @@ function shotpowerEventListeners() {
             success: function (response) {
                 // Assuming the response is already parsed into an object
                 let svgData = response.svgData; // Get the SVG data from the response
+                console.log("svgData: ", svgData);
                 let svgArray = Object.values(svgData); // Convert SVG data object to an array
-
-                console.log("Received SVG data: ");
 
                 displayNextSVG(svgArray); // Call the function to display SVGs one by one
                 createCueAndAimLine();
