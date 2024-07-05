@@ -35,7 +35,32 @@ $(document).ready(function () {
 });
 
 function createCueAndAimLine() {
-    let cueBall = $("#cue_ball");
+    let cueBall;
+
+    try {
+        cueBall = $("#cue_ball");
+    
+        // Check if the cue ball is not found
+        if (cueBall.length === 0) {
+            throw new Error("Cue ball not found");
+        }
+    } catch {
+        // If cue ball is not found, create and append it to the SVG container
+        let svg = $("#svg-container svg")[0];
+    
+        // Create a new cue ball element
+        cueBall = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        cueBall.setAttribute("id", "cue_ball");
+        cueBall.setAttribute("cx", "675");
+        cueBall.setAttribute("cy", "2025");
+        cueBall.setAttribute("r", "25"); // Assuming a radius of 25 for the cue ball
+        cueBall.setAttribute("fill", "white");
+    
+        // Append the cue ball to the SVG container
+        svg.appendChild(cueBall);
+
+        cueBall = $("#cue_ball");
+    }
 
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
@@ -308,7 +333,7 @@ function getSVGCoordinates(svg, event) {
 function shotpowerEventListeners() {
     let isDragging = false;
     let initialY = 0;
-    let maxSpeed = 10; // Max speed in mph
+    let maxSpeed = 10000;
     let maxDragDistance = 540; // Distance in pixels (from 80 to 620)
     let shotLine = document.querySelector("#shot_line");
     let aimLine = document.querySelector("#aim_line");
@@ -381,7 +406,7 @@ function shotpowerEventListeners() {
         let vx = directionX * speed;
         let vy = directionY * speed;
 
-        console.log(`Shot speed: ${speed.toFixed(2)} mph`);
+        console.log(`Shot speed: ${speed.toFixed(2)} ms`);
         console.log(
             `Shot direction: (${directionX.toFixed(2)}, ${directionY.toFixed(
                 2
@@ -396,8 +421,8 @@ function shotpowerEventListeners() {
         // Prepare the data
         const dataToSend = {
             vectorData: {
-                x: vx,
-                y: vy,
+                'vx': vx,
+                'vy': vy,
             },
         };
 
@@ -408,18 +433,28 @@ function shotpowerEventListeners() {
             contentType: "application/json",
             data: JSON.stringify(dataToSend),
             success: function (response) {
-                // Assuming the response is already parsed into an object
                 let svgData = response.svgData; // Get the SVG data from the response
-                console.log("svgData: ", svgData);
+                console.log("svgData: ", Object.keys(svgData).length);
                 let svgArray = Object.values(svgData); // Convert SVG data object to an array
-
-                displayNextSVG(svgArray); // Call the function to display SVGs one by one
-                createCueAndAimLine();
+        
+                // Use promise chaining to ensure order
+                displayNextSVG(svgArray)
+                    .then(() => {
+                        setupEventListeners();
+                        createCueAndAimLine();
+                        shotpowerEventListeners();
+                    })
+                    .catch((error) => {
+                        console.error("Error displaying SVGs:", error);
+                    });
             },
             error: function (xhr, status, error) {
                 console.error("Error sending data:", error);
+                console.error("Status:", status);
+                console.error("Response Text:", xhr.responseText);
             },
         });
+        
 
         // Reset the line position
         shotLine.setAttribute("x1", "37.5");
@@ -434,19 +469,34 @@ function shotpowerEventListeners() {
 }
 
 function displayNextSVG(svgArray) {
-    let currentIndex = 0; // Start from the first SVG
-    console.log("Received SVG data: ", svgArray[currentIndex]);
 
-    function updateSVG() {
-        if (currentIndex < svgArray.length) {
-            $("#svg-container").html(svgArray[currentIndex]); // Update the SVG container
-            currentIndex++; // Move to the next SVG
-            setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
+    return new Promise((resolve, reject) => {
+
+        let currentIndex = 0; // Start from the first SVG
+        console.log("Received SVG data: ", svgArray);
+
+        function updateSVG() {
+
+            if (currentIndex < svgArray.length) {
+                if ($("#svg-container").length) {
+                    $("#svg-container").html(svgArray[currentIndex]); // Update the SVG container
+                    console.log(`Displaying SVG : ${currentIndex + 1}`);
+                } else {
+                    console.error("#svg-container not found");
+                    reject(new Error("#svg-container not found"));
+                    return;
+                }
+                currentIndex++; // Move to the next SVG
+                setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
+            } else {
+                console.log("Finished displaying all SVGs.");
+                resolve(); // Resolve the promise when done
+            }
         }
-    }
-
-    updateSVG(); // Start the SVG update loop
+        updateSVG(); // Start the SVG update loop
+    });
 }
+
 
 function setupEventListeners() {
     let isDragging = false;

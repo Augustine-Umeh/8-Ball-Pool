@@ -1,7 +1,10 @@
 import Physics;
 
+# def write_svg( table_id, table ):
+#     with open( "table%4.2f.svg" % table.time, "w" ) as fp:
+#         fp.write( table.svg() );
 def write_svg( table_id, table ):
-    with open( "table%4.2f.svg" % table.time, "w" ) as fp:
+    with open( "table%02d.svg" % table_id, "w" ) as fp:
         fp.write( table.svg() );
 
 db = Physics.Database();
@@ -21,10 +24,14 @@ print( len(tableIDs) );
 # and moves about 10mm upwards each 0.01s while gradually slowing down
 for i in range( 10 ):
     print( i, db.readTable( i ) );
+    # table = db.readTable( i )
+    # write_svg( i, table )
 
 # this should print 10 frames of the shot as the cue ball hits the racked balls
 for i in range( 143, 153 ):
     print( i, db.readTable( i ) );
+    # table = db.readTable( i )
+    # write_svg( i, table )
 
 cur.close();
 db.conn.commit();

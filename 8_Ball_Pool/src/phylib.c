@@ -277,7 +277,7 @@ double phylib_distance(phylib_object *obj1, phylib_object *obj2)
 
     case PHYLIB_VCUSHION: // Ball and v-cushion minus ball radius
         return fabs(center_obj1.x - obj2->obj.vcushion.x) - PHYLIB_BALL_RADIUS;
-
+        // -4 - 1350 = 1354 - 28.5 = 
     default: // Invalid obj2 type
         return -1.0;
     }

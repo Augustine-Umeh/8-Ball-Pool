@@ -539,6 +539,7 @@ class Database():
         cursor.close()
         self.conn.commit()
         return new_table
+    
     def writeTable(self, table):
         # Step 1: Insert the time into TTable and get the new TABLEID
         self.conn.execute("INSERT INTO TTable (TIME) VALUES (?)", (table.time,))

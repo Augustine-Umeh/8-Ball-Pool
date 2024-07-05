@@ -107,8 +107,8 @@ class MyHandler(BaseHTTPRequestHandler):
 
             curTable = db.readTable(db.getLatestTableID())
 
-            curGame.shoot(gameName, p1Name, curTable, vectorData['x'], vectorData['y'])
-
+            curGame.shoot(gameName, p1Name, curTable, vectorData['vx'], vectorData['vy'])
+            print(vectorData['vx'], vectorData['vy'])
             svg_dict = {}
             curTableID_temp = curTableID  # Use a temporary variable to avoid changing the global curTableID unintentionally
 
@@ -122,14 +122,18 @@ class MyHandler(BaseHTTPRequestHandler):
                 
                 svg_dict[curTableID_temp] = tempTable.custom_svg(tempTable)
                 curTableID_temp += 1
-            
+            print("\n", len(svg_dict), "\n")
             curTableID = curTableID_temp  # Update the global curTableID
 
             # Send a response back to the client
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            response = {'status': 'Success', 'message': 'Data processed successfully', 'svgData': svg_dict}
+            response = {
+                'status': 'Success',
+                'message': 'Data processed successfully',
+                'svgData': svg_dict
+            }
             self.wfile.write(json.dumps(response).encode('utf-8'))
         else:
             # Handle other POST paths or send an error

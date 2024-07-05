@@ -4,7 +4,7 @@ import random;
 import Physics;
 
 def nudge():
-    return random.uniform( 0,0 );
+    return random.uniform( -1.5, 1.5 );
 
 table = Physics.Table();
 
@@ -40,7 +40,7 @@ sb = Physics.StillBall( 3, pos );
 table += sb;
 
 # cue ball also still
-pos = Physics.Coordinate( Physics.TABLE_WIDTH/2.0 + 2,
+pos = Physics.Coordinate( Physics.TABLE_WIDTH/2.0 + random.uniform( -3.0, 3.0 ),
                           Physics.TABLE_LENGTH - Physics.TABLE_WIDTH/2.0 );
 sb  = Physics.StillBall( 0, pos );
 
@@ -48,6 +48,5 @@ table += sb;
 
 
 game = Physics.Game( gameName="Game 01", player1Name="Stefan", player2Name="Efren Reyes" );
-print("calling shoot")
+
 game.shoot( "Game 01", "Stefan", table, 0.0, -1000.0 );
-print("called shoot")

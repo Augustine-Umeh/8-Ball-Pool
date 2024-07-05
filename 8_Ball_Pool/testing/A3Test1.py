@@ -1,21 +1,23 @@
 import math;
 import random;
-
-import Physics;
+import Physics
 
 def nudge():
     return random.uniform( -1.5, 1.5 );
 
 table = Physics.Table();
-
+# print(table)
 # 1 ball
 pos = Physics.Coordinate( 
                 Physics.TABLE_WIDTH / 2.0,
                 Physics.TABLE_WIDTH / 2.0,
                 );
 
+
 sb = Physics.StillBall( 1, pos );
+svg = Physics.StillBall( 1, pos ).svg()
 table += sb;
+# print(table)
 
 # 2 ball
 pos = Physics.Coordinate(
@@ -25,8 +27,11 @@ pos = Physics.Coordinate(
                 math.sqrt(3.0)/2.0*(Physics.BALL_DIAMETER+4.0) +
                 nudge()
                 );
+
 sb = Physics.StillBall( 2, pos );
+
 table += sb;
+
 
 # 3 ball
 pos = Physics.Coordinate(
@@ -47,6 +52,7 @@ acc = Physics.Coordinate( 0.0, 150.0 );
 rb  = Physics.RollingBall( 0, pos, vel, acc );
 
 table += rb;
+# print(table)
 
 
 db = Physics.Database( reset=True );
@@ -59,5 +65,6 @@ while table:
     print( "w" );
     db.writeTable( table );
     table = table.segment();
+    
 
 db.close();

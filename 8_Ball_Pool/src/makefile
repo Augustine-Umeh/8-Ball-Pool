@@ -24,4 +24,4 @@ _phylib.so: phylib_wrap.o
 a3: libphylib.so _phylib.so 
 
 clean:
-	rm -f *.o *.so a3 phylib_wrap.c phylib.py *.so *.o
+	rm -f *.o *.so a3 phylib_wrap.c phylib.py *.so *.o *.svg *.db
