@@ -23,9 +23,9 @@ $(document).ready(function () {
                 console.error("SVG Element not found!");
                 return;
             }
-
-            setupEventListeners(); // Call a function to setup event listeners
+            
             createCueAndAimLine();
+            setupEventListeners(); 
             shotpowerEventListeners();
         },
         error: function () {
@@ -67,17 +67,11 @@ function createCueAndAimLine() {
     let aimLineY = 0;
     let cueLineY = 0;
 
-    // Check if the cue ball is above the center of the table
-    if (cueBallY < 1375) {
-        aimLineY = cueBallY + 56; // Move cue line above the cue ball
-        cueLineY = cueBallY - 56;
-    } else {
-        aimLineY = cueBallY - 56; // Move cue line below the cue ball
-        cueLineY = cueBallY + 56;
-    }
-
     let poolCueLength = 1500;
     let aimLineLength = 2200;
+
+    aimLineY = cueBallY - 56;
+    cueLineY = cueBallY + 56;
 
     // Select the SVG container where you want to append the line
     let svg = $("#svg-container svg")[0];
@@ -99,7 +93,7 @@ function createCueAndAimLine() {
     aim_line.setAttribute("x1", cueBallX);
     aim_line.setAttribute("y1", aimLineY);
     aim_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
-    aim_line.setAttribute("y2", aimLineY - aimLineLength); // Keep y2 the same as y1 initially
+    aim_line.setAttribute("y2", (aimLineY - aimLineLength)); // Keep y2 the same as y1 initially
     aim_line.setAttribute("length", aimLineLength);
     aim_line.setAttribute("stroke", "grey");
     aim_line.setAttribute("stroke-width", "4");
@@ -109,7 +103,7 @@ function createCueAndAimLine() {
     svg.appendChild(pool_cue);
     svg.appendChild(aim_line);
 
-    checkLinePath(aimLineY - aimLineLength, aimLineLength, cueBallX, cueBallY);
+    checkLinePath(cueBallX, aimLineY - aimLineLength, cueBallX, cueBallY);
 }
 
 function poolcueCreation(x1, x2, y1, y2) {
@@ -436,12 +430,13 @@ function shotpowerEventListeners() {
                 let svgData = response.svgData; // Get the SVG data from the response
                 console.log("svgData: ", Object.keys(svgData).length);
                 let svgArray = Object.values(svgData); // Convert SVG data object to an array
-        
+                
+
                 // Use promise chaining to ensure order
                 displayNextSVG(svgArray)
                     .then(() => {
-                        setupEventListeners();
                         createCueAndAimLine();
+                        setupEventListeners();
                         shotpowerEventListeners();
                     })
                     .catch((error) => {
@@ -496,7 +491,6 @@ function displayNextSVG(svgArray) {
         updateSVG(); // Start the SVG update loop
     });
 }
-
 
 function setupEventListeners() {
     let isDragging = false;
