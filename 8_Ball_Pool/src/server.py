@@ -10,17 +10,9 @@ import json
 import phylib
 import math
 
-gameID = 0
-db = Database()
-curTable = Physics.Table()
-curGame = None
-gameName = None
-p1Name = None
-p2Name = None
-curTableID = 0
 
 class MyHandler(BaseHTTPRequestHandler):
-
+    
     def do_GET(self):
         parsed = urlparse(self.path)
 
@@ -56,8 +48,10 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_error(404, f"{self.path} not found")
 
     def do_POST(self):
-        global gameID, db, curTable, curGame, gameName, p1Name, p2Name, curTableID
-
+        # global gameID, db, curTable, curGame, gameName, p1Name, p2Name, curTableID
+        curGame = None
+        db = Database.createDB()
+        
         if self.path == '/startGame':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -67,34 +61,42 @@ class MyHandler(BaseHTTPRequestHandler):
             p1Name = data['p1Name']
             p2Name = data['p2Name']
             gameName = data['gameName']
-            
+            accountID = data.get('accountID', 0)  # Get accountID from request data or default to 0
+
             # Create a new game
-            curGame = Game(gameName=gameName, player1Name=p1Name, player2Name=p2Name)
-            gameID = curGame.gameID
-            
-            # Send a response back to the client
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = {
-                'status': 'Game started successfully',
-                'p1Name': p1Name,
-                'p2Name': p2Name,
-                'gameName': gameName
-            }
-            self.wfile.write(json.dumps(response).encode('utf-8'))
+            try:
+                curGame = Game(accountID, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
+                
+                # Send a response back to the client
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response = {
+                    'status': 'Game started successfully'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response = {
+                    'status': 'Error',
+                    'message': str(e)
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
 
         elif self.path == '/initializeGame':
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
+            
+            table = Physics.Table()
 
             # Creating table svg with cue_ball identifier
-            table_svg = curTable.initializeTable(curTable)
+            table_svg = table.initializeTable(table)
 
             # Store the table in the database
-            db.createDB()
-            db.writeTable(curTable)
+            db.writeTable(curGame.accountID, curGame.gameID, table)
 
             self.wfile.write(bytes(table_svg, 'utf-8'))
             

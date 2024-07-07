@@ -254,7 +254,6 @@ class Database:
         finally:
             cursor.close()
 
-
     def newShot(self, accountID, gameID, playerName):
         cursor = self.conn.cursor()
 
@@ -285,16 +284,6 @@ class Database:
             return None
         finally:
             cursor.close()
-
-    def getPlayerIDByName(self, playerName):
-        cursor = self.conn.cursor()  # Create a cursor from the connection
-        cursor.execute("SELECT PLAYERID FROM Player WHERE PLAYERNAME = ?", (playerName,))
-        result = cursor.fetchone()  # Fetch the result using the cursor
-        cursor.close()  
-        if result:
-            return result[0]  # Return the playerID
-        else:
-            return None  # Return None if the player was not found
 
     def writeTableShot(self, accountID, gameID, tableID, shotID):
         cursor = self.conn.cursor()
@@ -341,14 +330,6 @@ class Database:
             return None
         finally:
             cursor.close()
-
-    def getLatestTableID(self):
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT MAX(TABLEID) FROM TTable")
-        tableID = cursor.fetchone()[0]
-
-        cursor.close()
-        return tableID - 1  # Adjusting because SQL IDs start at 1, but we want to start at 0
 
     def close(self):
         # Commit any pending transaction and close the connection

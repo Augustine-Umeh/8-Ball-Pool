@@ -6,7 +6,8 @@ $(document).ready(function() {
         var formData = {
             p1Name: $('#player1Name').val(), 
             p2Name: $('#player2Name').val(),
-            gameName: $('#gameName').val()
+            gameName: $('#gameName').val(),
+            accountID: $('#accountID').val()
         };
 
         // Store the player names in localStorage
