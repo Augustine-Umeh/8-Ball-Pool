@@ -485,6 +485,11 @@ function displayNextSVG(svgArray) {
                 setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
             } else {
                 console.log("Finished displaying all SVGs.");
+                if (svgArray.length >= 2){
+                    console.log(svgArray[svgArray.length - 1])
+                    console.log(svgArray[svgArray.length - 2])
+                }
+                console.log("Finished displaying all SVGs.");
                 resolve(); // Resolve the promise when done
             }
         }

@@ -30,7 +30,6 @@ MAX_TIME = phylib.PHYLIB_MAX_TIME;
 
 MAX_OBJECTS = phylib.PHYLIB_MAX_OBJECTS;
 
-# Assignement 3 constants
 FRAME_INTERVAL = 0.01
 
 ################################################################################
@@ -316,32 +315,31 @@ class Table( phylib.phylib_table ):
     
     # Roll Method
     def roll(self, t):
-            new_table = Table()
-            for ball in self:
-                if isinstance(ball, RollingBall):
-                    # Create a new ball with the same number as the old ball
-                    new_ball = RollingBall(ball.obj.rolling_ball.number,
-                                        Coordinate(0,0), Coordinate(0,0),
+        new_table = Table()
+        for ball in self:
+            if isinstance(ball, RollingBall):
+                # Create a new ball with the same number as the old ball
+                new_ball = RollingBall(ball.obj.rolling_ball.number, Coordinate(0,0), Coordinate(0,0),
                                         Coordinate(0,0))
-                    # Compute where it rolls to (assuming phylib_roll is a placeholder for the actual calculation)
-                    phylib.phylib_roll(new_ball, ball, t)
-                    # Add ball to table
-                    new_table += new_ball
-                if isinstance(ball, StillBall):
-                    # Create a new ball with the same number and pos as the old ball
-                    new_ball = StillBall(ball.obj.still_ball.number,
-                                        Coordinate(ball.obj.still_ball.pos.x,
-                                                    ball.obj.still_ball.pos.y))
-                    # Add ball to table
-                    new_table += new_ball
-            # Return table
-            return new_table
+                # Compute where it rolls to (assuming phylib_roll is a placeholder for the actual calculation)
+                phylib.phylib_roll(new_ball, ball, t)
+                # Add ball to table
+                new_table += new_ball
+            if isinstance(ball, StillBall):
+                # Create a new ball with the same number and pos as the old ball
+                new_ball = StillBall(ball.obj.still_ball.number,
+                                    Coordinate(ball.obj.still_ball.pos.x, ball.obj.still_ball.pos.y))
+                # Add ball to table
+                new_table += new_ball
+                
+        # Return table
+        return new_table
 
     def cueBall(self, table, xvel, yvel):
         new = Table()
         for ball in table:
             if isinstance( ball, RollingBall ):
-                new += ball;
+                new += ball
             elif isinstance( ball, StillBall ):
                 if ball.obj.still_ball.number == 0:
                     # Turn this into rolling and calc acc
@@ -354,19 +352,23 @@ class Table( phylib.phylib_table ):
                     cue_ball_speed = math.sqrt((xvel * xvel) + (yvel * yvel))
 
                     if (cue_ball_speed > VEL_EPSILON):
-                        cue_ball_acc = Coordinate((-xvel/cue_ball_speed) * phylib.PHYLIB_DRAG, (-yvel/cue_ball_speed) * phylib.PHYLIB_DRAG)
+                        x_cord = -((xvel/cue_ball_speed) * phylib.PHYLIB_DRAG)
+                        y_cord = -((yvel/cue_ball_speed) * phylib.PHYLIB_DRAG)
+                        
+                        cue_ball_acc = Coordinate( x_cord, y_cord )
                     else:
-                        cue_ball_acc = Coordinate(0.0, 0.0)
+                        cue_ball_acc = Coordinate ( 0.0, 0.0 )
                     
                     cue_ball = RollingBall( 0,
                         cue_ball_pos,
                         cue_ball_vel,
-                        cue_ball_acc );
+                        cue_ball_acc )
 
                     new += cue_ball
                 else:
                     new += ball
         return new
+    
     def initializeTable(self, table):
         table += StillBall(0, Coordinate(675, 2025))
         table += StillBall(1, Coordinate(675, 640))
@@ -417,91 +419,415 @@ class Table( phylib.phylib_table ):
 ################################################################################
 # Assignment 3: Creating SQL Database
 
-class Database():
-    def __init__(self, reset=False):
-        self.db_path = "phylib.db"
+# class Database:
+#     def __init__(self, reset=False):
+#         self.db_path = "phylib.db"
         
-        if reset:
-            # Delete existing database if reset True
-            try:
-                os.remove(self.db_path)
-            except FileNotFoundError:
-                # If file does not exist, do nothing
-                pass
+#         if reset:
+#             # Delete existing database if reset True
+#             try:
+#                 os.remove(self.db_path)
+#             except FileNotFoundError:
+#                 # If file does not exist, do nothing
+#                 pass
         
-        # Create database connection
-        self.conn = sqlite3.connect(self.db_path)
+#         # Create database connection
+#         self.conn = sqlite3.connect(self.db_path)
     
-    def createDB(self):
-        cursor = self.conn.cursor()
+#     def createDB(self):
+#         cursor = self.conn.cursor()
         
-        # List of SQL commands to create the tables
-        tables = [
-            """CREATE TABLE IF NOT EXISTS TTable (
-                TABLEID INTEGER PRIMARY KEY AUTOINCREMENT,
-                TIME FLOAT NOT NULL
-            );""",
-            """CREATE TABLE IF NOT EXISTS Ball (
-                BALLID  INTEGER PRIMARY KEY AUTOINCREMENT,
-                BALLNO  INTEGER NOT NULL,
-                XPOS    FLOAT NOT NULL,
-                YPOS    FLOAT NOT NULL,
-                XVEL    FLOAT,
-                YVEL    FLOAT
-            );""",
-            """CREATE TABLE IF NOT EXISTS BallTable (
-                TABLEID INTEGER NOT NULL,
-                BALLID INTEGER NOT NULL,
-                FOREIGN KEY (TABLEID) REFERENCES TTable(TABLEID),
-                FOREIGN KEY (BALLID) REFERENCES Ball(BALLID)
-            );""",
-            """CREATE TABLE IF NOT EXISTS Shot (
-                SHOTID INTEGER PRIMARY KEY AUTOINCREMENT,
-                PLAYERID INTEGER NOT NULL,
-                GAMEID INTEGER NOT NULL,
-                FOREIGN KEY (PLAYERID) REFERENCES Player(PlayerID),
-                FOREIGN KEY (GAMEID) REFERENCES Game(GameID)
-            );""",
-            """CREATE TABLE IF NOT EXISTS TableShot (
-                TABLEID INTEGER NOT NULL,
-                SHOTID INTEGER NOT NULL,
-                FOREIGN KEY (TABLEID) REFERENCES TTable(TABLEID),
-                FOREIGN KEY (SHOTID) REFERENCES Shot(SHOTID)
-            );""",
-            """CREATE TABLE IF NOT EXISTS Game (
-                GAMEID INTEGER PRIMARY KEY AUTOINCREMENT,
-                GAMENAME VARCHAR(64) NOT NULL
-            );""",
-            """CREATE TABLE IF NOT EXISTS Player (
-                PLAYERID INTEGER PRIMARY KEY AUTOINCREMENT,
-                GAMEID INTEGER NOT NULL,
-                PLAYERNAME VARCHAR(64) NOT NULL,
-                FOREIGN KEY (GAMEID) REFERENCES Game(GAMEID)
-            );"""
-        ]
+#         # List of SQL commands to create the tables
+#         tables = [
+#             """
+#             CREATE TABLE IF NOT EXISTS Account (
+#                 AccountID SERIAL PRIMARY KEY,
+#                 AccountName TEXT(64) NOT NULL
+#                 AccountPassword VARCHAR(64) NOT NULL
+#             );
+#             """,
+#             """
+#             CREATE TABLE IF NOT EXISTS Game (
+#                 GameID INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 AccountID INTEGER NOT NULL,
+#                 GameName TEXT NOT NULL,
+#                 Player1Name TEXT NOT NULL,
+#                 Player2Name TEXT NOT NULL,
+#                 FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
+#             );
+#             """,
+#             """
+#             CREATE TABLE IF NOT EXISTS TTable (
+#                 TableID INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 GameID INTEGER NOT NULL,
+#                 Time REAL NOT NULL,
+#                 FOREIGN KEY (GameID) REFERENCES Game(GameID)
+#             );
+#             """,
+#             """
+#             CREATE TABLE IF NOT EXISTS Ball (
+#                 BallID INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 GameID INTEGER NOT NULL,
+#                 BallNo INTEGER NOT NULL,
+#                 XPos REAL NOT NULL,
+#                 YPos REAL NOT NULL,
+#                 XVel REAL,
+#                 YVel REAL,
+#                 FOREIGN KEY (GameID) REFERENCES Game(GameID)
+#             );
+#             """,
+#             """
+#             CREATE TABLE IF NOT EXISTS PositionsTable (
+#                 TableID INTEGER NOT NULL,
+#                 BallID INTEGER NOT NULL,
+#                 FOREIGN KEY (TableID) REFERENCES TTable(TableID),
+#                 FOREIGN KEY (BallID) REFERENCES Ball(BallID),
+#                 PRIMARY KEY (TableID, BallID)
+#             );
+#             """,
+#             """
+#             CREATE TABLE IF NOT EXISTS Shot (
+#                 ShotID INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 PlayerName TEXT NOT NULL,
+#                 GameID INTEGER NOT NULL,
+#                 FOREIGN KEY (GameID) REFERENCES Game(GameID)
+#             );
+#             """,
+#             """
+#             CREATE TABLE IF NOT EXISTS TableShot (
+#                 TableID INTEGER NOT NULL,
+#                 ShotID INTEGER NOT NULL,
+#                 FOREIGN KEY (TableID) REFERENCES TTable(TableID),
+#                 FOREIGN KEY (ShotID) REFERENCES Shot(ShotID),
+#                 PRIMARY KEY (TableID, ShotID)
+#             );
+#             """
+#         ]
 
-        # Executing all commands
-        for command in tables:
-            cursor.execute(command)
+
+#         # Executing all commands
+#         for command in tables:
+#             cursor.execute(command)
         
-        # Commit changes and close cursor
-        self.conn.commit()
-        cursor.close()
+#         # Commit changes and close cursor
+#         self.conn.commit()
+#         cursor.close()
     
-    def readTable(self, tableID):
+#     def readTable(self, accountID, gameID, tableID):
+#         cursor = self.conn.cursor()
+        
+#         # Check if the GameID belongs to the provided AccountID
+#         check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
+#         cursor.execute(check_query, (gameID, accountID))
+#         if cursor.fetchone() is None:
+#             cursor.close()
+#             return None  # GameID does not belong to the provided AccountID
+    
+#         # Increment tableID by 1 to match the SQL IDs
+#         new_tableID = tableID + 1
+
+#         # SQL query to retrieve Balls and Table time for a given gameID and tableID
+#         query = """
+#         SELECT b.BALLID, b.BALLNO, b.XPOS, b.YPOS, b.XVEL, b.YVEL, t.TIME
+#         FROM PositionsTable pt
+#         JOIN Ball b ON pt.BALLID = b.BALLID
+#         JOIN TTable t ON pt.TABLEID = t.TABLEID
+#         WHERE pt.TABLEID = ? AND t.GAMEID = ?
+#         """
+#         cursor.execute(query, (new_tableID, gameID))
+#         rows = cursor.fetchall()
+        
+#         # Check if TABLEID exists in the BallTable
+#         if not rows:
+#             return None  # No Balls found for the given TABLEID
+        
+#         # Instantiate a new Table object
+#         new_table = Table()
+#         new_table.time = rows[0][-1]  # Set table's time using the last column from the first row
+        
+#         # Process each ball
+#         for row in rows:
+#             ballID, ballNO, xPos, yPos, xVel, yVel, _ = row # Unpack the row
+            
+#             # Determine if the ball is still or rolling and add accordingly
+#             if xVel == 0 and yVel == 0:  # StillBall condition
+#                 new_ball = StillBall(ballNO, Coordinate(xPos, yPos))
+#             else:  # RollingBall condition
+                
+#                 rolling_ball_speed = math.sqrt((xVel * xVel) + (yVel * yVel))
+
+#                 if (rolling_ball_speed > VEL_EPSILON):
+#                     rolling_ball_acc = Coordinate((-xVel/rolling_ball_speed) * phylib.PHYLIB_DRAG, (-yVel/rolling_ball_speed) * phylib.PHYLIB_DRAG)
+#                 else:
+#                     rolling_ball_acc = Coordinate(0, 0)
+
+#                 rolling_ball_vel = Coordinate(xVel, yVel)
+#                 rolling_ball_pos = Coordinate(xPos, yPos)
+
+#                 new_ball = RollingBall(ballNO, rolling_ball_pos, rolling_ball_vel, rolling_ball_acc)
+                
+#             new_table += new_ball  
+        
+#         cursor.close()
+        
+#         return new_table
+
+#     def writeTable(self, accountID, gameID, table):
+#         cursor = self.conn.cursor()
+        
+#         # Check if the GameID belongs to the provided AccountID
+#         check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
+#         cursor.execute(check_query, (gameID, accountID))
+#         if cursor.fetchone() is None:
+#             cursor.close()
+#             return None  # GameID does not belong to the provided AccountID
+        
+#         # Step 1: Insert the time into TTable and get the new TABLEID
+#         cursor.execute("INSERT INTO TTable (GameID, Time) VALUES (?, ?)", (gameID, table.time))
+#         tableID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+#         # Step 2: For each ball on the table, insert into Ball and then into PositionsTable
+#         for ball in table:
+#             if isinstance(ball, StillBall):  # StillBall condition
+#                 xvel, yvel = 0, 0
+#                 cursor.execute(
+#                     "INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel) VALUES (?, ?, ?, ?, ?, ?)",
+#                     (gameID, ball.obj.still_ball.number, ball.obj.still_ball.pos.x, ball.obj.still_ball.pos.y, xvel, yvel)
+#                 )
+
+#             elif isinstance(ball, RollingBall):  # RollingBall condition
+#                 xvel, yvel = ball.obj.rolling_ball.vel.x, ball.obj.rolling_ball.vel.y
+#                 cursor.execute(
+#                     "INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel) VALUES (?, ?, ?, ?, ?, ?)",
+#                     (gameID, ball.obj.rolling_ball.number, ball.obj.rolling_ball.pos.x, ball.obj.rolling_ball.pos.y, xvel, yvel)
+#                 )
+#             else:  # Skip if not a ball
+#                 continue
+
+#             # Insert the ball into Ball table and link the ball to the table in PositionsTable
+#             ballID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
+#             cursor.execute("INSERT INTO PositionsTable (TableID, BallID) VALUES (?, ?)", (tableID, ballID))
+
+#         # Commit changes and return the adjusted TABLEID
+#         self.conn.commit()
+#         cursor.close()
+        
+#         return tableID - 1  # Adjusting because SQL IDs start at 1, but we want to start at 0
+    
+#     def getGame(self, accountID, gameID):
+#         cursor = self.conn.cursor()
+
+#         # SQL query to fetch gameName, and player names based on gameID
+#         query = """
+#         SELECT GameName, Player1Name, Player2Name
+#         FROM Game
+#         WHERE GameID = ? AND AccountID = ?
+#         LIMIT 1
+#         """
+
+#         try:
+#             cursor.execute(query, (gameID,))
+#             gameInfo = cursor.fetchone()
+#             if gameInfo:
+#                 return gameInfo  # This returns a tuple: (gameName, player1Name, player2Name)
+#             return None
+#         except Exception as e:
+#             print(f"An error occurred: {e}")
+#             return None
+#         finally:
+#             cursor.close()
+
+
+#     def setGame(self, accountID, gameName, player1Name, player2Name):
+#         cursor = self.conn.cursor()
+        
+#         # SQL query to insert a new game into the Game table
+#         query = """
+#         INSERT INTO Game (AccountID, GameName, Player1Name, Player2Name)
+#         VALUES (?, ?, ?, ?)
+#         """
+        
+#         try:
+#             cursor.execute(query, (accountID, gameName, player1Name, player2Name))
+#             self.conn.commit()
+            
+#             # Get the GameID of the newly inserted game
+#             gameID = cursor.lastrowid
+#             return gameID
+#         except Exception as e:
+#             print(f"An error occurred: {e}")
+#             self.conn.rollback()
+#             return None
+#         finally:
+#             cursor.close()
+
+
+#     def newShot(self, accountID, gameID, playerName):
+#         cursor = self.conn.cursor()
+
+#         # Check if the GameID belongs to the provided AccountID
+#         check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
+#         cursor.execute(check_query, (gameID, accountID))
+#         if cursor.fetchone() is None:
+#             cursor.close()
+#             return None  # GameID does not belong to the provided AccountID
+
+#         try:
+#             # Insert the new shot into the Shot table
+#             insert_query = "INSERT INTO Shot (PlayerName, GameID) VALUES (?, ?)"
+#             cursor.execute(insert_query, (playerName, gameID))
+
+#             # Get the ID of the newly inserted shot
+#             shotID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+#             # Commit the changes and return the shotID
+#             self.conn.commit()
+#             return shotID
+#         except Exception as e:
+#             print(f"An error occurred: {e}")
+#             return None
+#         finally:
+#             cursor.close()
+
+#     def getPlayerIDByName(self, playerName):
+#         cursor = self.conn.cursor()  # Create a cursor from the connection
+#         cursor.execute("SELECT PLAYERID FROM Player WHERE PLAYERNAME = ?", (playerName,))
+#         result = cursor.fetchone()  # Fetch the result using the cursor
+#         cursor.close()  
+#         if result:
+#             return result[0]  # Return the playerID
+#         else:
+#             return None  # Return None if the player was not found
+
+#     def writeTableShot(self, accountID, gameID, tableID, shotID):
+#         cursor = self.conn.cursor()
+
+#         # Check if the GameID belongs to the provided AccountID
+#         check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
+#         cursor.execute(check_query, (gameID, accountID))
+#         if cursor.fetchone() is None:
+#             cursor.close()
+#             return None  # GameID does not belong to the provided AccountID
+
+#         # Check if the tableID belongs to the provided gameID
+#         check_query = "SELECT 1 FROM TTable WHERE TableID = ? AND GameID = ?"
+#         cursor.execute(check_query, (tableID, gameID))
+#         if cursor.fetchone() is None:
+#             cursor.close()
+#             return None  # tableID does not belong to the provided gameID
+
+#         # Check if the shotID belongs to the provided gameID
+#         check_query = "SELECT 1 FROM Shot WHERE ShotID = ? AND GameID = ?"
+#         cursor.execute(check_query, (shotID, gameID))
+#         if cursor.fetchone() is None:
+#             cursor.close()
+#             return None  # shotID does not belong to the provided gameID
+
+#         try:
+#             # Insert the new table shot into the TableShot table
+#             insert_query = "INSERT INTO TableShot (TableID, ShotID) VALUES (?, ?)"
+#             cursor.execute(insert_query, (tableID, shotID))
+
+#             # Get the ID of the newly inserted table shot
+#             tableShotID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+#             # Commit the changes and return the tableShotID
+#             self.conn.commit()
+#             return tableShotID
+#         except Exception as e:
+#             print(f"An error occurred: {e}")
+#             return None
+#         finally:
+#             cursor.close()
+
+    
+#     def getLatestTableID(self):
+#         cursor = self.conn.cursor()
+#         cursor.execute("SELECT MAX(TABLEID) FROM TTable")
+#         tableID = cursor.fetchone()[0]
+
+#         cursor.close()
+#         return tableID - 1  # Adjusting because SQL IDs start at 1, but we want to start at 0
+
+#     def close(self):
+#         # Commit any pending transaction and close the connection
+#         self.conn.commit()
+#         self.conn.close()
+
+
+################################################################################
+# class Game:
+#     def __init__(self, gameID=None, gameName=None, player1Name=None, player2Name=None):
+#         self.db = Database()
+#         self.db.createDB()
+        
+#         if isinstance(gameID, int) and gameName is None and player1Name is None and player2Name is None:
+#             self.gameID = gameID
+
+#             gameInfo = self.db.getGame(gameID + 1)
+
+#             self.gameName = gameInfo[0]
+
+#             self.player1Name = gameInfo[1]
+#             self.player2Name = gameInfo[2]
+
+#         elif gameID is None and isinstance(gameName, str) and isinstance(player1Name, str) and isinstance(player2Name, str):
+#             self.gameName = gameName
+#             self.player1Name = player1Name
+#             self.player2Name = player2Name
+
+#             self.gameID = (self.db.setGame(gameName, player1Name, player2Name)) - 1
+#         else:
+#             raise TypeError("Invalid constructor usage.")
+
+#     def shoot(self,gameName, playerName, table, xvel, yvel):
+#         shotID = self.db.newShot(self.gameID, playerName)
+#         new_table = table.cueBall(table, xvel, yvel)
+#         table = new_table
+
+
+#         # Segment simulation loop
+#         beginning_table = table
+
+#         while True:
+#             # Directly use the table for simulation, updating its state
+#             segment_end_table = beginning_table.segment()
+
+#             if segment_end_table is None:
+#                 # tableID = self.db.writeTable(table)
+#                 # self.db.writeTableShot(tableID, shotID)
+#                 break
+
+#             segment_duration = segment_end_table.time - beginning_table.time
+#             num_frames = math.floor(segment_duration / FRAME_INTERVAL)
+            
+#             for frame in range(num_frames):  # Include the endpoint to ensure we capture the final state
+#                 frame_time = frame * FRAME_INTERVAL
+#                 new_table = beginning_table.roll(frame_time)
+                
+#                 new_table.time = frame_time + beginning_table.time
+                
+#                 # Record the current state of the table and the shot
+#                 tableID = self.db.writeTable(new_table)
+#                 self.db.writeTableShot(tableID, shotID) 
+
+#             beginning_table = segment_end_table
+
+
+"""
+def readTable(self, tableID):
         cursor = self.conn.cursor()
         
         # Increment tableID by 1 to match the SQL IDs
         new_tableID = tableID + 1
 
         # SQL query to retrieve Balls and Table time for a given tableID
-        query = """
-        SELECT b.BALLID, b.BALLNO, b.XPOS, b.YPOS, b.XVEL, b.YVEL, t.TIME
-        FROM BallTable bt
-        JOIN Ball b ON bt.BALLID = b.BALLID
-        JOIN TTable t ON bt.TABLEID = t.TABLEID
-        WHERE bt.TABLEID = ?
-        """
+        query = 
+        # SELECT b.BALLID, b.BALLNO, b.XPOS, b.YPOS, b.XVEL, b.YVEL, t.TIME
+        # FROM BallTable bt
+        # JOIN Ball b ON bt.BALLID = b.BALLID
+        # JOIN TTable t ON bt.TABLEID = t.TABLEID
+        # WHERE bt.TABLEID = ?
         cursor.execute(query, (new_tableID,))
         rows = cursor.fetchall()
         
@@ -580,15 +906,7 @@ class Database():
 
         # SQL query to fetch gameName, and player names based on gameID
         # We assume that the two players for each game are the two lowest PLAYERID values associated with that GAMEID
-        query = """
-        SELECT g.GAMENAME, p1.PLAYERNAME as player1Name, p2.PLAYERNAME as player2Name
-        FROM Game g
-        JOIN Player p1 ON g.GAMEID = p1.GAMEID
-        JOIN Player p2 ON g.GAMEID = p2.GAMEID AND p1.PLAYERID < p2.PLAYERID
-        WHERE g.GAMEID = ?
-        LIMIT 1;
-        """
-
+        query =
         try:
             cursor.execute(query, (gameID,))
             gameInfo = cursor.fetchone()
@@ -723,10 +1041,4 @@ class Game():
                 self.db.writeTableShot(tableID, shotID) 
 
             beginning_table = segment_end_table
-    
-
-    
-
-
-
-
+"""

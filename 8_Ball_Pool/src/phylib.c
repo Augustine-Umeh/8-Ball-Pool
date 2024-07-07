@@ -310,16 +310,16 @@ void phylib_roll(phylib_object *new, phylib_object *old, double time)
     new->obj.rolling_ball.vel.y = old->obj.rolling_ball.vel.y + (old->obj.rolling_ball.acc.y * time);
 
     // Checking for sign changes
-    if ((old->obj.rolling_ball.vel.x * new->obj.rolling_ball.vel.x) < 0)
+    if ((old->obj.rolling_ball.vel.x * new->obj.rolling_ball.vel.x) < 0.0)
     {
-        new->obj.rolling_ball.vel.x = 0;
-        new->obj.rolling_ball.acc.x = 0;
+        new->obj.rolling_ball.vel.x = 0.0;
+        new->obj.rolling_ball.acc.x = 0.0;
     }
 
-    if ((old->obj.rolling_ball.vel.y * new->obj.rolling_ball.vel.y) < 0)
+    if ((old->obj.rolling_ball.vel.y * new->obj.rolling_ball.vel.y) < 0.0)
     {
-        new->obj.rolling_ball.vel.y = 0;
-        new->obj.rolling_ball.acc.y = 0;
+        new->obj.rolling_ball.vel.y = 0.0;
+        new->obj.rolling_ball.acc.y = 0.0;
     }
 }
 
@@ -476,7 +476,7 @@ phylib_table *phylib_segment(phylib_table *table)
 
     while (time_passed <= PHYLIB_MAX_TIME)
     {
-        // Loop Throguh and roll all balls
+        // Loop Throguh and roll all rolling balls
         for (int i = 0; i < PHYLIB_MAX_OBJECTS; i++)
         {
             if (copyTable->object[i] != NULL && copyTable->object[i]->type == PHYLIB_ROLLING_BALL)
@@ -486,7 +486,7 @@ phylib_table *phylib_segment(phylib_table *table)
             }
         }
 
-        //  Loop again  and check if stopped or collision
+        //  Loop again and check if stopped or collision
         for (int i = 0; i < PHYLIB_MAX_OBJECTS; i++)
         {
             if (copyTable->object[i] != NULL && copyTable->object[i]->type == PHYLIB_ROLLING_BALL)

@@ -4,12 +4,14 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import cgi
 import Physics
+import Game
+import Database
 import json
 import phylib
 import math
 
 gameID = 0
-db = Physics.Database()
+db = Database()
 curTable = Physics.Table()
 curGame = None
 gameName = None
@@ -67,7 +69,7 @@ class MyHandler(BaseHTTPRequestHandler):
             gameName = data['gameName']
             
             # Create a new game
-            curGame = Physics.Game(gameName=gameName, player1Name=p1Name, player2Name=p2Name)
+            curGame = Game(gameName=gameName, player1Name=p1Name, player2Name=p2Name)
             gameID = curGame.gameID
             
             # Send a response back to the client
@@ -95,6 +97,7 @@ class MyHandler(BaseHTTPRequestHandler):
             db.writeTable(curTable)
 
             self.wfile.write(bytes(table_svg, 'utf-8'))
+            
         elif self.path == '/processDrag':
             content_length = int(self.headers['Content-Length'])  # Gets the size of data
             post_data = self.rfile.read(content_length)  # Gets the data itself
