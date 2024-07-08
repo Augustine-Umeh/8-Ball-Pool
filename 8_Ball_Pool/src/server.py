@@ -48,31 +48,28 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_error(404, f"{self.path} not found")
 
     def do_POST(self):
-        # global gameID, db, curTable, curGame, gameName, p1Name, p2Name, curTableID
-        curGame = None
-        db = Database.createDB()
-        
         if self.path == '/startGame':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             
-            # Assuming the sent data is JSON
             data = json.loads(post_data.decode('utf-8'))
             p1Name = data['p1Name']
             p2Name = data['p2Name']
             gameName = data['gameName']
-            accountID = data.get('accountID', 0)  # Get accountID from request data or default to 0
+            accountID = data.get('accountID', 0)
 
-            # Create a new game
+            # Debugging: Print received data
+            print(f"Received data: {data}")
+    
             try:
                 curGame = Game(accountID, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
-                
-                # Send a response back to the client
+                print(curGame.gameID)
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 response = {
-                    'status': 'Game started successfully'
+                    'status': 'Game started successfully',
+                    'gameID': curGame.gameID
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
             except Exception as e:
@@ -85,20 +82,37 @@ class MyHandler(BaseHTTPRequestHandler):
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
 
-        elif self.path == '/initializeGame':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            
-            table = Physics.Table()
+        elif self.path == '/initializeTable':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
 
-            # Creating table svg with cue_ball identifier
-            table_svg = table.initializeTable(table)
+            data = json.loads(post_data.decode('utf-8'))
+            accountID = data.get('accountID')
+            gameID = data.get('gameID')
 
-            # Store the table in the database
-            db.writeTable(curGame.accountID, curGame.gameID, table)
-
-            self.wfile.write(bytes(table_svg, 'utf-8'))
+            try:
+                table = Physics.Table()
+                initialized_table = table.initializeTable(table)
+                
+                db = Database.createDB()
+                tableID = db.writeTable(accountID, gameID, initialized_table)
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response = {
+                    'message': 'Table initialized successfully',
+                    'tableID': tableID
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response = {
+                    'error': str(e)
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
             
         elif self.path == '/processDrag':
             content_length = int(self.headers['Content-Length'])  # Gets the size of data

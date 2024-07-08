@@ -335,3 +335,51 @@ class Database:
         # Commit any pending transaction and close the connection
         self.conn.commit()
         self.conn.close()
+
+
+def main():
+    db = Database(reset=False)
+    db.createDB()
+    
+    accountID = 0
+    gameName = "First Game"
+    player1Name = "Alice"
+    player2Name = "Bob"
+    
+    # Set a new game
+    gameID = db.setGame(accountID, gameName, player1Name, player2Name)
+    print(f"New Game ID: {gameID}")
+    
+    # Get game details
+    game_details = db.getGame(accountID, gameID)
+    print(f"Game Details: {game_details}")
+    
+    # Create a table
+    table = Table()
+    table.time = 0.0
+    
+    # Add balls to the table
+    table += StillBall(1, Coordinate(0, 0))
+    table += RollingBall(2, Coordinate(1, 1), Coordinate(0.5, 0.5), Coordinate(-0.1, -0.1))
+    
+    # Write the table to the database
+    tableID = db.writeTable(accountID, gameID, table)
+    print(f"New Table ID: {tableID}")
+    
+    # Read the table from the database
+    read_table = db.readTable(accountID, gameID, tableID)
+    print(f"Read Table: {read_table}")
+    
+    # Add a new shot
+    shotID = db.newShot(accountID, gameID, player1Name)
+    print(f"New Shot ID: {shotID}")
+    
+    # Associate the table with the shot
+    table_shot_id = db.writeTableShot(accountID, gameID, tableID, shotID)
+    print(f"New TableShot ID: {table_shot_id}")
+
+    # Close the database
+    db.close()
+
+if __name__ == "__main__":
+    main()
