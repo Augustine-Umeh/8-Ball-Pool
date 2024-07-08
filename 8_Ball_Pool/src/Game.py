@@ -1,4 +1,4 @@
-import Database
+from Database import Database
 import math
 
 FRAME_INTERVAL = 0.01
@@ -25,7 +25,7 @@ class Game:
                 raise ValueError(f"Error retrieving game: {e}")
 
         # Case 2: New game, set details
-        elif gameID is None and accountID and isinstance(gameName, str) and isinstance(player1Name, str) and isinstance(player2Name, str):
+        elif gameID is None and accountID >= 0  and isinstance(gameName, str) and isinstance(player1Name, str) and isinstance(player2Name, str):
             self.gameName = gameName
             self.player1Name = player1Name
             self.player2Name = player2Name
@@ -69,7 +69,7 @@ class Game:
 
         except Exception as e:
             print(f"An error occurred during shooting: {e}")
-
+         
     def close(self):
         self.db.close()
 

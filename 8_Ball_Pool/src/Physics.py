@@ -386,7 +386,8 @@ class Table( phylib.phylib_table ):
         table += StillBall(13, Coordinate(675, 400))
         table += StillBall(14, Coordinate(735, 400))
         table += StillBall(15, Coordinate(795, 400))
-        return table.custom_svg(table)
+        # return table.custom_svg(table)
+        return table
 
     def custom_svg(self, table):
         # Making svg with cue_ball having id

@@ -4,8 +4,8 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import cgi
 import Physics
-import Game
-import Database
+from Game import Game
+from Database import Database
 import json
 import phylib
 import math
@@ -48,7 +48,39 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_error(404, f"{self.path} not found")
 
     def do_POST(self):
-        if self.path == '/startGame':
+        db = Database()
+        db.createDB()
+        if self.path == '/createAccount':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            accountName = data.get('accountName')
+            accountPassword = data.get('accountPassword')
+
+            success = db.createAccount(accountName, accountPassword)
+
+            self.send_response(201 if success else 409)  # 201 Created or 409 Conflict
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {'status': 'Account created successfully' if success else 'Account already exists'}
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+
+        elif self.path == '/verifyAccount':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            accountName = data.get('accountName')
+            accountPassword = data.get('accountPassword')
+
+            exists = db.verifyAccount(accountName, accountPassword)
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {'status': 'Account verified' if exists else 'Invalid account'}
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+            
+        elif self.path == '/startGame':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             
@@ -56,20 +88,24 @@ class MyHandler(BaseHTTPRequestHandler):
             p1Name = data['p1Name']
             p2Name = data['p2Name']
             gameName = data['gameName']
-            accountID = data.get('accountID', 0)
-
-            # Debugging: Print received data
-            print(f"Received data: {data}")
+            accountID = data['accountID']
     
             try:
-                curGame = Game(accountID, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
-                print(curGame.gameID)
+                created_game = db.checkCreatedGame(accountID)
+                if created_game >= 0:
+                    gameID = created_game
+                else:
+                    if not gameName:
+                        gameName += p1Name + " vs " + p2Name
+                    curGame = Game(accountID, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
+                    gameID = curGame.gameID
+                
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 response = {
-                    'status': 'Game started successfully',
-                    'gameID': curGame.gameID
+                    'status': 'Game Created successfully',
+                    'gameID': gameID
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
             except Exception as e:
@@ -89,19 +125,36 @@ class MyHandler(BaseHTTPRequestHandler):
             data = json.loads(post_data.decode('utf-8'))
             accountID = data.get('accountID')
             gameID = data.get('gameID')
-
+        
             try:
-                table = Physics.Table()
-                initialized_table = table.initializeTable(table)
+                unfinished_game = db.checkUnfinishedGame(accountID, gameID)
                 
-                db = Database.createDB()
-                tableID = db.writeTable(accountID, gameID, initialized_table)
-                
+                if unfinished_game:
+                    tableID = db.getLastTable(gameID)
+                    
+                    table = db.readTable(accountID, gameID, tableID)
+                  
+                    table_svg = table.custom_svg(table)
+                    
+                else:
+                    table = Physics.Table()
+                    table.time = 0.0
+                    
+                    initialized_table = table.initializeTable(table)
+                    table_svg = initialized_table.custom_svg(initialized_table)
+                    
+                    tableID = db.writeTable(accountID, gameID, initialized_table)
+                    db.markGameStatus(accountID, gameID, 1)
+                    
+                    if tableID is None:
+                        raise ValueError("This Game doesn't exist")
+
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 response = {
                     'message': 'Table initialized successfully',
+                    'svg': table_svg,
                     'tableID': tableID
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))

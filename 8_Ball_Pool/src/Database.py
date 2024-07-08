@@ -2,6 +2,7 @@ import sqlite3
 import phylib
 import os
 import math
+import json
 from Physics import Coordinate, Table, StillBall, RollingBall
 
 VEL_EPSILON = phylib.PHYLIB_VEL_EPSILON
@@ -28,8 +29,8 @@ class Database:
         tables = [
             """
             CREATE TABLE IF NOT EXISTS Account (
-                AccountID SERIAL PRIMARY KEY,
-                AccountName TEXT(64) NOT NULL
+                AccountID INTEGER PRIMARY KEY AUTOINCREMENT,
+                AccountName TEXT(64) NOT NULL,
                 AccountPassword VARCHAR(64) NOT NULL
             );
             """,
@@ -40,6 +41,7 @@ class Database:
                 GameName TEXT NOT NULL,
                 Player1Name TEXT NOT NULL,
                 Player2Name TEXT NOT NULL,
+                GameUsed BOOLEAN NOT NULL DEFAULT 0,
                 FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
             );
             """,
@@ -254,6 +256,129 @@ class Database:
         finally:
             cursor.close()
 
+    def createAccount(self, accountName, accountPassword):
+        
+        if self.verifyAccount(accountName, accountPassword):
+            return False
+        
+        cursor = self.conn.cursor()
+        creation_query = "INSERT INTO ACCOUNT (ACCOUNTNAME, ACCOUNTPASSWORD) VALUES (?, ?)"
+        
+        cursor.execute(creation_query, (accountName, accountPassword))
+        
+        self.conn.commit()
+        cursor.close()
+        return True
+    
+    def verifyAccount(self, accountName, accountPassword):
+        
+        cursor = self.conn.cursor()
+        verification_query = "SELECT 1 FROM Account WHERE AccountName = ? AND AccountPassword = ?"
+        
+        cursor.execute(verification_query, (accountName, accountPassword))
+        account_exists = cursor.fetchone() is not None
+        
+        cursor.close()
+        return account_exists
+    
+    def checkCreatedGame(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        
+        check_query = "SELECT GameID FROM Game WHERE AccountID = ? AND GameUsed = 0"
+        
+        cursor.execute(check_query, (accountID,))
+        created_game = cursor.fetchone()
+        
+        cursor.close()
+        return created_game[0] - 1 if created_game else -1
+        
+    def checkUnfinishedGame(self, accountID, gameID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        gameID += 1
+        
+        check_query = "SELECT 1 FROM Game WHERE AccountID = ? AND GameUsed = 1 AND GameID = ?"
+        
+        cursor.execute(check_query, (accountID, gameID))
+        created_game = cursor.fetchone()
+        
+        cursor.close()
+        return True if created_game else False
+    
+    def getLastTable(self, gameID):
+        gameID += 1
+        
+        cursor = self.conn.cursor()
+        
+        last_table_query = """
+        SELECT MAX(TableID) FROM TTable WHERE GameID = ?
+        """
+        
+        cursor.execute(last_table_query, (gameID,))
+        last_tableID = cursor.fetchone()[0]
+        
+        return last_tableID - 1
+    
+    def getSessionGames(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        
+        # Step 1: Retrieve all unfinished games
+        check_query = "SELECT GameID FROM Game WHERE AccountID = ? AND GameUsed = 1"
+        cursor.execute(check_query, (accountID,))
+        unfinished_games = cursor.fetchall()
+
+        result = {}
+        for game in unfinished_games:
+            gameID = game[0]
+
+            # Step 2: Find the last table state for the current gameID
+            last_table_query = """
+            SELECT MAX(TableID) FROM TTable WHERE GameID = ?
+            """
+            cursor.execute(last_table_query, (gameID,))
+            last_tableID = cursor.fetchone()[0]
+
+            if last_tableID is not None:
+                # Step 3: Retrieve positions and velocities of the 16 balls from the last table state
+                ball_query = """
+                SELECT Ball.BallNo, Ball.XPos, Ball.YPos, Ball.XVel, Ball.YVel
+                FROM Ball
+                JOIN PositionsTable ON Ball.BallID = PositionsTable.BallID
+                WHERE PositionsTable.TableID = ?
+                """
+                cursor.execute(ball_query, (last_tableID,))
+                balls = cursor.fetchall()
+
+                # Step 4: Create StillBall instances for each ball and add them to a table
+                table = Table()
+                for ball in balls:
+                    ball_number, pos_x, pos_y, x_vel, y_vel = ball
+                    still_ball = StillBall(ball_number, Coordinate(pos_x, pos_y))
+                    table += still_ball
+
+                # Step 5: Generate SVG for the table
+                table_svg = table.custom_svg(table)
+                result[gameID] = table_svg
+
+        cursor.close()
+        
+        # Step 6: Return JSON
+        return json.dumps(result)
+
+    def markGameStatus(self, accountID, gameID, status):
+        cursor = self.conn.cursor()
+        accountID += 1
+        gameID += 1
+        
+        update_query = "UPDATE Game SET GameUsed = ? WHERE AccountID = ? AND GameID = ?"
+        
+        cursor.execute(update_query, (status, accountID, gameID))
+        
+        self.conn.commit()
+        cursor.close()
+
     def newShot(self, accountID, gameID, playerName):
         cursor = self.conn.cursor()
 
@@ -335,51 +460,4 @@ class Database:
         # Commit any pending transaction and close the connection
         self.conn.commit()
         self.conn.close()
-
-
-def main():
-    db = Database(reset=False)
-    db.createDB()
-    
-    accountID = 0
-    gameName = "First Game"
-    player1Name = "Alice"
-    player2Name = "Bob"
-    
-    # Set a new game
-    gameID = db.setGame(accountID, gameName, player1Name, player2Name)
-    print(f"New Game ID: {gameID}")
-    
-    # Get game details
-    game_details = db.getGame(accountID, gameID)
-    print(f"Game Details: {game_details}")
-    
-    # Create a table
-    table = Table()
-    table.time = 0.0
-    
-    # Add balls to the table
-    table += StillBall(1, Coordinate(0, 0))
-    table += RollingBall(2, Coordinate(1, 1), Coordinate(0.5, 0.5), Coordinate(-0.1, -0.1))
-    
-    # Write the table to the database
-    tableID = db.writeTable(accountID, gameID, table)
-    print(f"New Table ID: {tableID}")
-    
-    # Read the table from the database
-    read_table = db.readTable(accountID, gameID, tableID)
-    print(f"Read Table: {read_table}")
-    
-    # Add a new shot
-    shotID = db.newShot(accountID, gameID, player1Name)
-    print(f"New Shot ID: {shotID}")
-    
-    # Associate the table with the shot
-    table_shot_id = db.writeTableShot(accountID, gameID, tableID, shotID)
-    print(f"New TableShot ID: {table_shot_id}")
-
-    # Close the database
-    db.close()
-
-if __name__ == "__main__":
-    main()
+        
