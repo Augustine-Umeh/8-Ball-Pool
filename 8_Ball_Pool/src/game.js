@@ -1,9 +1,9 @@
 $(document).ready(function () {
     var player1Name = localStorage.getItem("player1Name");
     var player2Name = localStorage.getItem("player2Name");
-    var gameID = localStorage.getItem("gameID");
+    var gameID = parseInt(localStorage.getItem("gameID"));
     var gameName = localStorage.getItem("gameName");
-    var accountID = localStorage.getItem("accountID");
+    var accountID = parseInt(localStorage.getItem("accountID"));
 
     $("#player1Name").text(player1Name);
     $("#player2Name").text(player2Name);
@@ -330,10 +330,17 @@ function getSVGCoordinates(svg, event) {
 }
 
 function shotpowerEventListeners() {
+    var gameID = parseInt(localStorage.getItem("gameID"));
+    var accountID = parseInt(localStorage.getItem("accountID"));
+    var gameName = String(localStorage.getItem("gameName"));
+    var player1Name = String(localStorage.getItem("player1Name"))
+    var player2Name = localStorage.getItem("player2Name");
+
     let isDragging = false;
     let initialY = 0;
     let maxSpeed = 10000;
     let maxDragDistance = 540; // Distance in pixels (from 80 to 620)
+    
     let shotLine = document.querySelector("#shot_line");
     let aimLine = document.querySelector("#aim_line");
 
@@ -425,28 +432,37 @@ function shotpowerEventListeners() {
             },
         };
 
+        taker = player1Name
+
         // Send the data using AJAX
         $.ajax({
             type: "POST",
             url: "/processDrag", // This URL should match your server endpoint
             contentType: "application/json",
-            data: JSON.stringify(dataToSend),
+            data: JSON.stringify({
+                "velocity": dataToSend.vectorData,
+                "accountID": accountID,
+                "gameID": gameID,
+                "gameName": gameName,
+                "shotTaker": taker
+            }),
             success: function (response) {
-                let svgData = response.svgData; // Get the SVG data from the response
-                console.log("svgData: ", Object.keys(svgData).length);
-                let svgArray = Object.values(svgData); // Convert SVG data object to an array
+                if (response.status === 'Success') {
+                    let svgData = response.svgData; // Get the SVG data from the response
+                    console.log("svgData: ", Object.keys(svgData).length);
+                    let svgArray = Object.values(svgData); // Convert SVG data object to an array
+                    
+                    // Use promise chaining to ensure order
+                    displayNextSVG(svgArray)
+                        .then(() => {
+                            createCueAndAimLine();
+                            setupEventListeners();
+                        })
+                        .catch((error) => {
+                            console.error("Error displaying SVGs:", error);
+                        });
+                }
                 
-
-                // Use promise chaining to ensure order
-                displayNextSVG(svgArray)
-                    .then(() => {
-                        createCueAndAimLine();
-                        setupEventListeners();
-                        shotpowerEventListeners();
-                    })
-                    .catch((error) => {
-                        console.error("Error displaying SVGs:", error);
-                    });
             },
             error: function (xhr, status, error) {
                 console.error("Error sending data:", error);
@@ -454,7 +470,6 @@ function shotpowerEventListeners() {
                 console.error("Response Text:", xhr.responseText);
             },
         });
-        
 
         // Reset the line position
         shotLine.setAttribute("x1", "37.5");
@@ -489,11 +504,6 @@ function displayNextSVG(svgArray) {
                 currentIndex++; // Move to the next SVG
                 setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
             } else {
-                console.log("Finished displaying all SVGs.");
-                if (svgArray.length >= 2){
-                    console.log(svgArray[svgArray.length - 1])
-                    console.log(svgArray[svgArray.length - 2])
-                }
                 console.log("Finished displaying all SVGs.");
                 resolve(); // Resolve the promise when done
             }

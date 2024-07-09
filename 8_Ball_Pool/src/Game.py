@@ -10,7 +10,7 @@ class Game:
         self.accountID = accountID
 
         # Case 1: Existing game, retrieve details
-        if isinstance(gameID, int) and accountID and gameName is None and player1Name is None and player2Name is None:
+        if isinstance(gameID, int) and gameID >= 0 and accountID >= 0 and gameName is None and player1Name is None and player2Name is None:
             self.gameID = gameID
 
             try:
@@ -34,6 +34,7 @@ class Game:
                 self.gameID = self.db.setGame(accountID, gameName, player1Name, player2Name) # Create new game with accountID
             except Exception as e:
                 raise ValueError(f"Error setting game: {e}")
+        
         else:
             raise TypeError("Invalid constructor usage.")
 
@@ -54,7 +55,7 @@ class Game:
                     break
 
                 segment_duration = segment_end_table.time - current_table.time
-                num_frames = math.floor(segment_duration / FRAME_INTERVAL) + 1
+                num_frames = math.floor(segment_duration / FRAME_INTERVAL) + 2
 
                 for frame in range(num_frames):  # Include the endpoint to ensure we capture the final state
                     frame_time = frame * FRAME_INTERVAL

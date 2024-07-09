@@ -172,7 +172,7 @@ class Database:
         cursor.execute(check_query, (gameID, accountID))
         if cursor.fetchone() is None:
             cursor.close()
-            return None  # GameID does not belong to the provided AccountID
+            return -1  # GameID does not belong to the provided AccountID
         
         # Step 1: Insert the time into TTable and get the new TABLEID
         cursor.execute("INSERT INTO TTable (GameID, Time) VALUES (?, ?)", (gameID, table.time))
@@ -311,10 +311,18 @@ class Database:
         cursor.close()
         return True if created_game else False
     
-    def getLastTable(self, gameID):
+    def getLastTable(self, accountID, gameID):
+        accountID += 1
         gameID += 1
         
         cursor = self.conn.cursor()
+        
+        # Check if the GameID belongs to the provided AccountID
+        check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
+        cursor.execute(check_query, (gameID, accountID))
+        if cursor.fetchone() is None:
+            cursor.close()
+            return -1  # GameID does not belong to the provided AccountID
         
         last_table_query = """
         SELECT MAX(TableID) FROM TTable WHERE GameID = ?

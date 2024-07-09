@@ -50,6 +50,7 @@ class MyHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         db = Database()
         db.createDB()
+        
         if self.path == '/createAccount':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -143,7 +144,10 @@ class MyHandler(BaseHTTPRequestHandler):
                 unfinished_game = db.checkUnfinishedGame(accountID, gameID)
                 
                 if unfinished_game:
-                    tableID = db.getLastTable(gameID)
+                    tableID = db.getLastTable(accountID, gameID)
+                    
+                    if tableID == -1:
+                        raise ValueError("This Game doesn't exist")
                     
                     table = db.readTable(accountID, gameID, tableID)
                   
@@ -159,7 +163,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     tableID = db.writeTable(accountID, gameID, initialized_table)
                     db.markGameStatus(accountID, gameID, 1)
                     
-                    if tableID is None:
+                    if tableID == -1:
                         raise ValueError("This Game doesn't exist")
 
                 self.send_response(200)
@@ -181,34 +185,45 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode('utf-8'))
             
         elif self.path == '/processDrag':
+            
             content_length = int(self.headers['Content-Length'])  # Gets the size of data
             post_data = self.rfile.read(content_length)  # Gets the data itself
 
             # Parse the data from JSON
             data = json.loads(post_data.decode('utf-8'))
-            vectorData = data['vectorData']
+            vectorData = data['velocity']
+            accountID = int(data["accountID"])
+            gameID = int(data["gameID"])
+            shotTaker = data['shotTaker']
   
             print(f"Recieved data: {vectorData}")
 
-            curTable = db.readTable(db.getLatestTableID())
+            vx = vectorData['vx']
+            vy = vectorData['vy']
+    
+            tableID = db.getLastTable(accountID, gameID)
+            if tableID == -1:
+                raise ValueError("This Game doesn't exist")
+            
+            currTable = db.readTable(accountID, gameID, tableID)
 
-            curGame.shoot(gameName, p1Name, curTable, vectorData['vx'], vectorData['vy'])
-            print(vectorData['vx'], vectorData['vy'])
+            curGame = Game(accountID, gameID=gameID)
+            curGame.shoot(curGame.gameName, shotTaker, currTable, vx, vy)
+            
             svg_dict = {}
-            curTableID_temp = curTableID  # Use a temporary variable to avoid changing the global curTableID unintentionally
-
+            
             # Assuming db.readTable() doesn't modify the state of your database cursor or similar,
             # and you can freely call it with increasing IDs.
             while True:
-                tempTable = db.readTable(curTableID_temp)
+                tempTable = db.readTable(accountID, gameID, tableID)
                 # Break the loop if no more tables are found
                 if tempTable is None:
                     break
                 
-                svg_dict[curTableID_temp] = tempTable.custom_svg(tempTable)
-                curTableID_temp += 1
+                svg_dict[tableID] = tempTable.custom_svg(tempTable)
+                tableID += 1
+                
             print("\n", len(svg_dict), "\n")
-            curTableID = curTableID_temp  # Update the global curTableID
 
             # Send a response back to the client
             self.send_response(200)
