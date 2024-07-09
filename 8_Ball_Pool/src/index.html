@@ -1,44 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link rel="stylesheet" href="index.css">
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Start Game</title>
-    </head>
-    <body>
-        <h2>Start Game</h2>
-        <form id="startGameForm">
+<head>
+    <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Start Game</title>
+</head>
+<body>
+    <h2>Welcome to 8 Ball Pool</h2>
+    <form id="startGameForm">
+        <div>
             <div>
-                <label for="player1Name">Player 1 Name:</label>
-                <input
-                    type="text"
-                    id="player1Name"
-                    name="player1Name"
-                    required
-                />
+                <a href="/login.html"><button type="button">Log in</button></a>
             </div>
             <div>
-                <label for="player2Name">Player 2 Name:</label>
-                <input
-                    type="text"
-                    id="player2Name"
-                    name="player2Name"
-                    required
-                />
+                <a href="/signup.html"><button type="button">Sign up</button></a>
             </div>
-            <div>
-                <label for="gameName">Game Name:</label>
-                <input
-                    type="text"
-                    id="gameName"
-                    name="gameName"
-                    required
-                />
-            </div>
-            <button type="submit" id="start-button">Start Game</button>
-        </form>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="./script.js"></script>
-    </body>
+        </div>
+    </form>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./script.js"></script>
+</body>
 </html>

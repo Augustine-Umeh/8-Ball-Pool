@@ -53,31 +53,39 @@ class MyHandler(BaseHTTPRequestHandler):
         if self.path == '/createAccount':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
+            
             data = json.loads(post_data.decode('utf-8'))
             accountName = data.get('accountName')
             accountPassword = data.get('accountPassword')
 
-            success = db.createAccount(accountName, accountPassword)
+            accountID = db.createAccount(accountName, accountPassword)
 
-            self.send_response(201 if success else 409)  # 201 Created or 409 Conflict
+            self.send_response(201)  
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            response = {'status': 'Account created successfully' if success else 'Account already exists'}
+            response = {
+                'status': 'Account created successfully' if accountID >= 0 else  'Account already exists',
+                'accountID': accountID
+            }
             self.wfile.write(json.dumps(response).encode('utf-8'))
 
         elif self.path == '/verifyAccount':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
+            
             data = json.loads(post_data.decode('utf-8'))
             accountName = data.get('accountName')
             accountPassword = data.get('accountPassword')
 
-            exists = db.verifyAccount(accountName, accountPassword)
+            accountID = db.verifyAccount(accountName, accountPassword)
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            response = {'status': 'Account verified' if exists else 'Invalid account'}
+            response = {
+                'status': 'Account verified' if accountID >= 0 else 'Invalid account',
+                'accountID': accountID
+            }
             self.wfile.write(json.dumps(response).encode('utf-8'))
             
         elif self.path == '/startGame':
@@ -88,24 +96,28 @@ class MyHandler(BaseHTTPRequestHandler):
             p1Name = data['p1Name']
             p2Name = data['p2Name']
             gameName = data['gameName']
-            accountID = data['accountID']
-    
+            accountID = int(data['accountID'])
+
             try:
                 created_game = db.checkCreatedGame(accountID)
-                if created_game >= 0:
-                    gameID = created_game
+                
+                if created_game[0] >= 0:
+                    gameID = created_game[0] - 1
+                    gameName = created_game[1]
                 else:
                     if not gameName:
-                        gameName += p1Name + " vs " + p2Name
+                        gameName = p1Name + " vs " + p2Name
                     curGame = Game(accountID, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
                     gameID = curGame.gameID
-                
+                    gameName = curGame.gameName
+                    
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 response = {
                     'status': 'Game Created successfully',
-                    'gameID': gameID
+                    'gameID': gameID,
+                    'gameName': gameName
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
             except Exception as e:
@@ -118,13 +130,14 @@ class MyHandler(BaseHTTPRequestHandler):
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
 
+
         elif self.path == '/initializeTable':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
 
             data = json.loads(post_data.decode('utf-8'))
-            accountID = data.get('accountID')
-            gameID = data.get('gameID')
+            accountID = int(data.get('accountID'))
+            gameID = int(data.get('gameID'))
         
             try:
                 unfinished_game = db.checkUnfinishedGame(accountID, gameID)

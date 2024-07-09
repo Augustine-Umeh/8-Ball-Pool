@@ -258,40 +258,45 @@ class Database:
 
     def createAccount(self, accountName, accountPassword):
         
-        if self.verifyAccount(accountName, accountPassword):
-            return False
+        if self.verifyAccount(accountName, accountPassword) >= 0:
+            return -1
         
         cursor = self.conn.cursor()
         creation_query = "INSERT INTO ACCOUNT (ACCOUNTNAME, ACCOUNTPASSWORD) VALUES (?, ?)"
         
         cursor.execute(creation_query, (accountName, accountPassword))
+        accountID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
         
         self.conn.commit()
         cursor.close()
-        return True
+        return accountID - 1
     
     def verifyAccount(self, accountName, accountPassword):
         
         cursor = self.conn.cursor()
-        verification_query = "SELECT 1 FROM Account WHERE AccountName = ? AND AccountPassword = ?"
+        verification_query = "SELECT AccountID FROM Account WHERE AccountName = ? AND AccountPassword = ?"
         
         cursor.execute(verification_query, (accountName, accountPassword))
-        account_exists = cursor.fetchone() is not None
+        row = cursor.fetchone()
+        if not row:
+            return -1
+        
+        accountID = row[0]
         
         cursor.close()
-        return account_exists
+        return accountID - 1
     
     def checkCreatedGame(self, accountID):
-        cursor = self.conn.cursor()
         accountID += 1
+        cursor = self.conn.cursor()
         
-        check_query = "SELECT GameID FROM Game WHERE AccountID = ? AND GameUsed = 0"
+        check_query = "SELECT GameID, GameName FROM Game WHERE AccountID = ? AND GameUsed = 0"
         
         cursor.execute(check_query, (accountID,))
         created_game = cursor.fetchone()
-        
+    
         cursor.close()
-        return created_game[0] - 1 if created_game else -1
+        return created_game if created_game else (-1, None)
         
     def checkUnfinishedGame(self, accountID, gameID):
         cursor = self.conn.cursor()

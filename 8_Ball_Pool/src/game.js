@@ -1,8 +1,9 @@
 $(document).ready(function () {
     var player1Name = localStorage.getItem("player1Name");
     var player2Name = localStorage.getItem("player2Name");
-
-    console.log("Player 1 Name: ", player1Name);
+    var gameID = localStorage.getItem("gameID");
+    var gameName = localStorage.getItem("gameName");
+    var accountID = localStorage.getItem("accountID");
 
     $("#player1Name").text(player1Name);
     $("#player2Name").text(player2Name);
@@ -10,10 +11,14 @@ $(document).ready(function () {
 
     $.ajax({
         type: "POST",
-        url: "/initializeGame",
-        dataType: "text",
+        url: "/initializeTable",
+        contentType: "application/json",
+        data: JSON.stringify({
+            accountID: parseInt(accountID),
+            gameID: parseInt(gameID)
+        }),
         success: function (response) {
-            document.getElementById("svg-container").innerHTML = response;
+            document.getElementById("svg-container").innerHTML = response.svg;
 
             // Now that the SVG is loaded, select it
             let tableSVG = document.querySelector("#svg-container svg");
