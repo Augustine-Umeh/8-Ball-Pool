@@ -39,6 +39,7 @@ $(document).ready(function () {
     });
 });
 
+var cue_coord = { x: '999', y: '999' };
 function createCueAndAimLine() {
     let cueBall;
 
@@ -52,13 +53,13 @@ function createCueAndAimLine() {
     } catch {
         // If cue ball is not found, create and append it to the SVG container
         let svg = $("#svg-container svg")[0];
-    
+   
         // Create a new cue ball element
         cueBall = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         cueBall.setAttribute("id", "cue_ball");
-        cueBall.setAttribute("cx", "675");
-        cueBall.setAttribute("cy", "2025");
-        cueBall.setAttribute("r", "25"); // Assuming a radius of 25 for the cue ball
+        cueBall.setAttribute("cx", cue_coord.x);
+        cueBall.setAttribute("cy", cue_coord.y);
+        cueBall.setAttribute("r", "28");
         cueBall.setAttribute("fill", "white");
     
         // Append the cue ball to the SVG container
@@ -432,7 +433,7 @@ function shotpowerEventListeners() {
             },
         };
 
-        taker = player1Name
+        shotTaker = player1Name
 
         // Send the data using AJAX
         $.ajax({
@@ -443,8 +444,7 @@ function shotpowerEventListeners() {
                 "velocity": dataToSend.vectorData,
                 "accountID": accountID,
                 "gameID": gameID,
-                "gameName": gameName,
-                "shotTaker": taker
+                "shotTaker": shotTaker
             }),
             success: function (response) {
                 if (response.status === 'Success') {
@@ -452,6 +452,8 @@ function shotpowerEventListeners() {
                     console.log("svgData: ", Object.keys(svgData).length);
                     let svgArray = Object.values(svgData); // Convert SVG data object to an array
                     
+                    cue_coord.x = String(response.cue_coord['x'])
+                    cue_coord.y = String(response.cue_coord['y'])
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {

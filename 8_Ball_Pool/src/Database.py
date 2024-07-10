@@ -206,6 +206,93 @@ class Database:
         
         return tableID - 1  # Adjusting because SQL IDs start at 1, but we want to start at 0
     
+    def checkCueBall(self, accountID, gameID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        gameID += 1
+
+        # Check if the game exists
+        check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
+        cursor.execute(check_query, (gameID, accountID))
+        if cursor.fetchone() is None:
+            cursor.close()
+            return (-1, -1)
+
+        # Query to get all balls in the latest table
+        query = """
+        SELECT b.BallNo, b.XPos, b.YPos
+        FROM Ball b
+        JOIN PositionsTable pt ON b.BallID = pt.BallID
+        JOIN TTable t ON pt.TableID = t.TableID
+        WHERE t.GameID = ? AND t.TableID = (
+            SELECT MAX(TableID)
+            FROM TTable
+            WHERE GameID = ?
+        )
+        """
+        cursor.execute(query, (gameID, gameID))
+        results = cursor.fetchall()
+
+        # Check if cue ball (BallNo 0) exists
+        for result in results:
+            if result[0] == 0:
+                cursor.close()
+                return (-1, -1)
+
+        # Calculate ball positions
+        ball_pos = set()
+        for result in results:
+            ball_pos.add((result[1], result[2]))
+            ball_pos.add((result[1] + 90, result[2]))
+            ball_pos.add((result[1] - 90, result[2]))
+            ball_pos.add((result[1], result[2] + 90))
+            ball_pos.add((result[1], result[2] - 90))
+
+        xpos = ypos = 999
+        for x in range(1200, 300, -120):
+            for y in range(2300, 500, -120):
+                if (x, y) not in ball_pos:
+                    xpos = x
+                    ypos = y
+                    break
+            if xpos != 999 and ypos != 999:
+                break
+
+        # Insert the cue ball into the Ball and PositionsTable
+        if xpos != 999 and ypos != 999:
+            try:
+                # Insert into Ball table
+                insert_ball_query = """
+                INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
+                VALUES (?, 0, ?, ?, 0, 0)
+                """
+                cursor.execute(insert_ball_query, (gameID, xpos, ypos))
+                ball_id = cursor.lastrowid
+
+                # Insert into PositionsTable
+                table_id_query = """
+                SELECT MAX(TableID) FROM TTable WHERE GameID = ?
+                """
+                cursor.execute(table_id_query, (gameID,))
+                table_id = cursor.fetchone()[0]
+
+                insert_position_query = """
+                INSERT INTO PositionsTable (TableID, BallID)
+                VALUES (?, ?)
+                """
+                cursor.execute(insert_position_query, (table_id, ball_id))
+
+                self.conn.commit()
+            except Exception as e:
+                self.conn.rollback()
+                print(f"Error inserting cue ball: {e}")
+                cursor.close()
+                return (-1, -1)
+
+        cursor.close()
+        return (xpos, ypos)
+
+
     def getGame(self, accountID, gameID):
         cursor = self.conn.cursor()
 
@@ -413,9 +500,7 @@ class Database:
             # Get the ID of the newly inserted shot
             shotID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
 
-            # Commit the changes and return the shotID
             self.conn.commit()
-            
             return shotID - 1
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -430,6 +515,7 @@ class Database:
         gameID += 1
         tableID += 1
         shotID += 1
+        
         # Check if the GameID belongs to the provided AccountID
         check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
         cursor.execute(check_query, (gameID, accountID))

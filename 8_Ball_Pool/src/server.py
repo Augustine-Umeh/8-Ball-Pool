@@ -207,8 +207,10 @@ class MyHandler(BaseHTTPRequestHandler):
             
             currTable = db.readTable(accountID, gameID, tableID)
 
-            curGame = Game(accountID, gameID=gameID)
+            curGame = Game(accountID, gameID=gameID)       
             curGame.shoot(curGame.gameName, shotTaker, currTable, vx, vy)
+            
+            cue_coord = db.checkCueBall(accountID, gameID)
             
             svg_dict = {}
             
@@ -232,7 +234,8 @@ class MyHandler(BaseHTTPRequestHandler):
             response = {
                 'status': 'Success',
                 'message': 'Data processed successfully',
-                'svgData': svg_dict
+                'svgData': svg_dict,
+                'cue_coord': {'x': cue_coord[0], 'y': cue_coord[1]}
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
         else:

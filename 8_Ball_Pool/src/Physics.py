@@ -337,6 +337,7 @@ class Table( phylib.phylib_table ):
 
     def cueBall(self, table, xvel, yvel):
         new = Table()
+        
         for ball in table:
             if isinstance( ball, RollingBall ):
                 new += ball

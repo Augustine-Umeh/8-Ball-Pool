@@ -55,9 +55,9 @@ class Game:
                     break
 
                 segment_duration = segment_end_table.time - current_table.time
-                num_frames = math.floor(segment_duration / FRAME_INTERVAL) + 2
+                num_frames = math.floor(segment_duration / FRAME_INTERVAL) + 1
 
-                for frame in range(num_frames):  # Include the endpoint to ensure we capture the final state
+                for frame in range(1, num_frames):  # Include the endpoint to ensure we capture the final state
                     frame_time = frame * FRAME_INTERVAL
                     frame_table = current_table.roll(frame_time)
                     frame_table.time = frame_time + current_table.time
