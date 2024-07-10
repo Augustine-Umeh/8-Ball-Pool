@@ -321,8 +321,9 @@ class Table( phylib.phylib_table ):
                 # Create a new ball with the same number as the old ball
                 new_ball = RollingBall(ball.obj.rolling_ball.number, Coordinate(0,0), Coordinate(0,0),
                                         Coordinate(0,0))
-                # Compute where it rolls to (assuming phylib_roll is a placeholder for the actual calculation)
+                
                 phylib.phylib_roll(new_ball, ball, t)
+                
                 # Add ball to table
                 new_table += new_ball
             if isinstance(ball, StillBall):

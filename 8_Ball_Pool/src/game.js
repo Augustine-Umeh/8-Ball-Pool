@@ -452,8 +452,8 @@ function shotpowerEventListeners() {
                     console.log("svgData: ", Object.keys(svgData).length);
                     let svgArray = Object.values(svgData); // Convert SVG data object to an array
                     
-                    cue_coord.x = String(response.cue_coord['x'])
-                    cue_coord.y = String(response.cue_coord['y'])
+                    cue_coord.x = String(response.cue_coord['x']);
+                    cue_coord.y = String(response.cue_coord['y']);
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {

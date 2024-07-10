@@ -331,8 +331,8 @@ unsigned char phylib_stopped(phylib_object *object)
     }
 
     // Calculating speed of rolling ball (length of velocity)
-    double speed = sqrt(object->obj.rolling_ball.vel.x * object->obj.rolling_ball.vel.x +
-                        object->obj.rolling_ball.vel.y * object->obj.rolling_ball.vel.y);
+    double speed = sqrt((object->obj.rolling_ball.vel.x * object->obj.rolling_ball.vel.x) +
+                        (object->obj.rolling_ball.vel.y * object->obj.rolling_ball.vel.y));
 
     if (speed < PHYLIB_VEL_EPSILON)
     {
@@ -500,15 +500,15 @@ phylib_table *phylib_segment(phylib_table *table)
                 }
 
                 // Check for phylib_distance less than 0.0
-                for (int j = 0; j < PHYLIB_MAX_OBJECTS; ++j)
+                for (int j = 0; j < PHYLIB_MAX_OBJECTS; j++)
                 {
                     if (i != j && copyTable->object[j] != NULL)
                     {
                         double distance = phylib_distance(copyTable->object[i], copyTable->object[j]);
                         if (distance < 0.0)
                         {
-                            copyTable->time += time_passed;
                             phylib_bounce(&copyTable->object[i], &copyTable->object[j]);
+                            copyTable->time += time_passed;
                             return copyTable;
                         }
                     }

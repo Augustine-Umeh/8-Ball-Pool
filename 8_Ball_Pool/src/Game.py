@@ -43,10 +43,7 @@ class Game:
         try:
             # Use accountID and gameID to log a new shot
             shotID = self.db.newShot(self.accountID, self.gameID, playerName)
-            new_table = table.cueBall(table, xvel, yvel)
-
-            # Segment simulation loop
-            current_table = new_table
+            current_table = table.cueBall(table, xvel, yvel)
 
             while True:
                 segment_end_table = current_table.segment()
@@ -55,12 +52,12 @@ class Game:
                     break
 
                 segment_duration = segment_end_table.time - current_table.time
-                num_frames = math.floor(segment_duration / FRAME_INTERVAL) + 1
-
-                for frame in range(1, num_frames):  # Include the endpoint to ensure we capture the final state
-                    frame_time = frame * FRAME_INTERVAL
+                num_frames = math.floor(segment_duration / FRAME_INTERVAL)
+                
+                for frame in range(1, num_frames + 1):  # Include the endpoint to ensure we capture the final state
+                    frame_time = (frame * FRAME_INTERVAL) + 0.036
                     frame_table = current_table.roll(frame_time)
-                    frame_table.time = frame_time + current_table.time
+                    frame_table.time = (frame_time + current_table.time)
 
                     # Record the current state of the table and the shot
                     tableID = self.db.writeTable(self.accountID, self.gameID, frame_table)

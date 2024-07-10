@@ -214,6 +214,7 @@ class MyHandler(BaseHTTPRequestHandler):
             
             svg_dict = {}
             
+            # tableID += 1
             # Assuming db.readTable() doesn't modify the state of your database cursor or similar,
             # and you can freely call it with increasing IDs.
             while True:
