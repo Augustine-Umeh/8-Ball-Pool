@@ -31,18 +31,18 @@ class Game:
             self.player2Name = player2Name
 
             try:
-                self.gameID = self.db.setGame(accountID, gameName, player1Name, player2Name) # Create new game with accountID
+                self.gameID = self.db.createGame(accountID, gameName, player1Name, player2Name) # Create new game with accountID
             except Exception as e:
                 raise ValueError(f"Error setting game: {e}")
         
         else:
             raise TypeError("Invalid constructor usage.")
 
-    def shoot(self, gameName, playerName, table, xvel, yvel):
+    def shoot(self, playerName, table, xvel, yvel):
         
         try:
             # Use accountID and gameID to log a new shot
-            shotID = self.db.newShot(self.accountID, self.gameID, playerName)
+            shotID = self.db.createShot(self.accountID, self.gameID, playerName)
             current_table = table.cueBall(table, xvel, yvel)
 
             while True:
@@ -52,22 +52,23 @@ class Game:
                     break
 
                 segment_duration = segment_end_table.time - current_table.time
-                num_frames = math.floor(segment_duration / FRAME_INTERVAL)
+                num_frames = math.floor((segment_duration / FRAME_INTERVAL) + 1)
                 
-                for frame in range(1, num_frames + 1):  # Include the endpoint to ensure we capture the final state
+                print("number of frames: ", num_frames)
+                for frame in range(1, num_frames):  
                     frame_time = (frame * FRAME_INTERVAL) + 0.036
                     frame_table = current_table.roll(frame_time)
                     frame_table.time = (frame_time + current_table.time)
-
+                    
                     # Record the current state of the table and the shot
                     tableID = self.db.writeTable(self.accountID, self.gameID, frame_table)
                     self.db.writeTableShot(self.accountID, self.gameID, tableID, shotID)
 
                 current_table = segment_end_table
-
+            
         except Exception as e:
             print(f"An error occurred during shooting: {e}")
-         
+        
     def close(self):
         self.db.close()
 

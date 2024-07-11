@@ -104,10 +104,10 @@ phylib_table *phylib_new_table(void)
     new_table->object[5] = phylib_new_hole(&(phylib_coord){0.0, PHYLIB_TABLE_WIDTH});
     new_table->object[6] = phylib_new_hole(&(phylib_coord){0.0, PHYLIB_TABLE_LENGTH});
     new_table->object[7] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, 0.0});
-    new_table->object[8] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_LENGTH / 2.0});
+    new_table->object[8] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_WIDTH});
     new_table->object[9] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_LENGTH});
 
-    for (int i = 10; i < PHYLIB_MAX_OBJECTS; ++i)
+    for (int i = 10; i < PHYLIB_MAX_OBJECTS; i++)
     {
         new_table->object[i] = NULL; // Initialize remaining pointers to NULL
     }
@@ -156,7 +156,7 @@ phylib_table *phylib_copy_table(phylib_table *table)
     }
 
     // Copy the objects array
-    for (int i = 0; i < PHYLIB_MAX_OBJECTS; ++i)
+    for (int i = 0; i < PHYLIB_MAX_OBJECTS; i++)
     {
         if (table->object[i] != NULL)
         {
@@ -183,7 +183,7 @@ void phylib_add_object(phylib_table *table, phylib_object *object)
     }
 
     // Iterate over the object array in the table to find a NULL pointer
-    for (int i = 0; i < PHYLIB_MAX_OBJECTS; ++i)
+    for (int i = 0; i < PHYLIB_MAX_OBJECTS; i++)
     {
         if (table->object[i] == NULL)
         {
@@ -441,7 +441,7 @@ unsigned char phylib_rolling(phylib_table *t)
     unsigned char rollingCount = 0;
 
     // Counting rolling balls
-    for (int i = 0; i < PHYLIB_MAX_OBJECTS; ++i)
+    for (int i = 0; i < PHYLIB_MAX_OBJECTS; i++)
     {
         if (t->object[i] != NULL && t->object[i]->type == PHYLIB_ROLLING_BALL)
         {
@@ -517,6 +517,24 @@ phylib_table *phylib_segment(phylib_table *table)
         }
 
         time_passed += PHYLIB_SIM_RATE;
+    }
+
+    // Additional check for small velocities
+    for (int i = 0; i < PHYLIB_MAX_OBJECTS; i++)
+    {
+        if (copyTable->object[i] != NULL && copyTable->object[i]->type == PHYLIB_ROLLING_BALL)
+        {
+            if (fabs(copyTable->object[i]->obj.rolling_ball.vel.x) < PHYLIB_VEL_EPSILON)
+            {
+                copyTable->object[i]->obj.rolling_ball.vel.x = 0.0;
+                copyTable->object[i]->obj.rolling_ball.acc.x = 0.0;
+            }
+            if (fabs(copyTable->object[i]->obj.rolling_ball.vel.y) < PHYLIB_VEL_EPSILON)
+            {
+                copyTable->object[i]->obj.rolling_ball.vel.y = 0.0;
+                copyTable->object[i]->obj.rolling_ball.acc.y = 0.0;
+            }
+        }
     }
 
     return copyTable;

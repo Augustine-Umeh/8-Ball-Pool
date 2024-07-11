@@ -333,17 +333,15 @@ function getSVGCoordinates(svg, event) {
 function shotpowerEventListeners() {
     var gameID = parseInt(localStorage.getItem("gameID"));
     var accountID = parseInt(localStorage.getItem("accountID"));
-    var gameName = String(localStorage.getItem("gameName"));
-    var player1Name = String(localStorage.getItem("player1Name"))
-    var player2Name = localStorage.getItem("player2Name");
-
+    var player1Name = String(localStorage.getItem("player1Name"));
+    var player2Name = String(localStorage.getItem("player2Name"));
+    
     let isDragging = false;
     let initialY = 0;
     let maxSpeed = 10000;
     let maxDragDistance = 540; // Distance in pixels (from 80 to 620)
     
     let shotLine = document.querySelector("#shot_line");
-    let aimLine = document.querySelector("#aim_line");
 
     let startY1 = parseFloat(shotLine.getAttribute("y1"));
     let startY2 = parseFloat(shotLine.getAttribute("y2"));
@@ -385,6 +383,8 @@ function shotpowerEventListeners() {
     $(".shot-meter-container svg").on("mouseup", function (e) {
         isDragging = false;
 
+        let aimLine = document.querySelector("#aim_line");
+
         // Getting Speed
         let currentY1 = parseFloat(shotLine.getAttribute("y1"));
         console.log(`Current Y1: ${currentY1}`);
@@ -400,6 +400,7 @@ function shotpowerEventListeners() {
         let x2 = parseFloat(aimLine.getAttribute("x2"));
         let y2 = parseFloat(aimLine.getAttribute("y2"));
 
+        console.log(`Current X1: ${x1} and Current X2: ${x2}`)
         // Calculate the direction vector
         let dx = x2 - x1;
         let dy = y2 - y1;
@@ -433,7 +434,8 @@ function shotpowerEventListeners() {
             },
         };
 
-        shotTaker = player1Name
+        var shotTaker = (shotTaker === player1Name) ? player2Name : player1Name;
+
 
         // Send the data using AJAX
         $.ajax({
@@ -464,7 +466,6 @@ function shotpowerEventListeners() {
                             console.error("Error displaying SVGs:", error);
                         });
                 }
-                
             },
             error: function (xhr, status, error) {
                 console.error("Error sending data:", error);
@@ -491,7 +492,7 @@ function displayNextSVG(svgArray) {
 
         let currentIndex = 0; // Start from the first SVG
         console.log("Received SVG data: ", svgArray);
-
+        
         function updateSVG() {
 
             if (currentIndex < svgArray.length) {
@@ -512,6 +513,16 @@ function displayNextSVG(svgArray) {
         }
         updateSVG(); // Start the SVG update loop
     });
+}
+
+function changeTurn() {
+    var spanText = $("#playerTurn").text();
+
+    if (spanText === player1Name) {
+        $("#playerTurn").text(player2Name);
+    } else {
+        $("#playerTurn").text(player1Name);
+    }
 }
 
 function setupEventListeners() {
@@ -567,115 +578,6 @@ function setupEventListeners() {
     $("#svg-container svg").on("mouseleave", function (e) {
         isDragging = false;
     });
-
-    // $("#svg-container").on("mousedown", "#cue_ball", function (e) {
-    //     e.preventDefault();
-    //     isDragging = true;
-
-    //     // Assuming the cue ball's center is stored in its 'cx' and 'cy' attributes
-    //     let ballCenterX = parseFloat($(this).attr("cx"));
-    //     let ballCenterY = parseFloat($(this).attr("cy"));
-
-    //     initialPosition = { x: ballCenterX, y: ballCenterY };
-
-    //     let cueLine = $(".cue_line");
-    //     if (cueLine.length === 0) {
-    //         let svg = $("#svg-container svg")[0]; // Assuming there's only one SVG element inside #svg-container
-    //         let line = document.createElementNS(
-    //             "http://www.w3.org/2000/svg",
-    //             "line"
-    //         );
-    //         line.setAttribute("id", "cue_line");
-    //         line.setAttribute("x1", initialPosition.x);
-    //         line.setAttribute("y1", initialPosition.y);
-    //         line.setAttribute("x2", initialPosition.x); // Initial x2, y2 set to the same as x1, y1
-    //         line.setAttribute("y2", initialPosition.y);
-    //         line.setAttribute("stroke", "black");
-    //         line.setAttribute("stroke-width", "8"); // Adjusted for visibility
-    //         line.setAttribute("visibility", "visible");
-    //         svg.appendChild(line);
-    //     } else {
-    //         cueLine.attr({
-    //             x1: initialPosition.x,
-    //             y1: initialPosition.y,
-    //             x2: initialPosition.x, // Reset x2, y2 on new mousedown
-    //             y2: initialPosition.y,
-    //             visibility: "visible",
-    //         });
-    //     }
-    // });
-
-    // $("#svg-container").on("mousemove", function (e) {
-    //     if (!isDragging) return;
-
-    //     let svg = document.querySelector("#svg-container svg");
-    //     let svgPoint = getSVGCoordinates(svg, e);
-
-    //     // Update line's end point to the mouse position
-    //     $(".cue_line").attr({
-    //         x2: svgPoint.x,
-    //         y2: svgPoint.y,
-    //     });
-    // });
-
-    // $(document).on("mouseup", function (e) {
-    //     if (isDragging) {
-    //         // changeTurn();
-
-    //         const svgPoint = getSVGCoordinates(svgElement, e);
-    //         isDragging = false;
-    //         $(".cue_line").attr("visibility", "hidden");
-    //         console.log(
-    //             `Dragged from (${initialPosition.x}, ${initialPosition.y}) to (${svgPoint.x}, ${svgPoint.y})`
-    //         );
-
-    //         // Prepare the data
-    //         const dataToSend = {
-    //             initialPosition: {
-    //                 x: initialPosition.x,
-    //                 y: initialPosition.y,
-    //             },
-    //             svgPoint: {
-    //                 x: svgPoint.x,
-    //                 y: svgPoint.y,
-    //             },
-    //         };
-
-    //         // Send the data using AJAX
-    //         $.ajax({
-    //             type: "POST",
-    //             url: "/processDrag", // This URL should match your server endpoint
-    //             contentType: "application/json",
-    //             data: JSON.stringify(dataToSend),
-    //             success: function (response) {
-    //                 // Assuming the response is already parsed into an object
-    //                 let svgData = response.svgData; // Get the SVG data from the response
-    //                 let svgArray = Object.values(svgData); // Convert SVG data object to an array
-
-    //                 console.log("Received SVG data: ");
-
-    //                 displayNextSVG(svgArray); // Call the function to display SVGs one by one
-    //                 createCueAndAimLine();
-    //             },
-    //             error: function (xhr, status, error) {
-    //                 console.error("Error sending data:", error);
-    //             },
-    //         });
-    //     }
-    // });
-
-    function changeTurn() {
-        var spanText = $("#playerTurn").text();
-
-        var player1Name = localStorage.getItem("player1Name");
-        var player2Name = localStorage.getItem("player2Name");
-
-        if (spanText === player1Name) {
-            $("#playerTurn").text(player2Name);
-        } else {
-            $("#playerTurn").text(player1Name);
-        }
-    }
 }
 
 /**

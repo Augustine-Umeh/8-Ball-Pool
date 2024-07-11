@@ -161,6 +161,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     table_svg = initialized_table.custom_svg(initialized_table)
                     
                     tableID = db.writeTable(accountID, gameID, initialized_table)
+
                     db.markGameStatus(accountID, gameID, 1)
                     
                     if tableID == -1:
@@ -202,19 +203,23 @@ class MyHandler(BaseHTTPRequestHandler):
             vy = vectorData['vy']
     
             tableID = db.getLastTable(accountID, gameID)
+            print("tableID to read from ", tableID)
             if tableID == -1:
                 raise ValueError("This Game doesn't exist")
             
             currTable = db.readTable(accountID, gameID, tableID)
 
             curGame = Game(accountID, gameID=gameID)       
-            curGame.shoot(curGame.gameName, shotTaker, currTable, vx, vy)
+            curGame.shoot(shotTaker, currTable, vx, vy)
             
             cue_coord = db.checkCueBall(accountID, gameID)
             
+            # db.updateBall(accountID, gameID)
+            
             svg_dict = {}
             
-            # tableID += 1
+            tableID += 1
+            print("table ID: ", tableID)
             # Assuming db.readTable() doesn't modify the state of your database cursor or similar,
             # and you can freely call it with increasing IDs.
             while True:
@@ -225,8 +230,9 @@ class MyHandler(BaseHTTPRequestHandler):
                 
                 svg_dict[tableID] = tempTable.custom_svg(tempTable)
                 tableID += 1
-                
-            print("\n", len(svg_dict), "\n")
+            print("table ID: ", tableID)
+            
+            print("\nLength of svg dict: ", len(svg_dict), "\n")
 
             # Send a response back to the client
             self.send_response(200)

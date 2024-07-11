@@ -292,6 +292,73 @@ class Database:
         cursor.close()
         return (xpos, ypos)
 
+    def updateBall(self, accountID, gameID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        gameID += 1
+
+        # Query to get all balls and time in the latest table
+        query = """
+        SELECT b.BallNo, b.XPos, b.YPos, t.Time
+        FROM Ball b
+        JOIN PositionsTable pt ON b.BallID = pt.BallID
+        JOIN TTable t ON pt.TableID = t.TableID
+        WHERE t.GameID = ? AND t.TableID = (
+            SELECT MAX(TableID)
+            FROM TTable
+            WHERE GameID = ?
+        )
+        """
+        cursor.execute(query, (gameID, gameID))
+        results = cursor.fetchall()
+
+        # Extract time from the first result (all rows should have the same time)
+        time = results[0][3]
+
+        # Insert into TTable
+        insert_ttable_query = """
+        INSERT INTO TTable (GameID, Time)
+        VALUES (?, ?)
+        """
+        cursor.execute(insert_ttable_query, (gameID, time))
+        table_id = cursor.lastrowid
+
+        # Insert into Ball and PositionsTable
+        for result in results:
+            ball_no, x_pos, y_pos = result[0], result[1], result[2]
+
+            insert_ball_query = """
+            INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
+            VALUES (?, ?, ?, ?, 0, 0)
+            """
+            cursor.execute(insert_ball_query, (gameID, ball_no, x_pos, y_pos))
+            ball_id = cursor.lastrowid
+
+            insert_position_query = """
+            INSERT INTO PositionsTable (TableID, BallID)
+            VALUES (?, ?)
+            """
+            cursor.execute(insert_position_query, (table_id, ball_id))
+
+        retrieve_shotID = """
+        SELECT ShotID
+        FROM TableShot
+        ORDER BY TableID DESC
+        LIMIT 1
+        """
+        
+        cursor.execute(retrieve_shotID)
+        shotID = cursor.fetchone()[0]
+        
+        # Insert into TableShot
+        insert_tableshot_query = """
+        INSERT INTO TableShot (TableID, ShotID)
+        VALUES (?, ?)
+        """
+        cursor.execute(insert_tableshot_query, (table_id, shotID))
+
+        self.conn.commit()
+        cursor.close()
 
     def getGame(self, accountID, gameID):
         cursor = self.conn.cursor()
@@ -319,29 +386,25 @@ class Database:
         finally:
             cursor.close()
 
-    def setGame(self, accountID, gameName, player1Name, player2Name):
+    def createGame(self, accountID, gameName, player1Name, player2Name):
         cursor = self.conn.cursor()
-        
         accountID += 1
-        # SQL query to insert a new game into the Game table
-        query = """
-        INSERT INTO Game (AccountID, GameName, Player1Name, Player2Name)
-        VALUES (?, ?, ?, ?)
-        """
-        
-        try:
-            cursor.execute(query, (accountID, gameName, player1Name, player2Name))
-            self.conn.commit()
-            
-            # Get the GameID of the newly inserted game
-            gameID = cursor.lastrowid
-            return gameID - 1
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            self.conn.rollback()
-            return None
-        finally:
+
+        check_query = "SELECT 1 FROM Account WHERE AccountID = ?"
+        cursor.execute(check_query, (accountID,))
+        if cursor.fetchone() is None:
             cursor.close()
+            return -1
+
+        cursor.execute(
+            "INSERT INTO Game (AccountID, GameName, Player1Name, Player2Name, GameUsed) VALUES (?, ?, ?, ?, ?)",
+            (accountID, gameName, player1Name, player2Name, False)
+        )
+        self.conn.commit()
+
+        gameID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
+        cursor.close()
+        return gameID - 1
 
     def createAccount(self, accountName, accountPassword):
         
@@ -397,6 +460,53 @@ class Database:
         
         cursor.close()
         return True if created_game else False
+    
+    def getScore(self, gameID, playerName):
+        cursor = self.conn.cursor()
+        gameID += 1
+
+        check_query = "SELECT 1 FROM Game WHERE GameID = ?"
+        cursor.execute(check_query, (gameID,))
+        if cursor.fetchone() is None:
+            cursor.close()
+            return -1
+
+        query = """
+        SELECT s.ShotID
+        FROM Shot s
+        WHERE s.PlayerName = ? AND s.GameID = ?
+        """
+        cursor.execute(query, (playerName, gameID))
+        shots = cursor.fetchall()
+
+        score = 0
+        for shot in shots:
+            shotID = shot[0]
+
+            query = """
+            SELECT t.TableID
+            FROM TableShot ts
+            JOIN TTable t ON ts.TableID = t.TableID
+            WHERE ts.ShotID = ?
+            """
+            cursor.execute(query, (shotID,))
+            tables = cursor.fetchall()
+
+            for table in tables:
+                tableID = table[0]
+                query = """
+                SELECT b.BallID
+                FROM Ball b
+                JOIN PositionsTable pt ON b.BallID = pt.BallID
+                WHERE pt.TableID = ?
+                """
+                cursor.execute(query, (tableID,))
+                balls = cursor.fetchall()
+
+                score += len(balls)
+
+        cursor.close()
+        return score
     
     def getLastTable(self, accountID, gameID):
         accountID += 1
@@ -479,7 +589,7 @@ class Database:
         self.conn.commit()
         cursor.close()
 
-    def newShot(self, accountID, gameID, playerName):
+    def createShot(self, accountID, gameID, playerName):
         cursor = self.conn.cursor()
 
         accountID += 1
@@ -536,24 +646,26 @@ class Database:
         if cursor.fetchone() is None:
             cursor.close()
             return None  # shotID does not belong to the provided gameID
+        
+        cursor.execute(
+            "INSERT INTO TableShot (TableID, ShotID) VALUES (?, ?)",
+            (tableID, shotID)
+        )
+        
+        self.conn.commit()
 
-        try:
-            # Insert the new table shot into the TableShot table
-            insert_query = "INSERT INTO TableShot (TableID, ShotID) VALUES (?, ?)"
-            cursor.execute(insert_query, (tableID, shotID))
-
-            # Get the ID of the newly inserted table shot
-            tableShotID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
-
-            # Commit the changes and return the tableShotID
-            self.conn.commit()
+        cursor.close()
+        return 0
             
-            return tableShotID - 1
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return None
-        finally:
-            cursor.close()
+    def listGames(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+
+        cursor.execute("SELECT GameID, GameName FROM Game WHERE AccountID = ? AND GameUsed = 0", (accountID,))
+        results = cursor.fetchall()
+
+        cursor.close()
+        return [(gameID - 1, gameName) for gameID, gameName in results]
 
     def close(self):
         # Commit any pending transaction and close the connection

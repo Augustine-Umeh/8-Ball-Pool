@@ -388,6 +388,16 @@ class Table( phylib.phylib_table ):
         table += StillBall(13, Coordinate(675, 400))
         table += StillBall(14, Coordinate(735, 400))
         table += StillBall(15, Coordinate(795, 400))
+        table += Hole(Coordinate(0, 0))
+        table += Hole(Coordinate(0, 2700))
+        table += Hole(Coordinate(2700, 0))
+        table += Hole(Coordinate(2700, 2700))
+        table += Hole(Coordinate(1350, 0))
+        table += Hole(Coordinate(1350, 2700))
+        table += HCushion(0)
+        table += HCushion(2700)
+        table += VCushion(0)
+        table += VCushion(1350)
         # return table.custom_svg(table)
         return table
 
