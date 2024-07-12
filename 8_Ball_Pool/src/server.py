@@ -131,7 +131,6 @@ class MyHandler(BaseHTTPRequestHandler):
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
 
-
         elif self.path == '/initializeTable':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
