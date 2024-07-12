@@ -48,6 +48,7 @@ function createCueAndAimLine() {
     
         // Check if the cue ball is not found
         if (cueBall.length === 0) {
+            console.log("couldn't get ball");
             throw new Error("Cue ball not found");
         }
     } catch {
@@ -76,8 +77,8 @@ function createCueAndAimLine() {
     let poolCueLength = 1500;
     let aimLineLength = 2200;
 
-    aimLineY = cueBallY - 56;
-    cueLineY = cueBallY + 56;
+    aimLineY = cueBallY - 48;
+    cueLineY = cueBallY + 48;
 
     // Select the SVG container where you want to append the line
     let svg = $("#svg-container svg")[0];
@@ -335,7 +336,7 @@ function shotpowerEventListeners() {
     var accountID = parseInt(localStorage.getItem("accountID"));
     var player1Name = String(localStorage.getItem("player1Name"));
     var player2Name = String(localStorage.getItem("player2Name"));
-    
+
     let isDragging = false;
     let initialY = 0;
     let maxSpeed = 10000;
@@ -414,6 +415,19 @@ function shotpowerEventListeners() {
         let vx = directionX * speed;
         let vy = directionY * speed;
 
+        if (vx === 0){
+            if ( vy < 0.0 ){
+                vx = -0.1383338342;
+            } else {
+                vx = 0.2484224842;
+            }
+        } else if (vy === 0){
+            if ( vx < 0.0 ){
+                vy = -0.1383338342;
+            } else {
+                vy = 0.2484224842;
+            }
+        }
         console.log(`Shot speed: ${speed.toFixed(2)} ms`);
         console.log(
             `Shot direction: (${directionX.toFixed(2)}, ${directionY.toFixed(
@@ -456,6 +470,7 @@ function shotpowerEventListeners() {
                     
                     cue_coord.x = String(response.cue_coord['x']);
                     cue_coord.y = String(response.cue_coord['y']);
+
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {
@@ -491,7 +506,6 @@ function displayNextSVG(svgArray) {
     return new Promise((resolve, reject) => {
 
         let currentIndex = 0; // Start from the first SVG
-        console.log("Received SVG data: ", svgArray);
         
         function updateSVG() {
 

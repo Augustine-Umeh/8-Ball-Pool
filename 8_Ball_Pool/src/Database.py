@@ -206,57 +206,36 @@ class Database:
         
         return tableID - 1  # Adjusting because SQL IDs start at 1, but we want to start at 0
     
-    def checkCueBall(self, accountID, gameID):
+    def checkCueBall(self, accountID, gameID, new_table):
         cursor = self.conn.cursor()
         accountID += 1
         gameID += 1
 
-        # Check if the game exists
-        check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
-        cursor.execute(check_query, (gameID, accountID))
-        if cursor.fetchone() is None:
-            cursor.close()
-            return (-1, -1)
-
-        # Query to get all balls in the latest table
-        query = """
-        SELECT b.BallNo, b.XPos, b.YPos
-        FROM Ball b
-        JOIN PositionsTable pt ON b.BallID = pt.BallID
-        JOIN TTable t ON pt.TableID = t.TableID
-        WHERE t.GameID = ? AND t.TableID = (
-            SELECT MAX(TableID)
-            FROM TTable
-            WHERE GameID = ?
-        )
-        """
-        cursor.execute(query, (gameID, gameID))
-        results = cursor.fetchall()
-
-        # Check if cue ball (BallNo 0) exists
-        for result in results:
-            if result[0] == 0:
-                cursor.close()
-                return (-1, -1)
-
         # Calculate ball positions
         ball_pos = set()
-        for result in results:
+        for result in new_table:
             ball_pos.add((result[1], result[2]))
-            ball_pos.add((result[1] + 90, result[2]))
-            ball_pos.add((result[1] - 90, result[2]))
-            ball_pos.add((result[1], result[2] + 90))
-            ball_pos.add((result[1], result[2] - 90))
 
         xpos = ypos = 999
+        # Range of positions to check
         for x in range(1200, 300, -120):
             for y in range(2300, 500, -120):
+                valid_position = True
+                
+                # Check if the position is not occupied
                 if (x, y) not in ball_pos:
-                    xpos = x
-                    ypos = y
-                    break
+                    # Check if the distance is at least 56 units from any existing ball
+                    for ball in new_table:
+                        distance = math.sqrt((x - ball[1]) ** 2 + (y - ball[2]) ** 2)
+                        if distance < 56:
+                            valid_position = False
+                            break
+                    
+                    if valid_position:
+                        xpos, ypos = x, y
+                        break  # Exit the y-loop if a valid position is found
             if xpos != 999 and ypos != 999:
-                break
+                break  # Exit the x-loop if a valid position is found
 
         # Insert the cue ball into the Ball and PositionsTable
         if xpos != 999 and ypos != 999:
@@ -287,78 +266,117 @@ class Database:
                 self.conn.rollback()
                 print(f"Error inserting cue ball: {e}")
                 cursor.close()
-                return (-1, -1)
+                return (999, 999)
 
         cursor.close()
         return (xpos, ypos)
 
-    def updateBall(self, accountID, gameID):
+    def updateTable(self, accountID, gameID):
         cursor = self.conn.cursor()
         accountID += 1
         gameID += 1
 
-        # Query to get all balls and time in the latest table
-        query = """
-        SELECT b.BallNo, b.XPos, b.YPos, t.Time
-        FROM Ball b
-        JOIN PositionsTable pt ON b.BallID = pt.BallID
-        JOIN TTable t ON pt.TableID = t.TableID
-        WHERE t.GameID = ? AND t.TableID = (
-            SELECT MAX(TableID)
-            FROM TTable
-            WHERE GameID = ?
-        )
-        """
-        cursor.execute(query, (gameID, gameID))
-        results = cursor.fetchall()
-
-        # Extract time from the first result (all rows should have the same time)
-        time = results[0][3]
-
-        # Insert into TTable
-        insert_ttable_query = """
-        INSERT INTO TTable (GameID, Time)
-        VALUES (?, ?)
-        """
-        cursor.execute(insert_ttable_query, (gameID, time))
-        table_id = cursor.lastrowid
-
-        # Insert into Ball and PositionsTable
-        for result in results:
-            ball_no, x_pos, y_pos = result[0], result[1], result[2]
-
-            insert_ball_query = """
-            INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
-            VALUES (?, ?, ?, ?, 0, 0)
+        try:
+            # Query to get balls and time in the latest table
+            query = """
+            SELECT b.BallID, b.BallNo, b.XPos, b.YPos, b.XVel, b.YVel, t.Time
+            FROM Ball b
+            JOIN PositionsTable pt ON b.BallID = pt.BallID
+            JOIN TTable t ON pt.TableID = t.TableID
+            WHERE t.GameID = ? AND t.TableID = (
+                SELECT MAX(TableID)
+                FROM TTable
+                WHERE GameID = ?
+            )
             """
-            cursor.execute(insert_ball_query, (gameID, ball_no, x_pos, y_pos))
-            ball_id = cursor.lastrowid
+            cursor.execute(query, (gameID, gameID))
+            results = cursor.fetchall()
 
-            insert_position_query = """
-            INSERT INTO PositionsTable (TableID, BallID)
+            # Extract time from the first result (all rows should have the same time)
+            time = results[0][6]
+
+            # Insert into TTable
+            insert_ttable_query = """
+            INSERT INTO TTable (GameID, Time)
             VALUES (?, ?)
             """
-            cursor.execute(insert_position_query, (table_id, ball_id))
+            cursor.execute(insert_ttable_query, (gameID, time))
+            table_id = cursor.lastrowid
 
-        retrieve_shotID = """
-        SELECT ShotID
-        FROM TableShot
-        ORDER BY TableID DESC
-        LIMIT 1
-        """
-        
-        cursor.execute(retrieve_shotID)
-        shotID = cursor.fetchone()[0]
-        
-        # Insert into TableShot
-        insert_tableshot_query = """
-        INSERT INTO TableShot (TableID, ShotID)
-        VALUES (?, ?)
-        """
-        cursor.execute(insert_tableshot_query, (table_id, shotID))
+            removed_cue = True
+            new_table = []
 
-        self.conn.commit()
-        cursor.close()
+            for result in results:
+                ball_id, ball_no, x_pos, y_pos, x_vel, y_vel = result[0], result[1], result[2], result[3], result[4], result[5]
+                valid = True
+                for hole in [(0, 0), (0, 1350), (0, 2700), (1350, 0), (1350, 1350), (1350, 2700)]:
+                    distance = math.sqrt((hole[0] - x_pos) ** 2 + (hole[1] - y_pos) ** 2)
+                    if distance <= 112:
+                        valid = False
+                        break
+                if ball_no != 0 and ((x_vel == 0.0 and y_vel == 0.0) or valid):
+                    insert_ball_query = """
+                    INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
+                    VALUES (?, ?, ?, ?, 0, 0)
+                    """
+                    cursor.execute(insert_ball_query, (gameID, ball_no, x_pos, y_pos))
+
+                    new_ball_id = cursor.lastrowid
+
+                    insert_position_query = """
+                    INSERT INTO PositionsTable (TableID, BallID)
+                    VALUES (?, ?)
+                    """
+                    cursor.execute(insert_position_query, (table_id, new_ball_id))
+                    new_table.append((ball_no, x_pos, y_pos, x_vel, y_vel))
+                    
+                else:
+                    if ball_no == 0:
+                        removed_cue = False
+                        insert_ball_query = """
+                        INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
+                        VALUES (?, ?, ?, ?, 0, 0)
+                        """
+                        cursor.execute(insert_ball_query, (gameID, ball_no, x_pos, y_pos))
+
+                        new_ball_id = cursor.lastrowid
+
+                        insert_position_query = """
+                        INSERT INTO PositionsTable (TableID, BallID)
+                        VALUES (?, ?)
+                        """
+                        cursor.execute(insert_position_query, (table_id, new_ball_id))
+
+            # Insert into TableShot
+            retrieve_shotID = """
+            SELECT ShotID
+            FROM TableShot
+            ORDER BY TableID DESC
+            LIMIT 1
+            """
+            cursor.execute(retrieve_shotID)
+            shotID = cursor.fetchone()[0]
+
+            insert_tableshot_query = """
+            INSERT INTO TableShot (TableID, ShotID)
+            VALUES (?, ?)
+            """
+            cursor.execute(insert_tableshot_query, (table_id, shotID))
+
+            res = (999, 999)
+            if removed_cue:
+                res = self.checkCueBall(accountID - 1, gameID - 1, new_table)
+                
+            self.conn.commit()
+            cursor.close()
+            return res
+
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error updating table: {e}")
+            cursor.close()
+            return (999, 999)
+
 
     def getGame(self, accountID, gameID):
         cursor = self.conn.cursor()
@@ -381,7 +399,7 @@ class Database:
                 return gameInfo  # This returns a tuple: (gameName, player1Name, player2Name)
             return None
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred in getting game: {e}")
             return None
         finally:
             cursor.close()
@@ -613,7 +631,7 @@ class Database:
             self.conn.commit()
             return shotID - 1
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred in creating shot: {e}")
             return None
         finally:
             cursor.close()

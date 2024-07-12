@@ -212,12 +212,9 @@ class MyHandler(BaseHTTPRequestHandler):
             curGame = Game(accountID, gameID=gameID)       
             curGame.shoot(shotTaker, currTable, vx, vy)
             
-            cue_coord = db.checkCueBall(accountID, gameID)
-            
-            # db.updateBall(accountID, gameID)
+            cue_coord = db.updateTable(accountID, gameID)
             
             svg_dict = {}
-            
             tableID += 1
             print("table ID: ", tableID)
             # Assuming db.readTable() doesn't modify the state of your database cursor or similar,
