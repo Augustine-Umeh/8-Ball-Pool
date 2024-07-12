@@ -75,7 +75,7 @@ function createCueAndAimLine() {
     let cueLineY = 0;
 
     let poolCueLength = 1500;
-    let aimLineLength = 2200;
+    let aimLineLength = 7000;
 
     aimLineY = cueBallY - 48;
     cueLineY = cueBallY + 48;

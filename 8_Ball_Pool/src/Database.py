@@ -270,7 +270,7 @@ class Database:
 
         cursor.close()
         return (xpos, ypos)
-
+    
     def updateTable(self, accountID, gameID):
         cursor = self.conn.cursor()
         accountID += 1
@@ -311,10 +311,10 @@ class Database:
                 valid = True
                 for hole in [(0, 0), (0, 1350), (0, 2700), (1350, 0), (1350, 1350), (1350, 2700)]:
                     distance = math.sqrt((hole[0] - x_pos) ** 2 + (hole[1] - y_pos) ** 2)
-                    if distance > 150:
+                    if distance < 113:
                         valid = False
                         break
-                if (-0.2 < x_vel < 0.2 and -0.2 < y_vel < 0.2) or valid:
+                if valid and (-53 < x_vel < 53 or -53 < y_vel < 53):
                     insert_ball_query = """
                     INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
                     VALUES (?, ?, ?, ?, 0, 0)

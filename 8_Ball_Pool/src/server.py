@@ -199,10 +199,13 @@ class MyHandler(BaseHTTPRequestHandler):
   
             print(f"Recieved data: {vectorData}")
 
+            tableID = db.getLastTable(accountID, gameID)
+            
             vx = vectorData['vx']
             vy = vectorData['vy']
+            if tableID == 0 and  -1 < vx < 1:
+                vx += 44
     
-            tableID = db.getLastTable(accountID, gameID)
             print("tableID to read from ", tableID)
             if tableID == -1:
                 raise ValueError("This Game doesn't exist")
