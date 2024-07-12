@@ -56,7 +56,7 @@ class Game:
                 
                 print("number of frames: ", num_frames)
                 for frame in range(1, num_frames):  
-                    frame_time = (frame * FRAME_INTERVAL)
+                    frame_time = (frame * FRAME_INTERVAL) + 0.036
                     frame_table = current_table.roll(frame_time)
                     frame_table.time = (frame_time + current_table.time)
                     

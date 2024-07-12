@@ -265,21 +265,21 @@ double phylib_distance(phylib_object *obj1, phylib_object *obj2)
 
     switch (obj2->type)
     {
-    case PHYLIB_ROLLING_BALL:
-    case PHYLIB_STILL_BALL: // Ball and Ball minus both radius'
-        return coord_distance(center_obj1, obj2->obj.still_ball.pos) - PHYLIB_BALL_DIAMETER;
+        case PHYLIB_ROLLING_BALL:
+        case PHYLIB_STILL_BALL: // Ball and Ball minus both radius'
+            return coord_distance(center_obj1, obj2->obj.still_ball.pos) - PHYLIB_BALL_DIAMETER;
 
-    case PHYLIB_HOLE: // Ball and hole minus hole radius
-        return coord_distance(center_obj1, obj2->obj.hole.pos) - PHYLIB_HOLE_RADIUS;
+        case PHYLIB_HOLE: // Ball and hole minus hole radius
+            return coord_distance(center_obj1, obj2->obj.hole.pos) - PHYLIB_HOLE_RADIUS;
 
-    case PHYLIB_HCUSHION: // Ball and h-cushion minus ball radius
-        return fabs(center_obj1.y - obj2->obj.hcushion.y) - PHYLIB_BALL_RADIUS;
+        case PHYLIB_HCUSHION: // Ball and h-cushion minus ball radius
+            return fabs(center_obj1.y - obj2->obj.hcushion.y) - PHYLIB_BALL_RADIUS;
 
-    case PHYLIB_VCUSHION: // Ball and v-cushion minus ball radius
-        return fabs(center_obj1.x - obj2->obj.vcushion.x) - PHYLIB_BALL_RADIUS;
-        // -4 - 1350 = 1354 - 28.5 = 
-    default: // Invalid obj2 type
-        return -1.0;
+        case PHYLIB_VCUSHION: // Ball and v-cushion minus ball radius
+            return fabs(center_obj1.x - obj2->obj.vcushion.x) - PHYLIB_BALL_RADIUS;
+            
+        default: // Invalid obj2 type
+            return -1.0;
     }
 }
 

@@ -311,10 +311,10 @@ class Database:
                 valid = True
                 for hole in [(0, 0), (0, 1350), (0, 2700), (1350, 0), (1350, 1350), (1350, 2700)]:
                     distance = math.sqrt((hole[0] - x_pos) ** 2 + (hole[1] - y_pos) ** 2)
-                    if distance <= 112:
+                    if distance > 150:
                         valid = False
                         break
-                if ball_no != 0 and ((x_vel == 0.0 and y_vel == 0.0) or valid):
+                if (-0.2 < x_vel < 0.2 and -0.2 < y_vel < 0.2) or valid:
                     insert_ball_query = """
                     INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
                     VALUES (?, ?, ?, ?, 0, 0)
@@ -329,24 +329,9 @@ class Database:
                     """
                     cursor.execute(insert_position_query, (table_id, new_ball_id))
                     new_table.append((ball_no, x_pos, y_pos, x_vel, y_vel))
-                    
-                else:
                     if ball_no == 0:
                         removed_cue = False
-                        insert_ball_query = """
-                        INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
-                        VALUES (?, ?, ?, ?, 0, 0)
-                        """
-                        cursor.execute(insert_ball_query, (gameID, ball_no, x_pos, y_pos))
-
-                        new_ball_id = cursor.lastrowid
-
-                        insert_position_query = """
-                        INSERT INTO PositionsTable (TableID, BallID)
-                        VALUES (?, ?)
-                        """
-                        cursor.execute(insert_position_query, (table_id, new_ball_id))
-
+                    
             # Insert into TableShot
             retrieve_shotID = """
             SELECT ShotID
