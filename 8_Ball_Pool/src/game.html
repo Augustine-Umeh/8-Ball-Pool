@@ -13,10 +13,16 @@
             <p>Player 2: <span id="player2Name"></span></p>
             <p><span id="playerTurn"></span>'s Turn</p>
         </div> -->
-        <div class="container">
+
+        <div class="grid-container">
             <div id="svg-container" class="div1"></div>
             <div class="shot-meter-container">
-                <svg width="75" height="700" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                    id="shot-meter"
+                    width="75"
+                    height="700"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
                     <rect
                         width="75"
                         height="700"
@@ -37,6 +43,40 @@
                 </svg>
             </div>
         </div>
+        <div class="scoreboard">
+            <!-- Player 1 -->
+            <div class="player">
+                <img
+                    src="https://via.placeholder.com/60"
+                    alt="Player 1 Picture"
+                />
+                <div class="name">Player 1</div>
+                <div class="balls-pocketed">Balls Pocketed:</div>
+                <div class="balls">
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                    <!-- Add more balls as needed -->
+                </div>
+            </div>
+
+            <!-- Player 2 -->
+            <div class="player">
+                <img
+                    src="https://via.placeholder.com/60"
+                    alt="Player 2 Picture"
+                />
+                <div class="name">Player 2</div>
+                <div class="balls-pocketed">Balls Pocketed:</div>
+                <div class="balls">
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                    <div class="ball"></div>
+                    <!-- Add more balls as needed -->
+                </div>
+            </div>
+        </div>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="game.js"></script>
     </body>

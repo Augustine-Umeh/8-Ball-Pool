@@ -8,9 +8,13 @@ body {
 }
 
 .container {
+    display: block;
+}
+
+.grid-container {
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 350px; /* Adjust as needed */
+    gap: 150px;
 }
 
 #svg-container {
@@ -26,6 +30,16 @@ body {
     align-items: center;
 }
 
+
+#table {
+    transform: scale(0.7);
+    /* width: 50%;
+    height: auto; */
+}
+
+#shot-meter {
+    transform: scale(0.7);
+}
 
 /* #svg-container {
     width: 75vw;
