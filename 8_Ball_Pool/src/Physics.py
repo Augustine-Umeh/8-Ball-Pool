@@ -92,15 +92,26 @@ class StillBall( phylib.phylib_object ):
 
     # add an svg method here
     def svg(self):
-        if (self.obj.still_ball.number < 9):
-            return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (
-                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number])
+        if self.obj.still_ball.number < 9:
+            return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
+                <circle cx="%d" cy="%d" r="%d" fill="%s" />
+                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>\n""" % (
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number],
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
+                )
         else:
             return """ <g class="ball">
-                        <circle cx="%d" cy="%d" r="%d" fill="%s" />
-                        <rect x="%d" y="%d" width="56" height="16" fill="white" />
-                        </g>\n""" % (
-                        self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number], self.obj.still_ball.pos.x - 28, self.obj.still_ball.pos.y - 8)
+                <circle cx="%d" cy="%d" r="%d" fill="%s" />
+                <circle cx="%d" cy="%d" r="%d" fill="%s" />
+                <rect x="%d" y="%d" width="56" height="16" fill="white" />
+                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
+                </g>\n""" % (
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number], 
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, 15,  BALL_COLOURS[0],
+                self.obj.still_ball.pos.x - 28, self.obj.still_ball.pos.y - 9, 
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
+                )
 
 
 ################################################################################
@@ -128,15 +139,28 @@ class RollingBall( phylib.phylib_object ):
 
     # add an svg method here
     def svg(self):
-        if (self.obj.rolling_ball.number < 9):
-            return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (
-                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number])
+        if self.obj.rolling_ball.number < 9:
+            return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
+                <circle cx="%d" cy="%d" r="%d" fill="%s" />
+                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>
+                \n""" % (
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number],
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
+                )
         else:
             return """ <g class="ball">
-                        <circle cx="%d" cy="%d" r="%d" fill="%s" />
-                        <rect x="%d" y="%d" width="56" height="16" fill="white" />
-                        </g>\n""" % (
-                        self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number], self.obj.rolling_ball.pos.x - 28, self.obj.rolling_ball.pos.y - 8)
+                <circle cx="%d" cy="%d" r="%d" fill="%s" />
+                <circle cx="%d" cy="%d" r="%d" fill="%s" />
+                <rect x="%d" y="%d" width="56" height="16" fill="white" />
+                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
+                </g>\n""" % (
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number], 
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, 15,  BALL_COLOURS[0],
+                self.obj.rolling_ball.pos.x - 28, self.obj.rolling_ball.pos.y - 9, 
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
+                )
+
 
 
 ################################################################################

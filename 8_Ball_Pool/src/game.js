@@ -175,7 +175,7 @@ function rotatePoolCue(angle) {
 }
 
 function checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY) {
-    const balls = $(".ball");
+    const balls = $("g.ball circle, circle.ball");
     const aimLine = $("#aim_line");
 
     let x1 = parseFloat(aimLine.attr("x1"));
@@ -415,17 +415,17 @@ function shotpowerEventListeners() {
         let vx = directionX * speed;
         let vy = directionY * speed;
 
-        if (vx === 0){
+        if (vx < 1 && vx > -1){
             if ( vy < 0.0 ){
-                vx = -0.1383338342;
+                vx = -22.1383338342;
             } else {
-                vx = 0.2484224842;
+                vx = 35.2484224842;
             }
-        } else if (vy === 0){
+        } else if (vy < 1 && vy > -1){
             if ( vx < 0.0 ){
-                vy = -0.1383338342;
+                vy = -32.32746462;
             } else {
-                vy = 0.2484224842;
+                vy = 28.737474743;
             }
         }
         console.log(`Shot speed: ${speed.toFixed(2)} ms`);

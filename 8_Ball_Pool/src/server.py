@@ -202,8 +202,6 @@ class MyHandler(BaseHTTPRequestHandler):
             
             vx = vectorData['vx']
             vy = vectorData['vy']
-            if tableID == 0 and  -1 < vx < 1:
-                vx += 44
     
             print("tableID to read from ", tableID)
             if tableID == -1:
