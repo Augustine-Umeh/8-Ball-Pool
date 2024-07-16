@@ -218,8 +218,8 @@ class Database:
 
         xpos = ypos = 999
         # Range of positions to check
-        for x in range(1200, 300, -120):
-            for y in range(2300, 500, -120):
+        for x in range(1200, 2500, -120):
+            for y in range(1200, 300, -120):
                 valid_position = True
                 
                 # Check if the position is not occupied
@@ -309,7 +309,7 @@ class Database:
             for result in results:
                 ball_id, ball_no, x_pos, y_pos, x_vel, y_vel = result[0], result[1], result[2], result[3], result[4], result[5]
                 valid = True
-                for hole in [(0, 0), (0, 1350), (0, 2700), (1350, 0), (1350, 1350), (1350, 2700)]:
+                for hole in [(0, 0), (1350, 0), (2700, 0), (1350, 1350), (2700, 1350), (2700, 1350)]:
                     distance = math.sqrt((hole[0] - x_pos) ** 2 + (hole[1] - y_pos) ** 2)
                     if distance < 113:
                         valid = False

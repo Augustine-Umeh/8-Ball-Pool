@@ -4,10 +4,10 @@ import math
 HEADER = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
 "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg id="table" width="700" height="1375" viewBox="-25 -25 1400 2750"
+<svg id="table" width="1375" height="700" viewBox="-25 -25 2750 1400"
 xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink">
-<rect width="1350" height="2700" x="0" y="0" fill="#C0D0C0" />"""
+<rect width="2700" height="1350" x="0" y="0" fill="#C0D0C0" />"""
 
 FOOTER = """</svg>\n"""
 
@@ -64,7 +64,6 @@ class Coordinate( phylib.phylib_coord ):
     """
     pass
 
-
 ################################################################################
 class StillBall( phylib.phylib_object ):
     """
@@ -93,9 +92,9 @@ class StillBall( phylib.phylib_object ):
             return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>\n""" % (
-                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number],
-                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
-                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
+                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number],
+                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, BALL_RADIUS // 2,  BALL_COLOURS[0],
+                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x + 2, self.obj.still_ball.number
                 )
         else:
             return """ <g class="ball">
@@ -104,12 +103,11 @@ class StillBall( phylib.phylib_object ):
                 <rect x="%d" y="%d" width="56" height="16" fill="white" />
                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
                 </g>\n""" % (
-                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number], 
-                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, 15,  BALL_COLOURS[0],
-                self.obj.still_ball.pos.x - 28, self.obj.still_ball.pos.y - 9, 
-                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
+                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number], 
+                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, 15,  BALL_COLOURS[0],
+                self.obj.still_ball.pos.y - 28, self.obj.still_ball.pos.x - 9, 
+                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x + 2, self.obj.still_ball.number
                 )
-
 
 ################################################################################
 class RollingBall( phylib.phylib_object ):
@@ -140,9 +138,9 @@ class RollingBall( phylib.phylib_object ):
                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>
                 \n""" % (
-                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number],
-                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
-                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
+                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number],
+                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, BALL_RADIUS // 2,  BALL_COLOURS[0],
+                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x + 2, self.obj.rolling_ball.number
                 )
         else:
             return """ <g class="ball">
@@ -151,12 +149,11 @@ class RollingBall( phylib.phylib_object ):
                 <rect x="%d" y="%d" width="56" height="16" fill="white" />
                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
                 </g>\n""" % (
-                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number], 
-                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, 15,  BALL_COLOURS[0],
-                self.obj.rolling_ball.pos.x - 28, self.obj.rolling_ball.pos.y - 9, 
-                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
+                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number], 
+                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, 15,  BALL_COLOURS[0],
+                self.obj.rolling_ball.pos.y - 28, self.obj.rolling_ball.pos.x - 9, 
+                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x + 2, self.obj.rolling_ball.number
                 )
-
 
 ################################################################################
 class Hole( phylib.phylib_object ):
@@ -180,12 +177,10 @@ class Hole( phylib.phylib_object ):
         # this converts the phylib_object into a Hole class
         self.__class__ = Hole
 
-
     # add an svg method here
     def svg(self):
         return """ <circle cx="%d" cy="%d" r="%d" fill="black" />\n""" % (
             self.obj.hole.pos.x, self.obj.hole.pos.y, HOLE_RADIUS)
-
 
 ################################################################################
 class HCushion( phylib.phylib_object ):
@@ -211,9 +206,8 @@ class HCushion( phylib.phylib_object ):
 
     # add an svg method here
     def svg(self):
-        y = -25 if self.obj.hcushion.y == 0 else 2700
-        return """ <rect width="1400" height="25" x="-25" y="%d" fill="darkgreen" />\n""" % (y)
-
+        y = -25 if self.obj.hcushion.y == 0 else 1350
+        return """ <rect width="2750" height="25" x="-25" y="%d" fill="darkgreen" />\n""" % (y)
 
 ################################################################################
 class VCushion( phylib.phylib_object ):
@@ -239,8 +233,186 @@ class VCushion( phylib.phylib_object ):
 
     # add an svg method here
     def svg(self):
-        x = -25 if self.obj.hcushion.y == 0 else 1350
-        return """ <rect width="25" height="2750" x="%d" y="-25" fill="darkgreen" />\n""" % (x)
+        x = -25 if self.obj.vcushion.x == 0 else 2700
+        return """ <rect width="25" height="1400" x="%d" y="-25" fill="darkgreen" />\n""" % (x)
+
+
+# ################################################################################
+# class StillBall( phylib.phylib_object ):
+#     """
+#     Python StillBall class.
+#     """
+
+#     def __init__( self, number, pos ):
+#         """
+#         Constructor function. Requires ball number and position (x,y) as
+#         arguments.
+#         """
+
+#         # this creates a generic phylib_object
+#         phylib.phylib_object.__init__( self, 
+#                                        phylib.PHYLIB_STILL_BALL, 
+#                                        number, 
+#                                        pos, None, None, 
+#                                        0.0, 0.0 )
+      
+#         # this converts the phylib_object into a StillBall class
+#         self.__class__ = StillBall
+
+#     # add an svg method here
+#     def svg(self):
+#         if self.obj.still_ball.number < 9:
+#             return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>\n""" % (
+#                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number],
+#                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
+#                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
+#                 )
+#         else:
+#             return """ <g class="ball">
+#                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <rect x="%d" y="%d" width="56" height="16" fill="white" />
+#                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
+#                 </g>\n""" % (
+#                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number], 
+#                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, 15,  BALL_COLOURS[0],
+#                 self.obj.still_ball.pos.x - 28, self.obj.still_ball.pos.y - 9, 
+#                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
+#                 )
+
+
+# ################################################################################
+# class RollingBall( phylib.phylib_object ):
+#     """
+#     Python RollingBall class.
+#     """
+
+#     def __init__( self, number, pos, vel, acc):
+#         """
+#         Constructor function. Requires ball number and position (x,y) as
+#         arguments.
+#         """
+
+#         # this creates a generic phylib_object
+#         phylib.phylib_object.__init__( self, 
+#                                        phylib.PHYLIB_ROLLING_BALL, 
+#                                        number, 
+#                                        pos, vel, acc, 
+#                                        0.0, 0.0 )
+      
+#         # this converts the phylib_object into a Rolling class
+#         self.__class__ = RollingBall
+
+#     # add an svg method here
+#     def svg(self):
+#         if self.obj.rolling_ball.number < 9:
+#             return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>
+#                 \n""" % (
+#                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number],
+#                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
+#                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
+#                 )
+#         else:
+#             return """ <g class="ball">
+#                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
+#                 <rect x="%d" y="%d" width="56" height="16" fill="white" />
+#                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
+#                 </g>\n""" % (
+#                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number], 
+#                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, 15,  BALL_COLOURS[0],
+#                 self.obj.rolling_ball.pos.x - 28, self.obj.rolling_ball.pos.y - 9, 
+#                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
+#                 )
+
+
+# ################################################################################
+# class Hole( phylib.phylib_object ):
+#     """
+#     Python Hole class.
+#     """
+
+#     def __init__( self, pos):
+#         """
+#         Constructor function. Requires ball number and position (x,y) as
+#         arguments.
+#         """
+
+#         # this creates a generic phylib_object
+#         phylib.phylib_object.__init__( self, 
+#                                        phylib.PHYLIB_HOLE, 
+#                                        0, 
+#                                        pos, None, None , 
+#                                        0.0, 0.0 )
+      
+#         # this converts the phylib_object into a Hole class
+#         self.__class__ = Hole
+
+
+#     # add an svg method here
+#     def svg(self):
+#         return """ <circle cx="%d" cy="%d" r="%d" fill="black" />\n""" % (
+#             self.obj.hole.pos.x, self.obj.hole.pos.y, HOLE_RADIUS)
+
+
+# ################################################################################
+# class HCushion( phylib.phylib_object ):
+#     """
+#     Python HCushion class.
+#     """
+
+#     def __init__( self, y):
+#         """
+#         Constructor function. Requires ball number and position (x,y) as
+#         arguments.
+#         """
+
+#         # this creates a generic phylib_object
+#         phylib.phylib_object.__init__( self, 
+#                                        phylib.PHYLIB_HCUSHION,
+#                                        0, 
+#                                        None, None, None, 
+#                                        0.0, y)
+      
+#         # this converts the phylib_object into a Rolling class
+#         self.__class__ = HCushion
+
+#     # add an svg method here
+#     def svg(self):
+#         y = -25 if self.obj.hcushion.y == 0 else 1350
+#         return """ <rect width="2750" height="25" x="-25" y="%d" fill="darkgreen" />\n""" % (y)
+
+
+# ################################################################################
+# class VCushion( phylib.phylib_object ):
+#     """
+#     Python VCushion class.
+#     """
+
+#     def __init__( self, x):
+#         """
+#         Constructor function. Requires ball number and position (x,y) as
+#         arguments.
+#         """
+
+#         # this creates a generic phylib_object
+#         phylib.phylib_object.__init__( self, 
+#                                        phylib.PHYLIB_VCUSHION, 
+#                                        0, 
+#                                        None, None, None , 
+#                                        x, 0.0)
+      
+#         # this converts the phylib_object into a Rolling class
+#         self.__class__ = VCushion
+
+#     # add an svg method here
+#     def svg(self):
+#         x = -25 if self.obj.hcushion.y == 0 else 2700
+#         return """ <rect width="25" height="1400" x="%d" y="-25" fill="darkgreen" />\n""" % (x)
 
 
 ################################################################################
@@ -403,22 +575,24 @@ class Table( phylib.phylib_table ):
         return new
     
     def initializeTable(self, table):
-        table += StillBall(0, Coordinate(675, 2025))
-        table += StillBall(1, Coordinate(675, 640))
-        table += StillBall(2, Coordinate(645, 580))
-        table += StillBall(3, Coordinate(705, 580))
-        table += StillBall(4, Coordinate(615, 520))
-        table += StillBall(5, Coordinate(675, 520))
-        table += StillBall(6, Coordinate(735,520))
-        table += StillBall(7, Coordinate(585,460))
-        table += StillBall(8, Coordinate(645,460))
-        table += StillBall(9, Coordinate(705, 460))
-        table += StillBall(10, Coordinate(765, 460))
-        table += StillBall(11, Coordinate(555, 400))
-        table += StillBall(12, Coordinate(615, 400))
-        table += StillBall(13, Coordinate(675, 400))
-        table += StillBall(14, Coordinate(735, 400))
-        table += StillBall(15, Coordinate(795, 400))
+        table += StillBall(0, Coordinate(2025, 675))  # Cue ball position
+
+        # Rack positions
+        table += StillBall(1, Coordinate(675, 640))   # Apex - 1-ball
+        table += StillBall(11, Coordinate(645, 580))  # Second row, left - 11-ball
+        table += StillBall(2, Coordinate(705, 580))   # Second row, right - 2-ball
+        table += StillBall(10, Coordinate(615, 520))  # Third row, left - 10-ball
+        table += StillBall(8, Coordinate(675, 520))   # Third row, middle - 8-ball
+        table += StillBall(3, Coordinate(735, 520))   # Third row, right - 3-ball
+        table += StillBall(9, Coordinate(585, 460))   # Fourth row, far left - 9-ball
+        table += StillBall(14, Coordinate(645, 460))  # Fourth row, left middle - 14-ball
+        table += StillBall(4, Coordinate(705, 460))   # Fourth row, right middle - 4-ball
+        table += StillBall(13, Coordinate(765, 460))  # Fourth row, far right - 13-ball
+        table += StillBall(12, Coordinate(555, 400))  # Base row, far left - 12-ball
+        table += StillBall(5, Coordinate(615, 400))   # Base row, left - 5-ball
+        table += StillBall(15, Coordinate(675, 400))  # Base row, middle - 15-ball
+        table += StillBall(6, Coordinate(735, 400))   # Base row, right - 6-ball
+        table += StillBall(7, Coordinate(795, 400))   # Base row, far right - 7-ball
         # return table.custom_svg(table)
         return table
 
