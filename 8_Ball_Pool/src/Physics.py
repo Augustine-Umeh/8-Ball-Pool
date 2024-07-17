@@ -7,7 +7,7 @@ HEADER = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg id="table" width="1375" height="700" viewBox="-25 -25 2750 1400"
 xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink">
-<rect width="2700" height="1350" x="0" y="0" fill="#C0D0C0" />"""
+<rect width="2700" height="1350" x="0" y="0" fill="#C0D0C0" />\n"""
 
 FOOTER = """</svg>\n"""
 
@@ -92,9 +92,9 @@ class StillBall( phylib.phylib_object ):
             return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>\n""" % (
-                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number],
-                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, BALL_RADIUS // 2,  BALL_COLOURS[0],
-                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x + 2, self.obj.still_ball.number
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number],
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
                 )
         else:
             return """ <g class="ball">
@@ -103,10 +103,10 @@ class StillBall( phylib.phylib_object ):
                 <rect x="%d" y="%d" width="56" height="16" fill="white" />
                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
                 </g>\n""" % (
-                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number], 
-                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x, 15,  BALL_COLOURS[0],
-                self.obj.still_ball.pos.y - 28, self.obj.still_ball.pos.x - 9, 
-                self.obj.still_ball.pos.y, self.obj.still_ball.pos.x + 2, self.obj.still_ball.number
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number], 
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, 15,  BALL_COLOURS[0],
+                self.obj.still_ball.pos.x - 28, self.obj.still_ball.pos.y - 9, 
+                self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
                 )
 
 ################################################################################
@@ -136,11 +136,10 @@ class RollingBall( phylib.phylib_object ):
         if self.obj.rolling_ball.number < 9:
             return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
-                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>
-                \n""" % (
-                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number],
-                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, BALL_RADIUS // 2,  BALL_COLOURS[0],
-                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x + 2, self.obj.rolling_ball.number
+                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>/>\n""" % (
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number],
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
                 )
         else:
             return """ <g class="ball">
@@ -149,10 +148,10 @@ class RollingBall( phylib.phylib_object ):
                 <rect x="%d" y="%d" width="56" height="16" fill="white" />
                 <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle">%d</text>
                 </g>\n""" % (
-                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number], 
-                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x, 15,  BALL_COLOURS[0],
-                self.obj.rolling_ball.pos.y - 28, self.obj.rolling_ball.pos.x - 9, 
-                self.obj.rolling_ball.pos.y, self.obj.rolling_ball.pos.x + 2, self.obj.rolling_ball.number
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number], 
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, 15,  BALL_COLOURS[0],
+                self.obj.rolling_ball.pos.x - 28, self.obj.rolling_ball.pos.y - 9, 
+                self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
                 )
 
 ################################################################################
@@ -578,21 +577,21 @@ class Table( phylib.phylib_table ):
         table += StillBall(0, Coordinate(2025, 675))  # Cue ball position
 
         # Rack positions
-        table += StillBall(1, Coordinate(675, 640))   # Apex - 1-ball
-        table += StillBall(11, Coordinate(645, 580))  # Second row, left - 11-ball
-        table += StillBall(2, Coordinate(705, 580))   # Second row, right - 2-ball
-        table += StillBall(10, Coordinate(615, 520))  # Third row, left - 10-ball
-        table += StillBall(8, Coordinate(675, 520))   # Third row, middle - 8-ball
-        table += StillBall(3, Coordinate(735, 520))   # Third row, right - 3-ball
-        table += StillBall(9, Coordinate(585, 460))   # Fourth row, far left - 9-ball
-        table += StillBall(14, Coordinate(645, 460))  # Fourth row, left middle - 14-ball
-        table += StillBall(4, Coordinate(705, 460))   # Fourth row, right middle - 4-ball
-        table += StillBall(13, Coordinate(765, 460))  # Fourth row, far right - 13-ball
-        table += StillBall(12, Coordinate(555, 400))  # Base row, far left - 12-ball
-        table += StillBall(5, Coordinate(615, 400))   # Base row, left - 5-ball
-        table += StillBall(15, Coordinate(675, 400))  # Base row, middle - 15-ball
-        table += StillBall(6, Coordinate(735, 400))   # Base row, right - 6-ball
-        table += StillBall(7, Coordinate(795, 400))   # Base row, far right - 7-ball
+        table += StillBall(1, Coordinate(770, 675))   # Apex - 1-ball
+        table += StillBall(11, Coordinate(718, 646))  # Second row, left - 11-ball
+        table += StillBall(2, Coordinate(718, 704))   # Second row, right - 2-ball
+        table += StillBall(10, Coordinate(666, 617))  # Third row, left - 10-ball
+        table += StillBall(8, Coordinate(666, 675))   # Third row, middle - 8-ball
+        table += StillBall(3, Coordinate(666, 733))   # Third row, right - 3-ball
+        table += StillBall(9, Coordinate(614, 588))   # Fourth row, far left - 9-ball
+        table += StillBall(14, Coordinate(614, 646))  # Fourth row, left middle - 14-ball
+        table += StillBall(4, Coordinate(614, 704))   # Fourth row, right middle - 4-ball
+        table += StillBall(13, Coordinate(614, 762))  # Fourth row, far right - 13-ball
+        table += StillBall(12, Coordinate(562, 559))  # Base row, far left - 12-ball
+        table += StillBall(5, Coordinate(562, 617))   # Base row, left - 5-ball
+        table += StillBall(15, Coordinate(562, 675))  # Base row, middle - 15-ball
+        table += StillBall(6, Coordinate(562, 733))   # Base row, right - 6-ball
+        table += StillBall(7, Coordinate(562, 791))   # Base row, far right - 7-ball
         # return table.custom_svg(table)
         return table
 
