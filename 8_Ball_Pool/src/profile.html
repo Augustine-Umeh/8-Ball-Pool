@@ -1,111 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="profile.css" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>8 Ball AI - Profile</title>
+    </head>
 
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="profile.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>8 Ball AI - Profile</title>
-</head>
-
-<body>
-    <div class="main">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid d-flex justify-content-between">
-                <!-- Left Elements -->
-                <div class="d-flex align-items-center">
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown" title="view match outcomes">
-                                <button class="btn custom-btn ms-3 me-3 dropdown-toggle" id="statsDropdown"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    Stats
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="statsDropdown">
-                                    <li class="dropdown-item text-success">5 Wins</li>
-                                    <li class="dropdown-item text-warning">4 Draws</li>
-                                    <li class="dropdown-item text-danger">3 Losses</li>
-                                </ul>
-                            </li>
-                            <li class="nav-item" title="view people you've played">
-                                <button class="btn custom-btn">
-                                    Friends
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Centered Logo -->
-                <a class="navbar-brand d-flex align-items-center logo-adjust" title="Logo" href="/profile.html">
-                    <img src="./assets/8-Ball-AI-Logo.svg" alt="8 Ball AI Logo" width="90" height="90" class="me-2">
-                    <span>Ball AI</span>
-                </a>
-
-                <!-- Right Elements -->
-                <div class="d-flex align-items-center">
-                    <div class="nav-item dropdown">
-                        <button class="btn text-reset dropdown-toggle hidden-arrow" id="navbarDropdownMenuLink"
-                            data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="tooltip"
-                            data-bs-placement="bottom" title="View game requests">
-                            <i class="fas fa-bell bell-icon"></i>
-                            <span class="badge rounded-pill badge-notification bg-danger">1</span>
+    <body>
+        <div class="main">
+            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+                <div class="container-fluid d-flex justify-content-between">
+                    <!-- Left Elements -->
+                    <div class="d-flex align-items-center">
+                        <button
+                            class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarNav"
+                            aria-controls="navbarNav"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation"
+                        >
+                            <span class="navbar-toggler-icon"></span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-                            <li class="dropdown-item">Some news</li>
-                            <li class="dropdown-item">Another news</li>
-                            <li class="dropdown-item">Something else here</li>
-                        </ul>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav">
+                                <li
+                                    class="nav-item dropdown"
+                                    title="view match outcomes"
+                                >
+                                    <button
+                                        class="btn custom-btn ms-3 me-3 dropdown-toggle"
+                                        id="statsDropdown"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        Stats
+                                    </button>
+                                    <ul
+                                        class="dropdown-menu"
+                                        aria-labelledby="statsDropdown"
+                                    >
+                                        <li class="dropdown-item text-success">
+                                            5 Wins
+                                        </li>
+                                        <li class="dropdown-item text-warning">
+                                            4 Draws
+                                        </li>
+                                        <li class="dropdown-item text-danger">
+                                            3 Losses
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li
+                                    class="nav-item"
+                                    title="view people you've played"
+                                >
+                                    <button class="btn custom-btn">
+                                        Friends
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div>
-                        <button class="btn btn-logout ms-3 me-3">Logout</button>
+
+                    <!-- Centered Logo -->
+                    <a
+                        class="navbar-brand d-flex align-items-center logo-adjust"
+                        title="Logo"
+                        href="/profile.html"
+                    >
+                        <img
+                            src="./assets/8-Ball-AI-Logo.svg"
+                            alt="8 Ball AI Logo"
+                            width="90"
+                            height="90"
+                            class="me-2"
+                        />
+                        <span>Ball AI</span>
+                    </a>
+
+                    <!-- Right Elements -->
+                    <div class="d-flex align-items-center">
+                        <div class="nav-item dropdown">
+                            <button
+                                class="btn text-reset dropdown-toggle hidden-arrow"
+                                id="navbarDropdownMenuLink"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom"
+                                title="View game requests"
+                            >
+                                <i class="fas fa-bell bell-icon"></i>
+                                <span
+                                    class="badge rounded-pill badge-notification bg-danger"
+                                    >1</span
+                                >
+                            </button>
+                            <ul
+                                class="dropdown-menu dropdown-menu-end"
+                                aria-labelledby="navbarDropdownMenuLink"
+                            >
+                                <li class="dropdown-item">Some news</li>
+                                <li class="dropdown-item">Another news</li>
+                                <li class="dropdown-item">
+                                    Something else here
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <button class="btn btn-logout ms-3 me-3">
+                                Logout
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </nav>
 
-            </div>
-        </nav>
-
-        <!-- Interactive portion -->
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Left Column (8.4/12 of the screen) -->
-                <div class="col-md-custom left-column d-flex flex-column">
-                    <h1 class="create text-center w-100">
-                        Create A Game
-                    </h1>
-                    <div class="d-flex flex-grow-1 align-items-center justify-content-center w-100 img-container">
-                        <img src="./assets/8-Ball-AI-Logo.svg" alt="8 Ball AI Logo" class="center-image">
+            <!-- Interactive portion -->
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Left Column (8.4/12 of the screen) -->
+                    <div class="col-8 text-center">
+                        <h1 class="">Create A Game</h1>
+                        <div class="container">
+                            <div class="position-relative">
+                                <img
+                                    id="8ball-bg"
+                                    src="./assets/8-Ball-AI-ProfileIcon.svg"
+                                    alt="8 Ball AI Logo"
+                                    class="img-fluid w-50 my-5"
+                                />
+                                <div class="rectangle-overlay translate-middle rounded"></div>
+                            </div>
+                        </div>
+                        <h3 class="">play against</h3>
                     </div>
-                    <h3 class="play-against text-center w-100">
-                        play against
-                    </h3>
-                </div>                              
-                
-                <!-- Divider Column (0.3/12 of the screen) -->
-                <div class="col-md-custom divider-column">
-                    <div class="divider"></div>
-                </div>
-                
-                <!-- Right Column (3.6/12 of the screen) -->
-                <div class="col-md-custom right-column">
-                    <!-- Right column content -->
+
+                    <!-- Right Column (3.6/12 of the screen) -->
+                    <div class="col">
+                        <!-- Right column content -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="./profile.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/js/all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
-</body>
-
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="./profile.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/js/all.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"
+        ></script>
+    </body>
 </html>

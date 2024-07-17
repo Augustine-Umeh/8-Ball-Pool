@@ -146,3 +146,13 @@ body {
 .play-against {
     margin-top: -70px; /* Adjust to move the text up or down */
 }
+
+.rectangle-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500px; /* Adjust the width as needed */
+    height: 250px; /* Adjust the height as needed */
+    background-color: green;
+    opacity: 1; /* Adjust the opacity as needed */
+}
