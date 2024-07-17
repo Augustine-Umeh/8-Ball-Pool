@@ -45,72 +45,131 @@ function createCueAndAimLine() {
 
     try {
         cueBall = $("#cue_ball");
-    
-        // Check if the cue ball is not found
+
         if (cueBall.length === 0) {
             console.log("couldn't get ball");
             throw new Error("Cue ball not found");
         }
     } catch {
-        // If cue ball is not found, create and append it to the SVG container
         let svg = $("#svg-container svg")[0];
-   
-        // Create a new cue ball element
+
         cueBall = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         cueBall.setAttribute("id", "cue_ball");
         cueBall.setAttribute("cx", cue_coord.x);
         cueBall.setAttribute("cy", cue_coord.y);
         cueBall.setAttribute("r", "28");
         cueBall.setAttribute("fill", "white");
-    
-        // Append the cue ball to the SVG container
+
         svg.appendChild(cueBall);
+        moveCueBall(cueBall);
 
         cueBall = $("#cue_ball");
     }
 
     let cueBallX = parseFloat(cueBall.attr("cx"));
     let cueBallY = parseFloat(cueBall.attr("cy"));
-    let aimLineY = 0;
-    let cueLineY = 0;
+
+    let aimLineX = cueBallX - 48;
+    let cueLineX = cueBallX + 48;
 
     let poolCueLength = 1500;
     let aimLineLength = 7000;
 
-    aimLineY = cueBallY - 48;
-    cueLineY = cueBallY + 48;
-
-    // Select the SVG container where you want to append the line
     let svg = $("#svg-container svg")[0];
 
     let pool_cue = poolcueCreation(
-        cueBallX,
-        cueBallX,
-        cueLineY,
-        cueLineY + poolCueLength
+        cueLineX,
+        cueLineX + poolCueLength,
+        cueBallY,
+        cueBallY
     );
 
-    // Create a new SVG aimline element
-    let aim_line = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line"
-    );
+    let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     aim_line.setAttribute("id", "aim_line");
     aim_line.setAttribute("class", "cue_line");
-    aim_line.setAttribute("x1", cueBallX);
-    aim_line.setAttribute("y1", aimLineY);
-    aim_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
-    aim_line.setAttribute("y2", (aimLineY - aimLineLength)); // Keep y2 the same as y1 initially
+    aim_line.setAttribute("x1", aimLineX);
+    aim_line.setAttribute("y1", cueBallY);
+    aim_line.setAttribute("x2", aimLineX - aimLineLength);
+    aim_line.setAttribute("y2", cueBallY);
     aim_line.setAttribute("length", aimLineLength);
     aim_line.setAttribute("stroke", "grey");
     aim_line.setAttribute("stroke-width", "4");
     aim_line.setAttribute("visibility", "visible");
 
-    // Append the line to the SVG container
     svg.appendChild(pool_cue);
     svg.appendChild(aim_line);
 
-    checkLinePath(cueBallX, aimLineY - aimLineLength, cueBallX, cueBallY);
+    checkLinePath(aimLineX - aimLineLength, cueBallY, cueBallX, cueBallY);
+}
+
+function isValidPosition(x, y, radius) {
+    let tableWidth = 2700;
+    let tableHeight = 1350;
+    let pocketRadius = 112;
+
+    if (x - radius < 0 || x + radius > tableWidth || y - radius < 0 || y + radius > tableHeight) {
+        return false;
+    }
+
+    let pockets = [
+        { cx: 0, cy: 0 },
+        { cx: tableWidth / 2, cy: 0 },
+        { cx: tableWidth, cy: 0 },
+        { cx: 0, cy: tableHeight },
+        { cx: tableWidth / 2, cy: tableHeight },
+        { cx: tableWidth, cy: tableHeight }
+    ];
+
+    for (let pocket of pockets) {
+        let distance = Math.sqrt(Math.pow(x - pocket.cx, 2) + Math.pow(y - pocket.cy, 2));
+        if (distance < pocketRadius + radius) {
+            return false;
+        }
+    }
+
+    const balls = $("g.ball circle, circle.ball");
+    for (let ball of balls) {
+        let ballX = parseFloat(ball.getAttribute('cx'));
+        let ballY = parseFloat(ball.getAttribute('cy'));
+        let ballRadius = parseFloat(ball.getAttribute('r'));
+        let distance = Math.sqrt(Math.pow(x - ballX, 2) + Math.pow(y - ballY, 2));
+        if (distance < radius + ballRadius) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function moveCueBall(cueBall) {
+    let svg = document.querySelector("#svg-container svg");
+    let isDragging = false;
+
+    cueBall.addEventListener('mousedown', (e) => {
+        console.log("clicked");
+        isDragging = true;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            let coords = getSVGCoordinates(svg, e);
+            let x = coords.x;
+            let y = coords.y;
+            let radius = parseFloat(cueBall.getAttribute('r'));
+            console.log(x, y, radius);
+            if (isValidPosition(x, y, radius)) {
+                cue_coord.x = x;
+                cue_coord.y = y;
+                cueBall.setAttribute('cx', cue_coord.x);
+                cueBall.setAttribute('cy', cue_coord.y);
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
 }
 
 function poolcueCreation(x1, x2, y1, y2) {
@@ -122,8 +181,8 @@ function poolcueCreation(x1, x2, y1, y2) {
     pool_cue.setAttribute("class", "cue_line");
     pool_cue.setAttribute("x1", x1);
     pool_cue.setAttribute("y1", y1);
-    pool_cue.setAttribute("x2", x2); // Set x2 based on desired length from cue ball position
-    pool_cue.setAttribute("y2", y2); // Keep y2 the same as y1 initially
+    pool_cue.setAttribute("x2", x2);
+    pool_cue.setAttribute("y2", y2);
     pool_cue.setAttribute("stroke", "black");
     pool_cue.setAttribute("stroke-width", "25");
     pool_cue.setAttribute("visibility", "visible");
@@ -140,7 +199,7 @@ function rotatePoolCue(angle) {
 
     // Lengths of the cue line and aim line
     let poolCueLength = 1500;
-    let aimLineLength = 2200;
+    let aimLineLength = 7000;
 
     // Calculate the offset coordinates
     let offsetX = offset * Math.cos(angle);
@@ -339,7 +398,7 @@ function shotpowerEventListeners() {
 
     let isDragging = false;
     let initialY = 0;
-    let maxSpeed = 10000;
+    let maxSpeed = 6000;
     let maxDragDistance = 540; // Distance in pixels (from 80 to 620)
     
     let shotLine = document.querySelector("#shot_line");
@@ -401,7 +460,8 @@ function shotpowerEventListeners() {
         let x2 = parseFloat(aimLine.getAttribute("x2"));
         let y2 = parseFloat(aimLine.getAttribute("y2"));
 
-        console.log(`Current X1: ${x1} and Current X2: ${x2}`)
+        console.log(`Current X1: ${x1} and Current X2: ${x2}`);
+
         // Calculate the direction vector
         let dx = x2 - x1;
         let dy = y2 - y1;
@@ -415,19 +475,20 @@ function shotpowerEventListeners() {
         let vx = directionX * speed;
         let vy = directionY * speed;
 
-        if (vx < 1 && vx > -1){
+        if (vx < 3 && vx > -3){
             if ( vy < 0.0 ){
                 vx = -22.1383338342;
             } else {
                 vx = 35.2484224842;
             }
-        } else if (vy < 1 && vy > -1){
+        } else if (vy < 3 && vy > -3){
             if ( vx < 0.0 ){
                 vy = -32.32746462;
             } else {
                 vy = 28.737474743;
             }
         }
+
         console.log(`Shot speed: ${speed.toFixed(2)} ms`);
         console.log(
             `Shot direction: (${directionX.toFixed(2)}, ${directionY.toFixed(
@@ -474,8 +535,10 @@ function shotpowerEventListeners() {
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {
-                            createCueAndAimLine();
-                            setupEventListeners();
+                            setTimeout(() => {
+                                createCueAndAimLine();
+                                setupEventListeners();
+                            }, 300); 
                         })
                         .catch((error) => {
                             console.error("Error displaying SVGs:", error);
@@ -502,13 +565,10 @@ function shotpowerEventListeners() {
 }
 
 function displayNextSVG(svgArray) {
-
     return new Promise((resolve, reject) => {
-
         let currentIndex = 0; // Start from the first SVG
         
         function updateSVG() {
-
             if (currentIndex < svgArray.length) {
                 if ($("#svg-container").length) {
                     $("#svg-container").html(svgArray[currentIndex]); // Update the SVG container
@@ -519,7 +579,7 @@ function displayNextSVG(svgArray) {
                     return;
                 }
                 currentIndex++; // Move to the next SVG
-                setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
+                setTimeout(updateSVG, 11); // Wait for 0.01s before displaying the next SVG
             } else {
                 console.log("Finished displaying all SVGs.");
                 resolve(); // Resolve the promise when done

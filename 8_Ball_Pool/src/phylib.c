@@ -94,7 +94,7 @@ phylib_table *phylib_new_table(void)
     new_table->time = 0.0;
 
     // Allocate and initialize objects for the table
-    new_table->object[0] = phylib_new_hcushion(0.0);
+    new_table->object[0] = phylib_new_hcushion(0.0); 
     new_table->object[1] = phylib_new_hcushion(PHYLIB_TABLE_LENGTH); // Use WIDTH for hcushion y-coordinate
     new_table->object[2] = phylib_new_vcushion(0.0);
     new_table->object[3] = phylib_new_vcushion(PHYLIB_TABLE_WIDTH); // Use LENGTH for vcushion x-coordinate

@@ -212,22 +212,19 @@ class Database:
         gameID += 1
 
         # Calculate ball positions
-        ball_pos = set()
-        for result in new_table:
-            ball_pos.add((result[1], result[2]))
+        ball_pos = set(new_table)
 
         xpos = ypos = 999
         # Range of positions to check
-        for x in range(1200, 2500, -120):
+        for x in range(500, 2500, 120):
             for y in range(1200, 300, -120):
                 valid_position = True
-                
                 # Check if the position is not occupied
                 if (x, y) not in ball_pos:
                     # Check if the distance is at least 56 units from any existing ball
                     for ball in new_table:
-                        distance = math.sqrt((x - ball[1]) ** 2 + (y - ball[2]) ** 2)
-                        if distance < 56:
+                        distance = math.sqrt((ball[0] - x) ** 2 + (ball[1] - y) ** 2)
+                        if distance < 58:
                             valid_position = False
                             break
                     
@@ -309,7 +306,7 @@ class Database:
             for result in results:
                 ball_id, ball_no, x_pos, y_pos, x_vel, y_vel = result[0], result[1], result[2], result[3], result[4], result[5]
                 valid = True
-                for hole in [(0, 0), (1350, 0), (2700, 0), (1350, 1350), (2700, 1350), (2700, 1350)]:
+                for hole in [(0, 0), (1350, 0), (2700, 0), (0, 1350), (1350, 1350), (2700, 1350)]:
                     distance = math.sqrt((hole[0] - x_pos) ** 2 + (hole[1] - y_pos) ** 2)
                     if distance < 113:
                         valid = False
