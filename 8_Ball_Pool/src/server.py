@@ -7,6 +7,7 @@ import Physics
 from Game import Game
 from Database import Database
 import json
+import random
 import phylib
 import math
 
@@ -98,7 +99,7 @@ class MyHandler(BaseHTTPRequestHandler):
             p2Name = data['p2Name']
             gameName = data['gameName']
             accountID = int(data['accountID'])
-
+            
             try:
                 created_game = db.checkCreatedGame(accountID)
                 
@@ -108,7 +109,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 else:
                     if not gameName:
                         gameName = p1Name + " vs " + p2Name
-                    curGame = Game(accountID, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
+                    curGame = Game(accountID, shotTaker=None, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
                     gameID = curGame.gameID
                     gameName = curGame.gameName
                     
@@ -138,7 +139,8 @@ class MyHandler(BaseHTTPRequestHandler):
             data = json.loads(post_data.decode('utf-8'))
             accountID = int(data.get('accountID'))
             gameID = int(data.get('gameID'))
-        
+            # ballNumbers = data['ballNumbers']
+            
             try:
                 unfinished_game = db.checkUnfinishedGame(accountID, gameID)
                 
@@ -159,7 +161,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     initialized_table = table.initializeTable(table)
                     table_svg = initialized_table.custom_svg(initialized_table)
                     
-                    tableID = db.writeTable(accountID, gameID, initialized_table)
+                    tableID = db.firstwriteTable(accountID, gameID, initialized_table)
 
                     db.markGameStatus(accountID, gameID, 1)
                     
@@ -195,6 +197,9 @@ class MyHandler(BaseHTTPRequestHandler):
             accountID = int(data["accountID"])
             gameID = int(data["gameID"])
             shotTaker = data['shotTaker']
+            cueBallPos = data['cueBallPos']
+            isOntable = data['isOntable']
+            ballNumbers = data['ballNumbers']
   
             print(f"Recieved data: {vectorData}")
 
@@ -206,13 +211,25 @@ class MyHandler(BaseHTTPRequestHandler):
             print("tableID to read from ", tableID)
             if tableID == -1:
                 raise ValueError("This Game doesn't exist")
+
+            curGame = Game(accountID, shotTaker=shotTaker, gameID=gameID, )   
+            curGame.ballNumbers = ballNumbers
+            
+            if not isOntable:
+                db.updateCueBallPos(accountID, gameID, (cueBallPos['x'], cueBallPos['y']))
             
             currTable = db.readTable(accountID, gameID, tableID)
-
-            curGame = Game(accountID, gameID=gameID)       
             curGame.shoot(shotTaker, currTable, vx, vy)
             
-            cue_coord = db.updateTable(accountID, gameID)
+            isOntable, cueBallPos = db.updateTable(accountID, gameID, ballNumbers)
+            db.updateShotTable(accountID, gameID)
+            
+            if not curGame.player1Category:
+                curGame.setPlayerCategory()
+            
+            curGame.playerTurn(isOntable)
+            shotTaker = curGame.currentPlayer
+            print("player's Turn: ", curGame.currentPlayer)
             
             svg_dict = {}
             tableID += 1
@@ -239,30 +256,14 @@ class MyHandler(BaseHTTPRequestHandler):
                 'status': 'Success',
                 'message': 'Data processed successfully',
                 'svgData': svg_dict,
-                'cue_coord': {'x': cue_coord[0], 'y': cue_coord[1]}
+                'isOntable': isOntable,
+                'cueBallPos': cueBallPos,
+                'shotTaker': shotTaker
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
         else:
             # Handle other POST paths or send an error
             self.send_error(404, f"Path {self.path} not found")
-
-def calculate_velocity_components(x1, y1, x2, y2, d_max=2000):
-    # Calculate the drag distance
-    d = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-    
-    # Calculate the total velocity
-    v = min((d / d_max) * 10000, 10000)
-    
-    # Calculate velocity components
-    if d == 0:  # To avoid division by zero
-        vx = 0
-        vy = 0
-    else:
-        vx = v * (x2 - x1) / d
-        vy = v * (y2 - y1) / d
-        print(f"vx: {vx}, vy: {vy}")
-    
-    return vx, vy
 
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
