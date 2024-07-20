@@ -42,6 +42,8 @@ $(document).ready(function () {
 var cue_coord = { x: '999', y: '999' };
 var isOntable = true;
 var ballNumbers = [];
+var play1balls = [1, 2, 3, 4, 5];
+var play2balls = [1, 2, 3, 4, 5];
 function createCueAndAimLine() {
     
     if (isOntable) {
@@ -86,7 +88,7 @@ function createCueAndAimLine() {
         checkLinePath(aimLineX - aimLineLength, cueBallY, cueBallX, cueBallY);
     } else {
         let svg = $("#svg-container svg")[0];
-        cueBall = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        let cueBall = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         cueBall.setAttribute("id", "cue_ball");
         cueBall.setAttribute("cx", cue_coord.x);
         cueBall.setAttribute("cy", cue_coord.y);
@@ -605,7 +607,9 @@ function shotpowerEventListeners() {
                 "shotTaker": shotTaker,
                 "cueBallPos": cue_coord,
                 "isOntable": isOntable,
-                "ballNumbers": ballNumbers
+                "ballNumbers": ballNumbers,
+                "play1balls": play1balls,
+                "play2balls": play2balls
             }),
             success: function (response) {
                 if (response.status === 'Success') {
@@ -617,6 +621,13 @@ function shotpowerEventListeners() {
                     cue_coord.x = String(response.cueBallPos[0]);
                     cue_coord.y = String(response.cueBallPos[1]);
                     shotTaker = response.shotTaker
+                    
+                    play1balls = response.play1balls;
+                    play2balls = response.play2balls;
+
+                    console.log("player1's balls: ", response.play1balls);
+                    console.log("player2's balls: ", response.play2balls);
+
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {
