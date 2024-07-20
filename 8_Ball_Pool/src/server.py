@@ -109,7 +109,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 else:
                     if not gameName:
                         gameName = p1Name + " vs " + p2Name
-                    curGame = Game(accountID, shotTaker=None, gameName=gameName, player1Name=p1Name, player2Name=p2Name)
+                    curGame = Game(accountID, shotTaker=None, gameName=gameName, player1Name=p1Name, player2Name=p2Name, play1balls=None, play2balls=None)
                     gameID = curGame.gameID
                     gameName = curGame.gameName
                     
@@ -200,7 +200,9 @@ class MyHandler(BaseHTTPRequestHandler):
             cueBallPos = data['cueBallPos']
             isOntable = data['isOntable']
             ballNumbers = data['ballNumbers']
-  
+            play1balls = data['play1balls']
+            play2balls = data['play2balls']
+            print("line 205: ", play1balls)
             print(f"Recieved data: {vectorData}")
 
             tableID = db.getLastTable(accountID, gameID)
@@ -212,7 +214,10 @@ class MyHandler(BaseHTTPRequestHandler):
             if tableID == -1:
                 raise ValueError("This Game doesn't exist")
 
-            curGame = Game(accountID, shotTaker=shotTaker, gameID=gameID, )   
+            play1balls = set(play1balls)
+            play2balls = set(play2balls)
+            
+            curGame = Game(accountID, shotTaker=shotTaker, gameID=gameID, play1balls=play1balls, play2balls=play2balls)   
             curGame.ballNumbers = ballNumbers
             
             if not isOntable:
@@ -226,10 +231,15 @@ class MyHandler(BaseHTTPRequestHandler):
             
             if not curGame.player1Category:
                 curGame.setPlayerCategory()
+                if curGame.player1Category:
+                    curGame.setPlayerBalls()
             
             curGame.playerTurn(isOntable)
             shotTaker = curGame.currentPlayer
             print("player's Turn: ", curGame.currentPlayer)
+            
+            play1balls = list(curGame.play1balls)
+            play2balls = list(curGame.play2balls)
             
             svg_dict = {}
             tableID += 1
@@ -258,7 +268,9 @@ class MyHandler(BaseHTTPRequestHandler):
                 'svgData': svg_dict,
                 'isOntable': isOntable,
                 'cueBallPos': cueBallPos,
-                'shotTaker': shotTaker
+                'shotTaker': shotTaker,
+                'play1balls': play1balls,
+                'play2balls': play2balls
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
         else:

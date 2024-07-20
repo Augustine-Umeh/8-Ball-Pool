@@ -4,7 +4,7 @@ import math
 FRAME_INTERVAL = 0.01
 
 class Game:
-    def __init__(self, accountID, shotTaker=None, gameID=None, gameName=None, player1Name=None, player2Name=None):
+    def __init__(self, accountID, shotTaker=None, gameID=None, gameName=None, player1Name=None, player2Name=None, play1balls=None, play2balls=None):
         self.db = Database()
         self.db.createDB()
         self.accountID = accountID
@@ -23,6 +23,8 @@ class Game:
                     self.player1Category = gameInfo[3]
                     self.player2Category = gameInfo[4]
                     self.currentPlayer = shotTaker
+                    self.play1balls = play1balls
+                    self.play2balls = play2balls
                 else:
                     raise ValueError(f"No game found for accountID {accountID + 1} and gameID {gameID + 1}")
             except Exception as e:
@@ -36,6 +38,8 @@ class Game:
             self.currentPlayer = None
             self.player1Category = None
             self.player2Category = None
+            self.play1balls = set()
+            self.play2balls = set()
 
             try:
                 self.gameID = self.db.createGame(accountID, gameName, player1Name, player2Name)  # Create new game with accountID
@@ -94,35 +98,26 @@ class Game:
                 else:
                     self.player1Category = "solid"
                     self.player2Category = "stripe"
-                
-        self.db.updateCategory(self.accountID, self.gameID, self.player1Category, self.player2Category)
-        # madeBall = self.db.checkIfBallPocketed(self.accountID, self.gameID, shotID)
-        # if madeBall:
-        #     if self.player1Category is None and self.player2Category is None:
-        #         # Assign categories
-        #         if 1 <= madeBall <= 7:
-        #             self.player1Category = "solid" if playerName == self.player1Name else "stripe"
-        #             self.player2Category = "stripe" if playerName == self.player1Name else "solid"
-        #         elif 9 <= madeBall <= 15:
-        #             self.player1Category = "stripe" if playerName == self.player1Name else "solid"
-        #             self.player2Category = "solid" if playerName == self.player1Name else "stripe"
-        #     # Determine if player continues or switches
-        #     self.currentPlayer = playerName
-        # else:
-        #     # Switch player
-        #     self.currentPlayer = self.player2Name if playerName == self.player1Name else self.player1Name
-    
+                    
+            self.db.updateCategory(self.accountID, self.gameID, self.player1Category, self.player2Category)
+        
     def playerTurn(self, isOnTable):
+        name, numbers = self.db.getPlayerAndMadeHole(self.accountID, self.gameID)
+        
+        if isinstance(numbers, list):
+            for ball in numbers:
+                self.play1balls.discard(ball)     
+                self.play2balls.discard(ball)
+                
         if not isOnTable:
             self.currentPlayer = self.player1Name if self.currentPlayer != self.player1Name else self.player2Name
             return
-        
-        name, numbers = self.db.getPlayerAndMadeHole(self.accountID, self.gameID)
 
         if isinstance(numbers, list):
             if not numbers:
                 self.currentPlayer = self.player1Name if self.currentPlayer == self.player2Name else self.player2Name
                 return
+                          
             for ball in numbers:
                 if self.currentPlayer == self.player1Name:
                     if self.player1Category == 'solid' and ball > 8:
@@ -139,25 +134,31 @@ class Game:
                         self.currentPlayer = self.player1Name
                         break 
             return
-        
-        # gameStatus = self.db.checkGamestatus(self.accountID, self.gameID)
-        # if gameStatus is None:
-        #     return None
-
-        # lastShot = self.db.getLastShot(self.accountID, self.gameID)
-        # if lastShot:
-        #     player, category, madeBall = lastShot
-        #     if madeBall:
-        #         return player
-        #     else:
-        #         self.currentPlayer = self.player2Name if player == self.player1Name else self.player1Name
-        #         return self.currentPlayer
-        # else:
-        #     return self.currentPlayer
             
+    def setPlayerBalls(self):
+        
+        if self.player1Category == 'solid':
+            self.play1balls = set([1, 2, 3, 4, 5, 6, 7])
+        elif self.player2Category == 'solid':
+            self.play2balls = set([1, 2, 3, 4, 5, 6, 7])
+        
+        if self.player1Category == 'stripe':
+            self.play1balls = set([9, 10, 11, 12, 13, 14, 15])
+        elif self.player2Category == 'stripe':
+            self.play2balls = set([9, 10, 11, 12, 13, 14, 15])
+        
     def gameEndResult(self):
-        pass
+        name, numbers = self.db.getPlayerAndMadeHole(self.accountID, self.gameID)
 
+        if isinstance(numbers, list):
+            if not numbers:
+                return
+            for ball in numbers:
+                if ball == 8:
+                    return
+        
+        eight_ball_in = False
+        
     def close(self):
         self.db.close()
 
