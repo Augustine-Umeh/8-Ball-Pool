@@ -120,6 +120,7 @@ class Game:
         if self.first_ball_hit:
             if self.first_ball_hit == "False":
                 self.currentPlayer = self.player1Name if self.currentPlayer != self.player1Name else self.player2Name
+                self.scratch = True
                 return
             
         name, numbers = self.db.getPlayerAndMadeHole(self.accountID, self.gameID)
@@ -131,6 +132,7 @@ class Game:
                 
         if not isOnTable:
             self.currentPlayer = self.player1Name if self.currentPlayer != self.player1Name else self.player2Name
+            self.scratch = True
             return
 
         if isinstance(numbers, list):

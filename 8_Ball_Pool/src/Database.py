@@ -429,7 +429,7 @@ class Database:
                     VALUES (?, ?)
                     """
                     cursor.execute(insert_position_query, (table_id, new_ball_id))
-                    new_table.append((ball_no, x_pos, y_vel, y_vel))
+                    new_table.append((ball_no, x_pos, y_pos))
                     if ball_no == 0:
                         cueBallPos = (x_pos, y_pos)
                         isOntable = True

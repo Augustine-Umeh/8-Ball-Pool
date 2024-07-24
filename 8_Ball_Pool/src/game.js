@@ -74,7 +74,7 @@ function createCueAndAimLine() {
         pool_cue.setAttribute("y1", cueBallY);
         pool_cue.setAttribute("x2", cueLineX + poolCueLength);
         pool_cue.setAttribute("y2", cueBallY);
-        pool_cue.setAttribute("stroke", "brown");
+        pool_cue.setAttribute("stroke", "black");
         pool_cue.setAttribute("stroke-width", "25");
         pool_cue.setAttribute("visibility", "visible");
 
@@ -606,7 +606,7 @@ function shotpowerEventListeners() {
         // Send the data using AJAX
         $.ajax({
             type: "POST",
-            url: "/processDrag", // This URL should match your server endpoint
+            url: "/processDrag", 
             contentType: "application/json",
             data: JSON.stringify({
                 "velocity": dataToSend.vectorData,
@@ -751,36 +751,33 @@ function setupEventListeners() {
     });
 }
 
-/**
- * code for later
- * 
- * function createPoolCueGradient(svg) {
-    let gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
-    gradient.setAttribute("id", "poolCueGradient");
-    gradient.setAttribute("x1", "0%");
-    gradient.setAttribute("y1", "0%");
-    gradient.setAttribute("x2", "100%");
-    gradient.setAttribute("y2", "0%");
+// function createPoolCueGradient(svg) {
+//     let gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+//     gradient.setAttribute("id", "poolCueGradient");
+//     gradient.setAttribute("x1", "0%");
+//     gradient.setAttribute("y1", "0%");
+//     gradient.setAttribute("x2", "100%");
+//     gradient.setAttribute("y2", "0%");
 
-    // Define the gradient colors
-    let stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-    stop1.setAttribute("offset", "0%");
-    stop1.setAttribute("style", "stop-color:brown;stop-opacity:1");
-    gradient.appendChild(stop1);
+//     // Define the gradient colors
+//     let stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+//     stop1.setAttribute("offset", "0%");
+//     stop1.setAttribute("style", "stop-color:brown;stop-opacity:1");
+//     gradient.appendChild(stop1);
 
-    let stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-    stop2.setAttribute("offset", "80%");
-    stop2.setAttribute("style", "stop-color:lightbrown;stop-opacity:1");
-    gradient.appendChild(stop2);
+//     let stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+//     stop2.setAttribute("offset", "80%");
+//     stop2.setAttribute("style", "stop-color:lightbrown;stop-opacity:1");
+//     gradient.appendChild(stop2);
 
-    let stop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-    stop3.setAttribute("offset", "100%");
-    stop3.setAttribute("style", "stop-color:darkbrown;stop-opacity:1");
-    gradient.appendChild(stop3);
+//     let stop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+//     stop3.setAttribute("offset", "100%");
+//     stop3.setAttribute("style", "stop-color:darkbrown;stop-opacity:1");
+//     gradient.appendChild(stop3);
 
-    // Append the gradient to the SVG's defs section
-    let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-    defs.appendChild(gradient);
-    svg.appendChild(defs);
-}
- */
+//     // Append the gradient to the SVG's defs section
+//     let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+//     defs.appendChild(gradient);
+//     svg.appendChild(defs);
+// }
+
