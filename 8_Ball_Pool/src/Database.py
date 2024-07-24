@@ -46,6 +46,7 @@ class Database:
                 Player1Category TEXT,
                 Player2Category TEXT,
                 GameUsed BOOLEAN NOT NULL DEFAULT 0,
+                Winner TEXT,
                 FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
             );
             """,
@@ -310,10 +311,11 @@ class Database:
             
         return (xpos, ypos)
     
-    def updateCueBallPos(self, accountID, gameID, ballPos):
+    def updateCueBallPos(self, accountID, gameID, tableID, ballPos):
         cursor = self.conn.cursor()
         accountID += 1
         gameID += 1
+        tableID += 1
 
         print("first thing in updateCueBallPos")
         # Check if the GameID belongs to the provided AccountID
@@ -323,30 +325,43 @@ class Database:
             cursor.close()
             return -1  # GameID does not belong to the provided AccountID
         
-        # Insert into Ball table
-        insert_ball_query = """
-        INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
-        VALUES (?, 0, ?, ?, 0, 0)
+        # Check if the cue ball already exists for this game
+        check_cueball_query = """
+        SELECT b.BallID 
+        FROM Ball b
+        JOIN PositionsTable pt ON b.BallID = pt.BallID
+        JOIN TTable t ON pt.TableID = t.TableID
+        WHERE t.GameID = ? AND t.TableID = ? AND b.BallNo = 0
         """
-        cursor.execute(insert_ball_query, (gameID, ballPos[0], ballPos[1]))
-        ball_id = cursor.lastrowid
+        cursor.execute(check_cueball_query, (gameID, tableID))
+        result = cursor.fetchone()
+        
+        print("result: ", result)
+        if result:
+            # Cue ball exists, update its position
+            cueball_id = result[0]
+            update_cueball_query = "UPDATE Ball SET XPos = ?, YPos = ? WHERE BallID = ?"
+            cursor.execute(update_cueball_query, (ballPos[0], ballPos[1], cueball_id))
+        else:
+            # Cue ball does not exist, insert it
+            insert_ball_query = """
+            INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
+            VALUES (?, 0, ?, ?, 0, 0)
+            """
+            cursor.execute(insert_ball_query, (gameID, ballPos[0], ballPos[1]))
+            cueball_id = cursor.lastrowid
 
-        # Insert into PositionsTable
-        table_id_query = """
-        SELECT MAX(TableID) FROM TTable WHERE GameID = ?
-        """
-        cursor.execute(table_id_query, (gameID,))
-        table_id = cursor.fetchone()[0]
+            # Insert into PositionsTable
+            table_id_query = "SELECT MAX(TableID) FROM TTable WHERE GameID = ?"
+            cursor.execute(table_id_query, (gameID,))
+            table_id = cursor.fetchone()[0]
 
-        insert_position_query = """
-        INSERT INTO PositionsTable (TableID, BallID)
-        VALUES (?, ?)
-        """
-        cursor.execute(insert_position_query, (table_id, ball_id))
-        print("updated position")
+            insert_position_query = "INSERT INTO PositionsTable (TableID, BallID) VALUES (?, ?)"
+            cursor.execute(insert_position_query, (table_id, cueball_id))
+            
         self.conn.commit()
         cursor.close()
-        
+
     def updateTable(self, accountID, gameID, ballNumbers):
         cursor = self.conn.cursor()
         accountID += 1
@@ -370,6 +385,9 @@ class Database:
             cursor.execute(query, (gameID, gameID))
             results = cursor.fetchall()
 
+            if not results:
+                raise ValueError("No results found for the given gameID.")
+
             # Extract time from the first result (all rows should have the same time)
             time = results[0][6]
 
@@ -384,7 +402,7 @@ class Database:
             new_table = []
             ball_dict = {ball: 0 for ball in ballNumbers}
             ball_dict['0'] = 0
-            
+
             for result in results:
                 ball_id, ball_no, x_pos, y_pos, x_vel, y_vel = result[0], result[1], result[2], result[3], result[4], result[5]
                 valid = True
@@ -394,10 +412,10 @@ class Database:
                         valid = False
                         break
                 if valid and (-53 < x_vel < 53 or -53 < y_vel < 53):
-                    
+
                     num = str(ball_no)
                     ball_dict[num] += 1
-                        
+
                     insert_ball_query = """
                     INSERT INTO Ball (GameID, BallNo, XPos, YPos, XVel, YVel)
                     VALUES (?, ?, ?, ?, 0, 0)
@@ -411,13 +429,13 @@ class Database:
                     VALUES (?, ?)
                     """
                     cursor.execute(insert_position_query, (table_id, new_ball_id))
-                    new_table.append((ball_no, x_pos, y_pos, x_vel, y_vel))
+                    new_table.append((ball_no, x_pos, y_vel, y_vel))
                     if ball_no == 0:
                         cueBallPos = (x_pos, y_pos)
                         isOntable = True
 
             self.update_madeHole(ball_dict)
-            
+
             print("Info about cueBall: ", isOntable, cueBallPos)
             # Insert into TableShot
             retrieve_shotID = """
@@ -427,17 +445,20 @@ class Database:
             LIMIT 1
             """
             cursor.execute(retrieve_shotID)
-            shotID = cursor.fetchone()[0]
+            shotID = cursor.fetchone()
+
+            if not shotID:
+                raise ValueError("No ShotID found.")
 
             insert_tableshot_query = """
             INSERT INTO TableShot (TableID, ShotID)
             VALUES (?, ?)
             """
-            cursor.execute(insert_tableshot_query, (table_id, shotID))
+            cursor.execute(insert_tableshot_query, (table_id, shotID[0]))
 
             if not isOntable:
                 cueBallPos = self.checkCueBall(accountID - 1, gameID - 1, new_table)
-                
+
             self.conn.commit()
             cursor.close()
             return isOntable, cueBallPos
@@ -456,7 +477,7 @@ class Database:
         
         # SQL query to fetch gameName, and player names based on gameID
         query = """
-        SELECT GameName, Player1Name, Player2Name, Player1Category, Player2Category
+        SELECT GameName, Player1Name, Player2Name, Player1Category, Player2Category, Winner
         FROM Game
         WHERE GameID = ? AND AccountID = ?
         LIMIT 1
@@ -466,7 +487,7 @@ class Database:
             cursor.execute(query, (gameID, accountID))
             gameInfo = cursor.fetchone()
             if gameInfo:
-                return gameInfo  # This returns a tuple: (gameName, player1Name, player2Name)
+                return gameInfo  # This returns a tuple: (gameName, player1Name, player2Name, Player1Category, Player2Category, GameUsed)
             return None
         except Exception as e:
             print(f"An error occurred in getting game: {e}")
@@ -902,6 +923,63 @@ class Database:
         cursor.close()
         return [(gameID - 1, gameName) for gameID, gameName in results]
 
+    def getBalls(self, gameID, tableID) -> list:
+        cursor = self.conn.cursor()
+        try:
+            query = """
+                SELECT BallNo, XPos, YPos 
+                FROM Ball
+                JOIN PositionsTable ON Ball.BallID = PositionsTable.BallID
+                WHERE PositionsTable.TableID = ? AND Ball.GameID = ?
+            """
+            params = (tableID, gameID)
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            if rows:
+                return [{'BallNo': row[0], 'XPos': row[1], 'YPos': row[2]} for row in rows]
+            else:
+                return None
+        except Exception as e:
+            print(f"An error occurred while retrieving balls: {e}")
+            return None
+        
+    def compareTables(self, accountID, gameID, startTableID, endTableID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        gameID += 1
+        startTableID += 1
+        endTableID += 1
+        
+        # Check if the GameID belongs to the provided AccountID
+        check_query = "SELECT 1 FROM Game WHERE GameID = ? AND AccountID = ?"
+        cursor.execute(check_query, (gameID, accountID))
+        if cursor.fetchone() is None:
+            cursor.close()
+            return None 
+        
+        try:
+            startBalls = self.getBalls(gameID, startTableID)
+            endBalls = self.getBalls(gameID, endTableID)
+            
+            if startBalls is None or endBalls is None:
+                return False
+
+            startPositions = {ball['BallNo']: (ball['XPos'], ball['YPos']) for ball in startBalls if ball['BallNo'] != 0}
+            endPositions = {ball['BallNo']: (ball['XPos'], ball['YPos']) for ball in endBalls if ball['BallNo'] != 0}
+
+            if startPositions.keys() != endPositions.keys():
+                return False
+
+            for ballNo in startPositions:
+                if startPositions[ballNo] != endPositions[ballNo]:
+                    return False
+
+            return True
+
+        except Exception as e:
+            print(f"An error occurred while comparing tables: {e}")
+            return False
+    
     def close(self):
         # Commit any pending transaction and close the connection
         self.conn.commit()
