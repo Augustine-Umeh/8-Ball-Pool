@@ -94,18 +94,18 @@ phylib_table *phylib_new_table(void)
     new_table->time = 0.0;
 
     // Allocate and initialize objects for the table
-    new_table->object[0] = phylib_new_hcushion(0.0);
-    new_table->object[1] = phylib_new_hcushion(PHYLIB_TABLE_LENGTH);
+    new_table->object[0] = phylib_new_hcushion(0.0); 
+    new_table->object[1] = phylib_new_hcushion(PHYLIB_TABLE_LENGTH); // Use WIDTH for hcushion y-coordinate
     new_table->object[2] = phylib_new_vcushion(0.0);
-    new_table->object[3] = phylib_new_vcushion(PHYLIB_TABLE_WIDTH);
+    new_table->object[3] = phylib_new_vcushion(PHYLIB_TABLE_WIDTH); // Use LENGTH for vcushion x-coordinate
 
     // Create holes
-    new_table->object[4] = phylib_new_hole(&(phylib_coord){0.0, 0.0});
-    new_table->object[5] = phylib_new_hole(&(phylib_coord){0.0, PHYLIB_TABLE_WIDTH});
-    new_table->object[6] = phylib_new_hole(&(phylib_coord){0.0, PHYLIB_TABLE_LENGTH});
-    new_table->object[7] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, 0.0});
-    new_table->object[8] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_WIDTH});
-    new_table->object[9] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_LENGTH});
+    new_table->object[4] = phylib_new_hole(&(phylib_coord){0.0, 0.0});                                          // Top Left
+    new_table->object[5] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_LENGTH, 0.0});                          // Top Middle
+    new_table->object[6] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, 0.0});                           // Top Right
+    new_table->object[7] = phylib_new_hole(&(phylib_coord){0.0, PHYLIB_TABLE_LENGTH});           // Bottom Left
+    new_table->object[8] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_LENGTH, PHYLIB_TABLE_LENGTH});                       // Bottom Middle
+    new_table->object[9] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_LENGTH});       // Bottom Right
 
     for (int i = 10; i < PHYLIB_MAX_OBJECTS; i++)
     {
@@ -114,6 +114,38 @@ phylib_table *phylib_new_table(void)
 
     return new_table;
 }
+
+// phylib_table *phylib_new_table(void)
+// {
+//     phylib_table *new_table = (phylib_table *)malloc(sizeof(phylib_table));
+//     if (new_table == NULL)
+//     {
+//         return NULL; // Memory allocation failed
+//     }
+
+//     new_table->time = 0.0;
+
+//     // Allocate and initialize objects for the table
+//     new_table->object[0] = phylib_new_hcushion(0.0);
+//     new_table->object[1] = phylib_new_hcushion(PHYLIB_TABLE_LENGTH);
+//     new_table->object[2] = phylib_new_vcushion(0.0);
+//     new_table->object[3] = phylib_new_vcushion(PHYLIB_TABLE_WIDTH);
+
+//     // Create holes
+//     new_table->object[4] = phylib_new_hole(&(phylib_coord){0.0, 0.0});
+//     new_table->object[5] = phylib_new_hole(&(phylib_coord){0.0, PHYLIB_TABLE_WIDTH});
+//     new_table->object[6] = phylib_new_hole(&(phylib_coord){0.0, PHYLIB_TABLE_LENGTH});
+//     new_table->object[7] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, 0.0});
+//     new_table->object[8] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_WIDTH});
+//     new_table->object[9] = phylib_new_hole(&(phylib_coord){PHYLIB_TABLE_WIDTH, PHYLIB_TABLE_LENGTH});
+
+//     for (int i = 10; i < PHYLIB_MAX_OBJECTS; i++)
+//     {
+//         new_table->object[i] = NULL; // Initialize remaining pointers to NULL
+//     }
+
+//     return new_table;
+// }
 
 // Part 2 functions
 
@@ -265,21 +297,21 @@ double phylib_distance(phylib_object *obj1, phylib_object *obj2)
 
     switch (obj2->type)
     {
-        case PHYLIB_ROLLING_BALL:
-        case PHYLIB_STILL_BALL: // Ball and Ball minus both radius'
-            return coord_distance(center_obj1, obj2->obj.still_ball.pos) - PHYLIB_BALL_DIAMETER;
+    case PHYLIB_ROLLING_BALL:
+    case PHYLIB_STILL_BALL: // Ball and Ball minus both radius'
+        return coord_distance(center_obj1, obj2->obj.still_ball.pos) - PHYLIB_BALL_DIAMETER;
 
-        case PHYLIB_HOLE: // Ball and hole minus hole radius
-            return coord_distance(center_obj1, obj2->obj.hole.pos) - PHYLIB_HOLE_RADIUS;
+    case PHYLIB_HOLE: // Ball and hole minus hole radius
+        return coord_distance(center_obj1, obj2->obj.hole.pos) - PHYLIB_HOLE_RADIUS;
 
-        case PHYLIB_HCUSHION: // Ball and h-cushion minus ball radius
-            return fabs(center_obj1.y - obj2->obj.hcushion.y) - PHYLIB_BALL_RADIUS;
+    case PHYLIB_HCUSHION: // Ball and h-cushion minus ball radius
+        return fabs(center_obj1.y - obj2->obj.hcushion.y) - PHYLIB_BALL_RADIUS;
 
-        case PHYLIB_VCUSHION: // Ball and v-cushion minus ball radius
-            return fabs(center_obj1.x - obj2->obj.vcushion.x) - PHYLIB_BALL_RADIUS;
-            
-        default: // Invalid obj2 type
-            return -1.0;
+    case PHYLIB_VCUSHION: // Ball and v-cushion minus ball radius
+        return fabs(center_obj1.x - obj2->obj.vcushion.x) - PHYLIB_BALL_RADIUS;
+
+    default: // Invalid obj2 type
+        return -1.0;
     }
 }
 

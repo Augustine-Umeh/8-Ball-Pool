@@ -28,9 +28,9 @@ $(document).ready(function () {
                 console.error("SVG Element not found!");
                 return;
             }
-            
+
             createCueAndAimLine();
-            setupEventListeners(); 
+            setupEventListeners();
             shotpowerEventListeners();
         },
         error: function () {
@@ -40,95 +40,219 @@ $(document).ready(function () {
 });
 
 var cue_coord = { x: '999', y: '999' };
+var isOntable = true;
+var ballNumbers = [];
+var play1balls = [1, 11, 2, 10, 8, 3, 9, 14, 4, 13, 12, 5, 15, 6, 7];
+var play2balls = [1, 11, 2, 10, 8, 3, 9, 14, 4, 13, 12, 5, 15, 6, 7];
+var sameTables = false;
 function createCueAndAimLine() {
-    let cueBall;
 
-    try {
-        cueBall = $("#cue_ball");
-    
-        // Check if the cue ball is not found
-        if (cueBall.length === 0) {
-            console.log("couldn't get ball");
-            throw new Error("Cue ball not found");
+    if (isOntable) {
+        let cueBall = $("#cue_ball");
+
+        if (sameTables){
+            moveCueBall(document.getElementById("cue_ball"));
+            isOntable = false;
+            return;
         }
-    } catch {
-        // If cue ball is not found, create and append it to the SVG container
+
+        let cueBallX = parseFloat(cueBall.attr("cx"));
+        let cueBallY = parseFloat(cueBall.attr("cy"));
+
+        let aimLineX = cueBallX - 48;
+        let cueLineX = cueBallX + 48;
+
+        let poolCueLength = 1500;
+        let aimLineLength = 7000;
+
         let svg = $("#svg-container svg")[0];
-   
-        // Create a new cue ball element
-        cueBall = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+
+        let pool_cue = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        pool_cue.setAttribute("id", "pool_cue");
+        pool_cue.setAttribute("class", "cue_line");
+        pool_cue.setAttribute("x1", cueLineX);
+        pool_cue.setAttribute("y1", cueBallY);
+        pool_cue.setAttribute("x2", cueLineX + poolCueLength);
+        pool_cue.setAttribute("y2", cueBallY);
+        pool_cue.setAttribute("stroke", "brown");
+        pool_cue.setAttribute("stroke-width", "25");
+        pool_cue.setAttribute("visibility", "visible");
+
+        let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        aim_line.setAttribute("id", "aim_line");
+        aim_line.setAttribute("class", "cue_line");
+        aim_line.setAttribute("x1", aimLineX);
+        aim_line.setAttribute("y1", cueBallY);
+        aim_line.setAttribute("x2", aimLineX - aimLineLength);
+        aim_line.setAttribute("y2", cueBallY);
+        aim_line.setAttribute("length", aimLineLength);
+        aim_line.setAttribute("stroke", "grey");
+        aim_line.setAttribute("stroke-width", "4");
+        aim_line.setAttribute("visibility", "visible");
+
+        svg.appendChild(pool_cue);
+        svg.appendChild(aim_line);
+
+        checkLinePath(aimLineX - aimLineLength, cueBallY, cueBallX, cueBallY);
+    } else {
+        let svg = $("#svg-container svg")[0];
+        let cueBall = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         cueBall.setAttribute("id", "cue_ball");
         cueBall.setAttribute("cx", cue_coord.x);
         cueBall.setAttribute("cy", cue_coord.y);
         cueBall.setAttribute("r", "28");
         cueBall.setAttribute("fill", "white");
-    
-        // Append the cue ball to the SVG container
-        svg.appendChild(cueBall);
 
-        cueBall = $("#cue_ball");
+        svg.appendChild(cueBall);
+        moveCueBall(document.getElementById("cue_ball"));
+
+        isOntable = false;
     }
 
-    let cueBallX = parseFloat(cueBall.attr("cx"));
-    let cueBallY = parseFloat(cueBall.attr("cy"));
-    let aimLineY = 0;
-    let cueLineY = 0;
+    ballNumbers = getBallNumbersFromSVG();
+    console.log(ballNumbers);   
+}
+
+function moveCueBall(cueBall) {
+    let svg = document.querySelector("#svg-container svg");
+    let isDragging = false;
+
+    let cueBallX = parseFloat(cueBall.getAttribute("cx"));
+    let cueBallY = parseFloat(cueBall.getAttribute("cy"));
+
+    let aimLineX = cueBallX - 48;
+    let cueLineX = cueBallX + 48;
 
     let poolCueLength = 1500;
     let aimLineLength = 7000;
 
-    aimLineY = cueBallY - 48;
-    cueLineY = cueBallY + 48;
+    let pool_cue = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    pool_cue.setAttribute("id", "pool_cue");
+    pool_cue.setAttribute("class", "cue_line");
+    pool_cue.setAttribute("x1", cueLineX);
+    pool_cue.setAttribute("y1", cueBallY);
+    pool_cue.setAttribute("x2", cueLineX + poolCueLength);
+    pool_cue.setAttribute("y2", cueBallY);
+    pool_cue.setAttribute("stroke", "black");
+    pool_cue.setAttribute("stroke-width", "25");
+    pool_cue.setAttribute("visibility", "visible");
 
-    // Select the SVG container where you want to append the line
-    let svg = $("#svg-container svg")[0];
-
-    let pool_cue = poolcueCreation(
-        cueBallX,
-        cueBallX,
-        cueLineY,
-        cueLineY + poolCueLength
-    );
-
-    // Create a new SVG aimline element
-    let aim_line = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line"
-    );
+    let aim_line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     aim_line.setAttribute("id", "aim_line");
     aim_line.setAttribute("class", "cue_line");
-    aim_line.setAttribute("x1", cueBallX);
-    aim_line.setAttribute("y1", aimLineY);
-    aim_line.setAttribute("x2", cueBallX); // Set x2 based on desired length from cue ball position
-    aim_line.setAttribute("y2", (aimLineY - aimLineLength)); // Keep y2 the same as y1 initially
+    aim_line.setAttribute("x1", aimLineX);
+    aim_line.setAttribute("y1", cueBallY);
+    aim_line.setAttribute("x2", aimLineX - aimLineLength);
+    aim_line.setAttribute("y2", cueBallY);
     aim_line.setAttribute("length", aimLineLength);
     aim_line.setAttribute("stroke", "grey");
     aim_line.setAttribute("stroke-width", "4");
     aim_line.setAttribute("visibility", "visible");
 
-    // Append the line to the SVG container
     svg.appendChild(pool_cue);
     svg.appendChild(aim_line);
 
-    checkLinePath(cueBallX, aimLineY - aimLineLength, cueBallX, cueBallY);
+    checkLinePath(aimLineX - aimLineLength, cueBallY, cueBallX, cueBallY);
+
+    cueBall.addEventListener('mousedown', (e) => {
+        let pool_cue = $("#pool_cue");
+        let aim_line = $("#aim_line");
+
+        isDragging = true;
+        e.preventDefault();
+
+        pool_cue.hide();
+        aim_line.hide();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            let coords = getSVGCoordinates(svg, e);
+            let x = coords.x;
+            let y = coords.y;
+            let radius = parseFloat(cueBall.getAttribute('r'));
+
+            if (isValidPosition(x, y, radius)) {
+                cue_coord.x = x;
+                cue_coord.y = y;
+                cueBall.setAttribute('cx', cue_coord.x);
+                cueBall.setAttribute('cy', cue_coord.y);
+            }
+        }
+    });
+
+    cueBall.addEventListener('mouseup', () => {
+        cue_coord.x = cueBall.getAttribute("cx");
+        cue_coord.y = cueBall.getAttribute("cy");
+        isDragging = false;
+
+        showPoolCue(poolCueLength, aimLineLength);
+    });
 }
 
-function poolcueCreation(x1, x2, y1, y2) {
-    let pool_cue = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line"
-    );
-    pool_cue.setAttribute("id", "pool_cue");
-    pool_cue.setAttribute("class", "cue_line");
-    pool_cue.setAttribute("x1", x1);
-    pool_cue.setAttribute("y1", y1);
-    pool_cue.setAttribute("x2", x2); // Set x2 based on desired length from cue ball position
-    pool_cue.setAttribute("y2", y2); // Keep y2 the same as y1 initially
-    pool_cue.setAttribute("stroke", "black");
-    pool_cue.setAttribute("stroke-width", "25");
-    pool_cue.setAttribute("visibility", "visible");
+function showPoolCue(poolCueLength, aimLineLength) {
+    let cueBall = $("#cue_ball");
+    let cueBallX = parseFloat(cueBall.attr("cx"));
+    let cueBallY = parseFloat(cueBall.attr("cy"));
 
-    return pool_cue;
+    let aimLineX = cueBallX - 48;
+    let cueLineX = cueBallX + 48;
+
+    let pool_cue = $("#pool_cue");
+    pool_cue.attr("x1", cueLineX);
+    pool_cue.attr("y1", cueBallY);
+    pool_cue.attr("x2", cueLineX + poolCueLength);
+    pool_cue.attr("y2", cueBallY);
+
+    let aim_line = $("#aim_line");
+    aim_line.attr("x1", aimLineX);
+    aim_line.attr("y1", cueBallY);
+    aim_line.attr("x2", aimLineX - aimLineLength);
+    aim_line.attr("y2", cueBallY);
+
+    pool_cue.show();
+    aim_line.show();
+
+    checkLinePath(aimLineX - aimLineLength, cueBallY, cueBallX, cueBallY);
+}
+
+function isValidPosition(x, y, radius) {
+    let tableWidth = 2700;
+    let tableHeight = 1350;
+    let pocketRadius = 112;
+
+    if (x - radius < 0 || x + radius > tableWidth || y - radius < 0 || y + radius > tableHeight) {
+        return false;
+    }
+
+    let pockets = [
+        { cx: 0, cy: 0 },
+        { cx: tableWidth / 2, cy: 0 },
+        { cx: tableWidth, cy: 0 },
+        { cx: 0, cy: tableHeight },
+        { cx: tableWidth / 2, cy: tableHeight },
+        { cx: tableWidth, cy: tableHeight }
+    ];
+
+    for (let pocket of pockets) {
+        let distance = Math.sqrt(Math.pow(x - pocket.cx, 2) + Math.pow(y - pocket.cy, 2));
+        if (distance < pocketRadius + radius) {
+            return false;
+        }
+    }
+
+    const balls = $("g.ball circle, circle.ball");
+
+    for (let ball of balls) {
+        let ballX = parseFloat(ball.getAttribute('cx'));
+        let ballY = parseFloat(ball.getAttribute('cy'));
+        let ballRadius = parseFloat(ball.getAttribute('r'));
+        let distance = Math.sqrt(Math.pow(x - ballX, 2) + Math.pow(y - ballY, 2));
+        if (distance < radius + ballRadius) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function rotatePoolCue(angle) {
@@ -140,7 +264,7 @@ function rotatePoolCue(angle) {
 
     // Lengths of the cue line and aim line
     let poolCueLength = 1500;
-    let aimLineLength = 2200;
+    let aimLineLength = 7000;
 
     // Calculate the offset coordinates
     let offsetX = offset * Math.cos(angle);
@@ -207,7 +331,7 @@ function checkLinePath(aimLineEndX, aimLineEndY, cueBallX, cueBallY) {
             // Calculate distance from cue ball
             let distance = Math.sqrt(
                 (cueBallX - intersectionPoint.x) ** 2 +
-                    (cueBallY - intersectionPoint.y) ** 2
+                (cueBallY - intersectionPoint.y) ** 2
             );
 
             // Update closest intersection if this one is closer
@@ -331,17 +455,45 @@ function getSVGCoordinates(svg, event) {
     return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
+function getBallNumbersFromSVG() {
+    // Retrieve the SVG element
+    let svg = document.getElementById("table");
+
+    if (!svg) {
+        console.error("SVG not found!");
+        return [];
+    }
+
+    // Get all text elements inside the SVG
+    let textElements = svg.getElementsByTagName("text");
+    var ballNumbers = [];
+
+    // Iterate through text elements and extract ball numbers
+    for (let i = 0; i < textElements.length; i++) {
+        const textElement = textElements[i];
+        const ballNumber = textElement.textContent.trim();
+
+        // Check if the text content is a number
+        if (!isNaN(ballNumber)) {
+            ballNumbers.push(ballNumber);
+        }
+    }
+
+    return ballNumbers;
+}
+
 function shotpowerEventListeners() {
     var gameID = parseInt(localStorage.getItem("gameID"));
     var accountID = parseInt(localStorage.getItem("accountID"));
     var player1Name = String(localStorage.getItem("player1Name"));
     var player2Name = String(localStorage.getItem("player2Name"));
+    var shotTaker = Math.random() < 0.5 ? player1Name : player2Name;
 
     let isDragging = false;
     let initialY = 0;
-    let maxSpeed = 10000;
+    let maxSpeed = 6000;
     let maxDragDistance = 540; // Distance in pixels (from 80 to 620)
-    
+
     let shotLine = document.querySelector("#shot_line");
 
     let startY1 = parseFloat(shotLine.getAttribute("y1"));
@@ -401,7 +553,8 @@ function shotpowerEventListeners() {
         let x2 = parseFloat(aimLine.getAttribute("x2"));
         let y2 = parseFloat(aimLine.getAttribute("y2"));
 
-        console.log(`Current X1: ${x1} and Current X2: ${x2}`)
+        console.log(`Current X1: ${x1} and Current X2: ${x2}`);
+
         // Calculate the direction vector
         let dx = x2 - x1;
         let dy = y2 - y1;
@@ -415,19 +568,20 @@ function shotpowerEventListeners() {
         let vx = directionX * speed;
         let vy = directionY * speed;
 
-        if (vx < 1 && vx > -1){
-            if ( vy < 0.0 ){
-                vx = -22.1383338342;
+        if (vx < 3 && vx > -3) {
+            if (vy < 0.0) {
+                vx = -7.1383338342;
             } else {
-                vx = 35.2484224842;
+                vx = 9.2484224842;
             }
-        } else if (vy < 1 && vy > -1){
-            if ( vx < 0.0 ){
-                vy = -32.32746462;
+        } else if (vy < 3 && vy > -3) {
+            if (vx < 0.0) {
+                vy = -7.32746462;
             } else {
-                vy = 28.737474743;
+                vy = 9.737474743;
             }
         }
+
         console.log(`Shot speed: ${speed.toFixed(2)} ms`);
         console.log(
             `Shot direction: (${directionX.toFixed(2)}, ${directionY.toFixed(
@@ -447,10 +601,8 @@ function shotpowerEventListeners() {
                 'vy': vy,
             },
         };
-
-        var shotTaker = (shotTaker === player1Name) ? player2Name : player1Name;
-
-
+        
+        console.log("Current Player: ", shotTaker);
         // Send the data using AJAX
         $.ajax({
             type: "POST",
@@ -460,22 +612,39 @@ function shotpowerEventListeners() {
                 "velocity": dataToSend.vectorData,
                 "accountID": accountID,
                 "gameID": gameID,
-                "shotTaker": shotTaker
+                "shotTaker": shotTaker,
+                "cueBallPos": cue_coord,
+                "isOntable": isOntable,
+                "ballNumbers": ballNumbers,
+                "play1balls": play1balls,
+                "play2balls": play2balls
             }),
             success: function (response) {
                 if (response.status === 'Success') {
                     let svgData = response.svgData; // Get the SVG data from the response
                     console.log("svgData: ", Object.keys(svgData).length);
                     let svgArray = Object.values(svgData); // Convert SVG data object to an array
-                    
-                    cue_coord.x = String(response.cue_coord['x']);
-                    cue_coord.y = String(response.cue_coord['y']);
 
+                    isOntable = response.isOntable
+                    cue_coord.x = String(response.cueBallPos[0]);
+                    cue_coord.y = String(response.cueBallPos[1]);
+                    shotTaker = response.shotTaker
+                    
+                    play1balls = response.play1balls;
+                    play2balls = response.play2balls;
+
+                    console.log("player1's balls: ", response.play1balls);
+                    console.log("player2's balls: ", response.play2balls);
+                    
+                    sameTables = response.sameTables;
+                    
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {
-                            createCueAndAimLine();
-                            setupEventListeners();
+                            setTimeout(() => {
+                                createCueAndAimLine();
+                                setupEventListeners();
+                            }, 300);
                         })
                         .catch((error) => {
                             console.error("Error displaying SVGs:", error);
@@ -502,13 +671,10 @@ function shotpowerEventListeners() {
 }
 
 function displayNextSVG(svgArray) {
-
     return new Promise((resolve, reject) => {
-
         let currentIndex = 0; // Start from the first SVG
-        
-        function updateSVG() {
 
+        function updateSVG() {
             if (currentIndex < svgArray.length) {
                 if ($("#svg-container").length) {
                     $("#svg-container").html(svgArray[currentIndex]); // Update the SVG container
@@ -519,7 +685,7 @@ function displayNextSVG(svgArray) {
                     return;
                 }
                 currentIndex++; // Move to the next SVG
-                setTimeout(updateSVG, 10); // Wait for 0.01s before displaying the next SVG
+                setTimeout(updateSVG, 11); // Wait for 0.01s before displaying the next SVG
             } else {
                 console.log("Finished displaying all SVGs.");
                 resolve(); // Resolve the promise when done
@@ -527,16 +693,6 @@ function displayNextSVG(svgArray) {
         }
         updateSVG(); // Start the SVG update loop
     });
-}
-
-function changeTurn() {
-    var spanText = $("#playerTurn").text();
-
-    if (spanText === player1Name) {
-        $("#playerTurn").text(player2Name);
-    } else {
-        $("#playerTurn").text(player1Name);
-    }
 }
 
 function setupEventListeners() {
@@ -587,6 +743,7 @@ function setupEventListeners() {
 
     $("#svg-container svg").on("mouseup", function (e) {
         isDragging = false;
+        
     });
 
     $("#svg-container svg").on("mouseleave", function (e) {

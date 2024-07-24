@@ -15,34 +15,40 @@
         </div> -->
 
         <div class="grid-container">
-            <div id="svg-container" class="div1"></div>
-            <div class="shot-meter-container">
-                <svg
-                    id="shot-meter"
-                    width="75"
-                    height="700"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <rect
+            <div class="svg-wrapper">
+                <div id="svg-container" class="div1 svg-container"></div>
+            </div>
+
+            <div class="svg-wrapper">
+                <div class="shot-meter-container svg-container">
+                    <svg
+                        id="shot-meter"
                         width="75"
                         height="700"
-                        x="0"
-                        y="0"
-                        rx="20"
-                        ry="20"
-                        style="fill: #996633; opacity: 60%"
-                    />
-                    <line
-                        id="shot_line"
-                        x1="37.5"
-                        y1="80"
-                        x2="37.5"
-                        y2="620"
-                        style="stroke: black; stroke-width: 14"
-                    />
-                </svg>
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <rect
+                            width="75"
+                            height="700"
+                            x="0"
+                            y="0"
+                            rx="20"
+                            ry="20"
+                            style="fill: #996633; opacity: 60%"
+                        />
+                        <line
+                            id="shot_line"
+                            x1="37.5"
+                            y1="80"
+                            x2="37.5"
+                            y2="620"
+                            style="stroke: black; stroke-width: 14"
+                        />
+                    </svg>
+                </div>
             </div>
         </div>
+
         <div class="scoreboard">
             <!-- Player 1 -->
             <div class="player">

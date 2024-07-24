@@ -7,24 +7,20 @@ body {
     background-color: #f0f0f0;
 }
 
-.container {
-    display: block;
-}
-
 .grid-container {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 150px;
+    grid-template-columns: auto auto;
+    gap: 50px;
 }
 
-#svg-container {
-    transform: rotate(-90deg);
+.svg-wrapper {
+    overflow: visible;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.shot-meter-container {
+.svg-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,13 +28,12 @@ body {
 
 
 #table {
-    transform: scale(0.7);
-    /* width: 50%;
-    height: auto; */
+    /* transform: rotate(-90deg);
+    transform-origin: center center;  */
 }
 
 #shot-meter {
-    transform: scale(0.7);
+    /* transform: scale(0.7); */
 }
 
 /* #svg-container {
