@@ -128,8 +128,8 @@
             <!-- Interactive portion -->
             <div class="container-fluid">
                 <div class="row">
-                    <!-- Left Column (8.4/12 of the screen) -->
-                    <div class="col-8 text-center">
+                    <!-- Left Column (8/12 of the screen) -->
+                    <div class="col-8 text-center align-middle">
                         <h1 class="">Create A Game</h1>
                         <div class="container">
                             <div class="position-relative">
@@ -139,15 +139,46 @@
                                     alt="8 Ball AI Logo"
                                     class="img-fluid w-50 my-5"
                                 />
-                                <div class="rectangle-overlay translate-middle rounded"></div>
                             </div>
                         </div>
-                        <h3 class="">play against</h3>
+                        <div
+                            id="versus"
+                            class="d-flex flex-row mb-3 justify-content-center align-items-center mx-5"
+                        >
+                            <div class="border btn-group d-flex w-100">
+                                <button class="btn btn-success flex-fill">
+                                    AI
+                                </button>
+                                <div
+                                    class="border flex-fill d-flex align-items-center justify-content-center"
+                                >
+                                    Play Against
+                                </div>
+                                <button class="btn btn-success flex-fill">
+                                    Friends
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Right Column (3.6/12 of the screen) -->
-                    <div class="col">
-                        <!-- Right column content -->
+                    <!-- Right Column (4/12 of the screen) -->
+
+                    <div
+                        class="col-4 border-start border-dark border-2 scrolling-column d-flex align-self-center flex-column overflow-auto"
+                    >
+                        <!-- Green rectangles -->
+                        <div class="scrolling-column align-middle">
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                            <div class="green-rectangle"></div>
+                        </div>
                     </div>
                 </div>
             </div>
