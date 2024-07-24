@@ -42,12 +42,20 @@ $(document).ready(function () {
 var cue_coord = { x: '999', y: '999' };
 var isOntable = true;
 var ballNumbers = [];
-var play1balls = [1, 2, 3, 4, 5];
-var play2balls = [1, 2, 3, 4, 5];
+var play1balls = [1, 11, 2, 10, 8, 3, 9, 14, 4, 13, 12, 5, 15, 6, 7];
+var play2balls = [1, 11, 2, 10, 8, 3, 9, 14, 4, 13, 12, 5, 15, 6, 7];
+var sameTables = false;
 function createCueAndAimLine() {
-    
+
     if (isOntable) {
         let cueBall = $("#cue_ball");
+
+        if (sameTables){
+            moveCueBall(document.getElementById("cue_ball"));
+            isOntable = false;
+            return;
+        }
+
         let cueBallX = parseFloat(cueBall.attr("cx"));
         let cueBallY = parseFloat(cueBall.attr("cy"));
 
@@ -66,7 +74,7 @@ function createCueAndAimLine() {
         pool_cue.setAttribute("y1", cueBallY);
         pool_cue.setAttribute("x2", cueLineX + poolCueLength);
         pool_cue.setAttribute("y2", cueBallY);
-        pool_cue.setAttribute("stroke", "black");
+        pool_cue.setAttribute("stroke", "brown");
         pool_cue.setAttribute("stroke-width", "25");
         pool_cue.setAttribute("visibility", "visible");
 
@@ -627,7 +635,9 @@ function shotpowerEventListeners() {
 
                     console.log("player1's balls: ", response.play1balls);
                     console.log("player2's balls: ", response.play2balls);
-
+                    
+                    sameTables = response.sameTables;
+                    
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {
