@@ -45,12 +45,13 @@ var ballNumbers = [];
 var play1balls = [1, 11, 2, 10, 8, 3, 9, 14, 4, 13, 12, 5, 15, 6, 7];
 var play2balls = [1, 11, 2, 10, 8, 3, 9, 14, 4, 13, 12, 5, 15, 6, 7];
 var sameTables = false;
+var winner = null;
 function createCueAndAimLine() {
 
     if (isOntable) {
         let cueBall = $("#cue_ball");
 
-        if (sameTables){
+        if (sameTables) {
             moveCueBall(document.getElementById("cue_ball"));
             isOntable = false;
             return;
@@ -74,7 +75,7 @@ function createCueAndAimLine() {
         pool_cue.setAttribute("y1", cueBallY);
         pool_cue.setAttribute("x2", cueLineX + poolCueLength);
         pool_cue.setAttribute("y2", cueBallY);
-        pool_cue.setAttribute("stroke", "brown");
+        pool_cue.setAttribute("stroke", "black");
         pool_cue.setAttribute("stroke-width", "25");
         pool_cue.setAttribute("visibility", "visible");
 
@@ -110,7 +111,7 @@ function createCueAndAimLine() {
     }
 
     ballNumbers = getBallNumbersFromSVG();
-    console.log(ballNumbers);   
+    console.log(ballNumbers);
 }
 
 function moveCueBall(cueBall) {
@@ -540,7 +541,6 @@ function shotpowerEventListeners() {
 
         // Getting Speed
         let currentY1 = parseFloat(shotLine.getAttribute("y1"));
-        console.log(`Current Y1: ${currentY1}`);
         let dragDistance = currentY1 - startY1; // Calculate how much the line was dragged back
 
         // Convert drag distance to speed (mph)
@@ -552,8 +552,6 @@ function shotpowerEventListeners() {
         let y1 = parseFloat(aimLine.getAttribute("y1"));
         let x2 = parseFloat(aimLine.getAttribute("x2"));
         let y2 = parseFloat(aimLine.getAttribute("y2"));
-
-        console.log(`Current X1: ${x1} and Current X2: ${x2}`);
 
         // Calculate the direction vector
         let dx = x2 - x1;
@@ -583,17 +581,8 @@ function shotpowerEventListeners() {
         }
 
         console.log(`Shot speed: ${speed.toFixed(2)} ms`);
-        console.log(
-            `Shot direction: (${directionX.toFixed(2)}, ${directionY.toFixed(
-                2
-            )})`
-        );
-        console.log(
-            `Velocity vector: (vx: ${vx.toFixed(2)}, vy: ${vy.toFixed(2)})`
-        );
 
         // Send the shot data to the server
-
         // Prepare the data
         const dataToSend = {
             vectorData: {
@@ -601,12 +590,12 @@ function shotpowerEventListeners() {
                 'vy': vy,
             },
         };
-        
+
         console.log("Current Player: ", shotTaker);
         // Send the data using AJAX
         $.ajax({
             type: "POST",
-            url: "/processDrag", // This URL should match your server endpoint
+            url: "/processDrag",
             contentType: "application/json",
             data: JSON.stringify({
                 "velocity": dataToSend.vectorData,
@@ -629,15 +618,18 @@ function shotpowerEventListeners() {
                     cue_coord.x = String(response.cueBallPos[0]);
                     cue_coord.y = String(response.cueBallPos[1]);
                     shotTaker = response.shotTaker
-                    
+
                     play1balls = response.play1balls;
                     play2balls = response.play2balls;
 
-                    console.log("player1's balls: ", response.play1balls);
-                    console.log("player2's balls: ", response.play2balls);
-                    
+                    console.log(`${player1Name}'s balls: [${response.play1balls}]`);
+                    console.log(`${player2Name}'s balls: [${response.play2balls}]`);
+
                     sameTables = response.sameTables;
-                    
+
+                    endResult = response.endResult
+
+
                     // Use promise chaining to ensure order
                     displayNextSVG(svgArray)
                         .then(() => {
@@ -649,8 +641,25 @@ function shotpowerEventListeners() {
                         .catch((error) => {
                             console.error("Error displaying SVGs:", error);
                         });
+
+                    console.log("Updates: ",);
+                    if (sameTables) {
+                        console.log("Scratch!!");
+                    }
+                    for (let i = 0; i < endResult.length; i++) {
+                        console.log(endResult[i]);
+                    }
+
+                    winner = response.winner
+                    if (winner) {
+                        const svgContainer = $(".shot-meter-container svg");
+                        svgContainer.hide()
+                        console.log(`${winner} is the winner`);
+                        console.log("Game over");
+                        return;
+                    }
                 }
-            },
+            }, 
             error: function (xhr, status, error) {
                 console.error("Error sending data:", error);
                 console.error("Status:", status);
@@ -678,7 +687,6 @@ function displayNextSVG(svgArray) {
             if (currentIndex < svgArray.length) {
                 if ($("#svg-container").length) {
                     $("#svg-container").html(svgArray[currentIndex]); // Update the SVG container
-                    console.log(`Displaying SVG : ${currentIndex + 1}`);
                 } else {
                     console.error("#svg-container not found");
                     reject(new Error("#svg-container not found"));
@@ -687,7 +695,6 @@ function displayNextSVG(svgArray) {
                 currentIndex++; // Move to the next SVG
                 setTimeout(updateSVG, 11); // Wait for 0.01s before displaying the next SVG
             } else {
-                console.log("Finished displaying all SVGs.");
                 resolve(); // Resolve the promise when done
             }
         }
@@ -743,7 +750,7 @@ function setupEventListeners() {
 
     $("#svg-container svg").on("mouseup", function (e) {
         isDragging = false;
-        
+
     });
 
     $("#svg-container svg").on("mouseleave", function (e) {
@@ -751,36 +758,33 @@ function setupEventListeners() {
     });
 }
 
-/**
- * code for later
- * 
- * function createPoolCueGradient(svg) {
-    let gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
-    gradient.setAttribute("id", "poolCueGradient");
-    gradient.setAttribute("x1", "0%");
-    gradient.setAttribute("y1", "0%");
-    gradient.setAttribute("x2", "100%");
-    gradient.setAttribute("y2", "0%");
+// function createPoolCueGradient(svg) {
+//     let gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+//     gradient.setAttribute("id", "poolCueGradient");
+//     gradient.setAttribute("x1", "0%");
+//     gradient.setAttribute("y1", "0%");
+//     gradient.setAttribute("x2", "100%");
+//     gradient.setAttribute("y2", "0%");
 
-    // Define the gradient colors
-    let stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-    stop1.setAttribute("offset", "0%");
-    stop1.setAttribute("style", "stop-color:brown;stop-opacity:1");
-    gradient.appendChild(stop1);
+//     // Define the gradient colors
+//     let stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+//     stop1.setAttribute("offset", "0%");
+//     stop1.setAttribute("style", "stop-color:brown;stop-opacity:1");
+//     gradient.appendChild(stop1);
 
-    let stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-    stop2.setAttribute("offset", "80%");
-    stop2.setAttribute("style", "stop-color:lightbrown;stop-opacity:1");
-    gradient.appendChild(stop2);
+//     let stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+//     stop2.setAttribute("offset", "80%");
+//     stop2.setAttribute("style", "stop-color:lightbrown;stop-opacity:1");
+//     gradient.appendChild(stop2);
 
-    let stop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
-    stop3.setAttribute("offset", "100%");
-    stop3.setAttribute("style", "stop-color:darkbrown;stop-opacity:1");
-    gradient.appendChild(stop3);
+//     let stop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+//     stop3.setAttribute("offset", "100%");
+//     stop3.setAttribute("style", "stop-color:darkbrown;stop-opacity:1");
+//     gradient.appendChild(stop3);
 
-    // Append the gradient to the SVG's defs section
-    let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-    defs.appendChild(gradient);
-    svg.appendChild(defs);
-}
- */
+//     // Append the gradient to the SVG's defs section
+//     let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+//     defs.appendChild(gradient);
+//     svg.appendChild(defs);
+// }
+

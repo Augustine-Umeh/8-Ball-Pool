@@ -91,7 +91,7 @@ class StillBall( phylib.phylib_object ):
         if self.obj.still_ball.number < 9:
             return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
-                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">%d</text>/>\n""" % (
+                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">%d</text>\n""" % (
                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number],
                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
                 self.obj.still_ball.pos.x, self.obj.still_ball.pos.y + 2, self.obj.still_ball.number
@@ -136,7 +136,7 @@ class RollingBall( phylib.phylib_object ):
         if self.obj.rolling_ball.number < 9:
             return """ <circle class="ball" cx="%d" cy="%d" r="%d" fill="%s" />
                 <circle cx="%d" cy="%d" r="%d" fill="%s" />
-                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">%d</text>/>\n""" % (
+                <text x="%d" y="%d" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">%d</text>\n""" % (
                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number],
                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS // 2,  BALL_COLOURS[0],
                 self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y + 2, self.obj.rolling_ball.number
@@ -610,7 +610,7 @@ class Table( phylib.phylib_table ):
                 elif isinstance(obj, RollingBall):
                     if obj.obj.rolling_ball.number == 0:
                         svg_str += """ <circle cx="%d" cy="%d" r="%d" fill="%s" id="cue_ball" />\n""" % (
-                            obj.obj.still_ball.pos.x, obj.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[obj.obj.still_ball.number])
+                            obj.obj.rolling_ball.pos.x, obj.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[obj.obj.rolling_ball.number])
                     else:
                         svg_str += obj.svg()
                 else:

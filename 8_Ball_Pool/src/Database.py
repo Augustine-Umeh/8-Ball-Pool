@@ -328,7 +328,7 @@ class Database:
                     VALUES (?, ?)
                     """
                     cursor.execute(insert_position_query, (table_id, new_ball_id))
-                    new_table.append((ball_no, x_pos, y_pos, x_vel, y_vel))
+                    new_table.append((ball_no, x_pos, y_pos))
                     if ball_no == 0:
                         removed_cue = False
                     
@@ -580,14 +580,17 @@ class Database:
         # Step 6: Return JSON
         return json.dumps(result)
 
-    def markGameStatus(self, accountID, gameID, status):
+    def markGameStatus(self, accountID, gameID, status, winner):
         cursor = self.conn.cursor()
         accountID += 1
         gameID += 1
         
         update_query = "UPDATE Game SET GameUsed = ? WHERE AccountID = ? AND GameID = ?"
-        
         cursor.execute(update_query, (status, accountID, gameID))
+        
+        if winner:
+            update_query = "UPDATE Game SET Winner = ? WHERE AccountID = ? AND GameID = ?"
+            cursor.execute(update_query, (winner, accountID, gameID))
         
         self.conn.commit()
         cursor.close()
