@@ -1,8 +1,10 @@
 from Database import Database
 
-class player:
+class playerProfile:
     def __init__(self):
-        pass
+        self.db = Database()
+        self.db.createDB()
+        self.conn = self.db.conn
 
     def listGames(self, accountID):
         cursor = self.conn.cursor()
@@ -153,5 +155,15 @@ class player:
 
                 score += len(balls)
 
+    def getGameStats(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        
+        stats_query = 'SELECT Player2Name, Winner FROM Game WHERE AccountID = ?'
+        cursor.execute(stats_query, (accountID,))
+        res = cursor.fetchall()
+        
+        return res
+    
         cursor.close()
         return score

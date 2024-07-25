@@ -71,6 +71,7 @@ $(document).ready(function() {
 
     $('#statsDropdown').on('click', function() {
         var accountID = localStorage.getItem('accountID');
+        var accountName = localStorage.getItem('accountName')
         if (accountID < 0) {
             console.error("Account ID not found in localStorage.");
             return;
@@ -81,11 +82,32 @@ $(document).ready(function() {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ 
-                accountID: parseInt(accountID) 
+                accountID: parseInt(accountID)
             }),
             success: function(response) {
                 // Handle stats
-                console.log("Stats: ", response.stats);
+                stats = response.stats
+                let wins = 0;
+                let loses = 0;
+                let incomplete = 0;
+                let totalGames = stats.length;
+
+                for (let i = 0; i < totalGames; i ++){
+                    if (stats[i][1]) {
+                        if (accountName == stats[i][1]) {
+                            wins += 1;
+                        } else {
+                            loses += 1;
+                        }
+                    }
+                }
+                incomplete = totalGames - (wins + loses);
+
+                console.log("Stats:");
+                console.log(`Wins: ${wins}`);
+                console.log(`Loses: ${loses}`);
+                console.log(`Incomplete : ${incomplete}`);
+                console.log(`Total Games: ${totalGames}`);
                 
             },
             error: function(response) {

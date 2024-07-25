@@ -16,6 +16,7 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.status === 'Account created successfully') {
                     localStorage.setItem('accountID', response.accountID);
+                    localStorage.setItem('accountName', accountName);
                     console.log("signup account", response.accountID);
                     window.location.href = 'profile.html';
                 } else if (response.status === 'Account already exists'){
