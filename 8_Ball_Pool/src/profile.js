@@ -109,6 +109,11 @@ $(document).ready(function() {
                 console.log(`Incomplete : ${incomplete}`);
                 console.log(`Total Games: ${totalGames}`);
                 
+                var statsList = $('#statsList');
+                statsList.empty();
+                statsList.append(`<li class="dropdown-item text-success">${wins} Wins</li>`);
+                statsList.append(`<li class="dropdown-item text-danger">${loses} Losses</li>`);
+                statsList.append(`<li class="dropdown-item text-warning">${incomplete} Incomplete</li>`);
             },
             error: function(response) {
                 console.error("Error: ", response.message);
