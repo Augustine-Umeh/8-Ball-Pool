@@ -89,6 +89,46 @@ class MyHandler(BaseHTTPRequestHandler):
                 'accountID': accountID
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        elif self.path == '/friendsList':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            
+            accountID = int(data['accountID'])
+            
+            friends = db.getFriends(accountID)
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'friends': friends
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+            
+        elif self.path == '/stats':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            
+        elif self.path == '/logOut':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            accountID = int(data['accountID'])
+            
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'status': 'Logged out successfully'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
             
         elif self.path == '/startGame':
             content_length = int(self.headers['Content-Length'])

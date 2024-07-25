@@ -35,6 +35,15 @@ class Database:
             );
             """,
             """
+            CREATE TABLE IF NOT EXISTS Friends (
+                AccountID INTEGER,
+                FriendID INTEGER,
+                FOREIGN KEY (AccountID) REFERENCES Account(AccountID),
+                FOREIGN KEY (FriendID) REFERENCES Account(AccountID),
+                PRIMARY KEY (AccountID, FriendID)
+            );
+            """,
+            """
             CREATE TABLE IF NOT EXISTS Game (
                 GameID INTEGER PRIMARY KEY AUTOINCREMENT,
                 AccountID INTEGER NOT NULL,
@@ -673,6 +682,93 @@ class Database:
         cursor.close()
         return [(gameID - 1, gameName) for gameID, gameName in results]
 
+    def addFriend(self, accountName, friendName):
+        cursor = self.conn.cursor()
+
+        try:
+            # Check if both accounts exist and retrieve their IDs
+            cursor.execute("SELECT AccountID FROM Account WHERE AccountName = ?", (accountName,))
+            account = cursor.fetchone()
+
+            cursor.execute("SELECT AccountID FROM Account WHERE AccountName = ?", (friendName,))
+            friend = cursor.fetchone()
+
+            if not account:
+                print(f"{accountName} doesn't exist")
+                return 
+
+            if not friend:
+                print(f"{friendName} doesn't exist")
+                return 
+
+            accountID = account[0]
+            friendID = friend[0]
+
+            # Add each other as friends
+            cursor.execute("INSERT INTO Friends (AccountID, FriendID) VALUES (?, ?)", (accountID, friendID))
+            cursor.execute("INSERT INTO Friends (AccountID, FriendID) VALUES (?, ?)", (friendID, accountID))
+
+            self.conn.commit()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            self.conn.rollback()
+        finally:
+            cursor.close()
+
+    def getFriends(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+
+        id_query = "SELECT FriendID FROM Friends WHERE AccountID = ?"
+        cursor.execute(id_query, (accountID,))
+        friend_ids = [row[0] for row in cursor.fetchall()]
+
+        if not friend_ids:
+            return []
+
+        friends_query = "SELECT AccountName FROM Account WHERE AccountID IN ({})".format(
+            ",".join("?" for _ in friend_ids))
+        cursor.execute(friends_query, friend_ids)
+
+        return [row[0] for row in cursor.fetchall()]
+
+    def deleteFriend(self, accountName, friendName):
+        cursor = self.conn.cursor()
+
+        try:
+            # Check if both accounts exist and retrieve their IDs
+            cursor.execute("SELECT AccountID FROM Account WHERE AccountName = ?", (accountName,))
+            account = cursor.fetchone()
+
+            cursor.execute("SELECT AccountID FROM Account WHERE AccountName = ?", (friendName,))
+            friend = cursor.fetchone()
+
+            if not account:
+                print(f"{accountName} doesn't exist")
+                return 
+
+            if not friend:
+                print(f"{friendName} doesn't exist")
+                return 
+
+            accountID = account[0]
+            friendID = friend[0]
+
+            # Remove each other as friends
+            cursor.execute("DELETE FROM Friends WHERE AccountID = ? AND FriendID = ?", (accountID, friendID))
+            cursor.execute("DELETE FROM Friends WHERE AccountID = ? AND FriendID = ?", (friendID, accountID))
+
+            self.conn.commit()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            self.conn.rollback()
+        finally:
+            cursor.close()
+
+    def getGameStats(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        
     def close(self):
         # Commit any pending transaction and close the connection
         self.conn.commit()
