@@ -163,7 +163,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     
                     tableID = db.firstwriteTable(accountID, gameID, initialized_table)
 
-                    db.markGameStatus(accountID, gameID, 1)
+                    db.markGameStatus(accountID, gameID, 1, None)
                     
                     if tableID == -1:
                         raise ValueError("This Game doesn't exist")
@@ -202,14 +202,15 @@ class MyHandler(BaseHTTPRequestHandler):
             ballNumbers = data['ballNumbers']
             play1balls = data['play1balls']
             play2balls = data['play2balls']
-            print("line 205: ", play1balls)
-            print(f"Recieved data: {vectorData}")
 
+            endResult = []
             tableID = db.getLastTable(accountID, gameID)
             
             vx = vectorData['vx']
             vy = vectorData['vy']
+            
             startTableID = tableID
+            
             print("tableID to read from ", tableID)
             if tableID == -1:
                 raise ValueError("This Game doesn't exist")
@@ -225,42 +226,55 @@ class MyHandler(BaseHTTPRequestHandler):
             
             currTable = db.readTable(accountID, gameID, tableID)
             curGame.shoot(shotTaker, currTable, vx, vy)
-            # print("first ball hit: ", curGame.first_ball_hit)
             
             isOntable, cueBallPos = db.updateTable(accountID, gameID, ballNumbers)
+            if not isOntable:
+                endResult.append("cue ball went into the hole")
+                curGame.scratch = True
+                
             db.updateShotTable(accountID, gameID)
-            
-            if not curGame.player1Category:
-                curGame.setPlayerCategory()
-                if curGame.player1Category:
-                    curGame.setPlayerBalls()
-            
-            curGame.playerTurn(isOntable)
-            shotTaker = curGame.currentPlayer
-            print("player's Turn: ", curGame.currentPlayer)
-            
-            play1balls = list(curGame.play1balls)
-            play2balls = list(curGame.play2balls)
             
             svg_dict = {}
             tableID += 1
-            print("table ID: ", tableID)
-            # Assuming db.readTable() doesn't modify the state of your database cursor or similar,
-            # and you can freely call it with increasing IDs.
+            
+            print("start tableID: ", tableID)
             while True:
                 tempTable = db.readTable(accountID, gameID, tableID)
-                # Break the loop if no more tables are found
                 if tempTable is None:
                     break
                 
                 svg_dict[tableID] = tempTable.custom_svg(tempTable)
                 tableID += 1
-            print("table ID: ", tableID)
+            print("end tableID: ", tableID)
             endTableID = tableID - 1
             print("\nLength of svg dict: ", len(svg_dict), "\n")
+            
+            winner = None
+            name, decision = curGame.isGameEnd()
+            if decision == 'winner':
+                winner = name
+                
+            if curGame.first_ball_hit == 'False':
+                curGame.scratch = True
+                endResult.append("Didn't make first contact with any of your team balls")
+                
+            if not curGame.player1Category:
+                curGame.setPlayerCategory()
+                if curGame.player1Category:
+                    endResult.append(f"{curGame.player1Name} has {curGame.player1Category} and {curGame.player2Name} has {curGame.player2Category}")
+                    curGame.setPlayerBalls()
+            
+            curGame.playerTurn(isOntable)
+            shotTaker = curGame.currentPlayer
+            print("player's Turn: ", shotTaker)
+            
+            play1balls = list(curGame.play1balls)
+            play2balls = list(curGame.play2balls)
 
-            sameTables = db.compareTables(accountID, gameID, startTableID, endTableID)
-            print("for sameballs: ", sameTables)
+            res = db.compareTables(accountID, gameID, startTableID, endTableID)
+            if res: 
+                endResult.append('Cue ball made no contact with another ball')
+                curGame.scratch = True
             
             # Send a response back to the client
             self.send_response(200)
@@ -275,7 +289,9 @@ class MyHandler(BaseHTTPRequestHandler):
                 'shotTaker': shotTaker,
                 'play1balls': play1balls,
                 'play2balls': play2balls,
-                'sameBalls': sameTables
+                'sameTables': curGame.scratch,
+                'endResult': endResult,
+                'winner': winner
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
         else:

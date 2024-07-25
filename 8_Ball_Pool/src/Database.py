@@ -686,14 +686,17 @@ class Database:
         # Step 6: Return JSON
         return json.dumps(result)
 
-    def markGameStatus(self, accountID, gameID, status):
+    def markGameStatus(self, accountID, gameID, status, winner):
         cursor = self.conn.cursor()
         accountID += 1
         gameID += 1
         
         update_query = "UPDATE Game SET GameUsed = ? WHERE AccountID = ? AND GameID = ?"
-        
         cursor.execute(update_query, (status, accountID, gameID))
+        
+        if winner:
+            update_query = "UPDATE Game SET Winner = ? WHERE AccountID = ? AND GameID = ?"
+            cursor.execute(update_query, (winner, accountID, gameID))
         
         self.conn.commit()
         cursor.close()

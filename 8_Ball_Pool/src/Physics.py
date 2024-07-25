@@ -610,7 +610,7 @@ class Table( phylib.phylib_table ):
                 elif isinstance(obj, RollingBall):
                     if obj.obj.rolling_ball.number == 0:
                         svg_str += """ <circle cx="%d" cy="%d" r="%d" fill="%s" id="cue_ball" />\n""" % (
-                            obj.obj.still_ball.pos.x, obj.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[obj.obj.still_ball.number])
+                            obj.obj.rolling_ball.pos.x, obj.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[obj.obj.rolling_ball.number])
                     else:
                         svg_str += obj.svg()
                 else:

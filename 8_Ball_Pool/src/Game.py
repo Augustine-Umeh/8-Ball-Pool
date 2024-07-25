@@ -117,18 +117,17 @@ class Game:
             self.db.updateCategory(self.accountID, self.gameID, self.player1Category, self.player2Category)
 
     def playerTurn(self, isOnTable):
-        if self.first_ball_hit:
-            if self.first_ball_hit == "False":
-                self.currentPlayer = self.player1Name if self.currentPlayer != self.player1Name else self.player2Name
-                self.scratch = True
-                return
-            
         name, numbers = self.db.getPlayerAndMadeHole(self.accountID, self.gameID)
         
         if isinstance(numbers, list):
             for ball in numbers:
                 self.play1balls.discard(ball)     
                 self.play2balls.discard(ball)
+                
+        if self.first_ball_hit == "False":
+            self.currentPlayer = self.player1Name if self.currentPlayer != self.player1Name else self.player2Name
+            self.scratch = True
+            return
                 
         if not isOnTable:
             self.currentPlayer = self.player1Name if self.currentPlayer != self.player1Name else self.player2Name
@@ -165,51 +164,61 @@ class Game:
         if isinstance(numbers, list):
             for ball in numbers:
                 if ball == 8:
-                    self.db.markGameStatus(self.accountID, self.gameID, 2)
                     self.winner = 'winner'
                     if name == self.player1Name:
+                        if not self.player1Category:
+                            self.db.markGameStatus(self.accountID, self.gameID, 2, self.player2Name)
+                            return self.player2Name, self.winner
+                        
                         if not self.play1balls:
+                            self.db.markGameStatus(self.accountID, self.gameID, 2, self.player1Name)
                             return self.player1Name, self.winner
                         else:
+                            self.db.markGameStatus(self.accountID, self.gameID, 2, self.player2Name)
                             return self.player2Name, self.winner
                     elif name == self.player2Name:
+                        if not self.player2Category:
+                            self.db.markGameStatus(self.accountID, self.gameID, 2, self.player1Name)
+                            return self.player1Name, self.winner
+                         
                         if not self.play2balls:
+                            self.db.markGameStatus(self.accountID, self.gameID, 2, self.player2Name)
                             return self.player2Name, self.winner
                         else:
-                            return self.player2Name, self.winner
-        elif numbers == -1:
-            return name, self.winner
+                            self.db.markGameStatus(self.accountID, self.gameID, 2, self.player1Name)
+                            return self.player1Name, self.winner
+        return name, self.winner
         
-    def checkfirstball(self, prevTable, currTable):
+    def checkfirstball(self, prev_table, curr_table):
         curr_dict = {}
 
-        for ball in currTable:
-            if isinstance(ball, RollingBall) and ball.obj.rolling_ball.number > 0:
-                num = ball.obj.rolling_ball.number
-                curr_dict[num] = (ball.obj.rolling_ball.pos.x, ball.obj.rolling_ball.pos.y)
+        for ball in curr_table:
+            if isinstance(ball, RollingBall):
+                ball_number = ball.obj.rolling_ball.number
+                if ball_number != 0 and ball_number != 8:  # Ignoring cue ball and 8 ball
+                    curr_dict[ball_number] = (ball.obj.rolling_ball.pos.x, ball.obj.rolling_ball.pos.y)
 
         if not curr_dict:
             return
-        
-        for ball in prevTable:
+
+        for ball in prev_table:
             if isinstance(ball, RollingBall):
-                num = ball.obj.rolling_ball.number
-                if num in curr_dict:
+                ball_number = ball.obj.rolling_ball.number
+                if ball_number in curr_dict:
                     if self.currentPlayer == self.player1Name:
-                        if (num > 8 and self.player1Category == 'solid') or (num < 8 and self.player1Category == 'stripe'):
+                        if (ball_number not in self.play1balls and self.player1Category == 'solid') or \
+                        (ball_number not in self.play1balls and self.player1Category == 'stripe'):
                             self.first_ball_hit = "False"
-                            return
                         else:
                             self.first_ball_hit = "True"
-                            return
                     elif self.currentPlayer == self.player2Name:
-                        if (num > 8 and self.player2Category == 'solid') or (num < 8 and self.player2Category == 'stripe'):
+                        if (ball_number not in self.play2balls and self.player2Category == 'solid') or \
+                        (ball_number not in self.play2balls and self.player2Category == 'stripe'):
                             self.first_ball_hit = "False"
-                            return
                         else:
                             self.first_ball_hit = "True"
-                            return   
-        return
+                    return
+
 
     def close(self):
         self.db.close()
