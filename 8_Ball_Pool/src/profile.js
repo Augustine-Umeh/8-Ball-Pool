@@ -43,6 +43,82 @@ $(document).ready(function() {
             }
         });
     });
-    
-});
 
+    $('#friendsList').on('click', function() {
+        var accountID = localStorage.getItem('accountID');
+        if (accountID < 0) {
+            console.error("Account ID not found in localStorage.");
+            return;
+        }
+
+        $.ajax({
+            url: '/friendsList',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                accountID: parseInt(accountID) 
+            }),
+            success: function(response) {
+                // Handle friends list
+                console.log("Friends: ", response.friends);
+                
+            },
+            error: function(response) {
+                console.error("Error: ", response.message);
+            }
+        });
+    });
+
+    $('#statsDropdown').on('click', function() {
+        var accountID = localStorage.getItem('accountID');
+        if (accountID < 0) {
+            console.error("Account ID not found in localStorage.");
+            return;
+        }
+
+        $.ajax({
+            url: '/stats',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                accountID: parseInt(accountID) 
+            }),
+            success: function(response) {
+                // Handle stats
+                console.log("Stats: ", response.stats);
+                
+            },
+            error: function(response) {
+                console.error("Error: ", response.message);
+            }
+        });
+    });
+
+    $('#logOut').on('click', function() {
+        var accountID = localStorage.getItem('accountID');
+        if (accountID < 0) {
+            console.error("Account ID not found in localStorage.");
+            return;
+        }
+
+        $.ajax({
+            url: '/logOut',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                accountID: parseInt(accountID) 
+            }),
+            success: function(response) {
+                if (response.status === 'Logged out successfully') {
+                    console.log("Logged out successfully");
+                    
+                    localStorage.removeItem('accountID');
+                    window.location.href = 'index.html';
+                }
+            },
+            error: function(response) {
+                console.error("Error: ", response.message);
+            }
+        });
+    });
+});
