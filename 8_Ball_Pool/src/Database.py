@@ -1077,6 +1077,12 @@ class Database:
         cursor = self.conn.cursor()
         accountID += 1
         
+        stats_query = 'SELECT Player2Name, Winner FROM Game WHERE AccountID = ?'
+        cursor.execute(stats_query, (accountID,))
+        res = cursor.fetchall()
+        
+        return res
+        
     def close(self):
         # Commit any pending transaction and close the connection
         self.conn.commit()

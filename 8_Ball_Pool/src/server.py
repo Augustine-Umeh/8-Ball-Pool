@@ -96,7 +96,7 @@ class MyHandler(BaseHTTPRequestHandler):
             
             data = json.loads(post_data.decode('utf-8'))
             
-            accountID = int(data['accountID'])
+            accountID = data['accountID']
             
             friends = db.getFriends(accountID)
             
@@ -113,13 +113,24 @@ class MyHandler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
             
             data = json.loads(post_data.decode('utf-8'))
+            accountID = data['accountID']
+            
+            stats = db.getGameStats(accountID)
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'stats': stats
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
             
         elif self.path == '/logOut':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             
             data = json.loads(post_data.decode('utf-8'))
-            accountID = int(data['accountID'])
+            accountID = data['accountID']
             
             
             self.send_response(200)
