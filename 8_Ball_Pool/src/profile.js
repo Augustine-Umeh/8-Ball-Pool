@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    // Tooltip initialization
+    $('[data-bs-toggle="tooltip"]').tooltip();
+
     $('#createGameForm').on('submit', function(event) {
         event.preventDefault();
         
@@ -40,4 +43,6 @@ $(document).ready(function() {
             }
         });
     });
+    
 });
+

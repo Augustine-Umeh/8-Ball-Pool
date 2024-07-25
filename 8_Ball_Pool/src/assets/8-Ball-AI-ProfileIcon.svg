@@ -1,0 +1,90 @@
+<svg id="table" width="585" height="500" viewBox="-25 -25 2750 1400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <circle cx="1350" cy="675" r="1100" fill="black" />
+  <circle cx="1350" cy="675" r="700" fill="white" />
+  <rect width="2700" height="1350" x="0" y="0" rx="150" ry="150" style="stroke-width:30;stroke:green" fill="#C0D0C0"></rect>
+  
+  <circle cx="2025" cy="675" r="28" fill="WHITE" id="cue_ball"></circle>
+  <circle class="ball" cx="770" cy="675" r="28" fill="YELLOW"></circle>
+  <circle cx="770" cy="675" r="14" fill="WHITE"></circle>
+  <text x="770" y="677" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">1</text>
+
+  <g class="ball">
+    <circle cx="718" cy="646" r="28" fill="PINK"></circle>
+    <circle cx="718" cy="646" r="15" fill="WHITE"></circle>
+    <rect x="690" y="637" width="56" height="16" fill="white"></rect>
+    <text x="718" y="648" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">11</text>
+  </g>
+
+  <circle class="ball" cx="718" cy="704" r="28" fill="BLUE"></circle>
+  <circle cx="718" cy="704" r="14" fill="WHITE"></circle>
+  <text x="718" y="706" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">2</text>
+
+  <g class="ball">
+    <circle cx="666" cy="617" r="28" fill="LIGHTBLUE"></circle>
+    <circle cx="666" cy="617" r="15" fill="WHITE"></circle>
+    <rect x="638" y="608" width="56" height="16" fill="white"></rect>
+    <text x="666" y="619" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">10</text>
+  </g>
+
+  <circle class="ball" cx="666" cy="675" r="28" fill="BLACK"></circle>
+  <circle cx="666" cy="675" r="14" fill="WHITE"></circle>
+  <text x="666" y="677" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">8</text>
+
+  <circle class="ball" cx="666" cy="733" r="28" fill="RED"></circle>
+  <circle cx="666" cy="733" r="14" fill="WHITE"></circle>
+  <text x="666" y="735" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">3</text>
+
+  <g class="ball">
+    <circle cx="614" cy="588" r="28" fill="LIGHTYELLOW"></circle>
+    <circle cx="614" cy="588" r="15" fill="WHITE"></circle>
+    <rect x="586" y="579" width="56" height="16" fill="white"></rect>
+    <text x="614" y="590" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">9</text>
+  </g>
+
+  <g class="ball">
+    <circle cx="614" cy="646" r="28" fill="LIGHTGREEN"></circle>
+    <circle cx="614" cy="646" r="15" fill="WHITE"></circle>
+    <rect x="586" y="637" width="56" height="16" fill="white"></rect>
+    <text x="614" y="648" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">14</text>
+  </g>
+
+  <circle class="ball" cx="614" cy="704" r="28" fill="PURPLE"></circle>
+  <circle cx="614" cy="704" r="14" fill="WHITE"></circle>
+  <text x="614" y="706" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">4</text>
+
+  <g class="ball">
+    <circle cx="614" cy="762" r="28" fill="LIGHTSALMON"></circle>
+    <circle cx="614" cy="762" r="15" fill="WHITE"></circle>
+    <rect x="586" y="753" width="56" height="16" fill="white"></rect>
+    <text x="614" y="764" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">13</text>
+  </g>
+
+  <g class="ball">
+    <circle cx="562" cy="559" r="28" fill="MEDIUMPURPLE"></circle>
+    <circle cx="562" cy="559" r="15" fill="WHITE"></circle>
+    <rect x="534" y="550" width="56" height="16" fill="white"></rect>
+    <text x="562" y="561" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">12</text>
+  </g>
+
+  <circle class="ball" cx="562" cy="617" r="28" fill="ORANGE"></circle>
+  <circle cx="562" cy="617" r="14" fill="WHITE"></circle>
+  <text x="562" y="619" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">5</text>
+
+  <g class="ball">
+    <circle cx="562" cy="675" r="28" fill="SANDYBROWN"></circle>
+    <circle cx="562" cy="675" r="15" fill="WHITE"></circle>
+    <rect x="534" y="666" width="56" height="16" fill="white"></rect>
+    <text x="562" y="677" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">15</text>
+  </g>
+
+  <circle class="ball" cx="562" cy="733" r="28" fill="GREEN"></circle>
+  <circle cx="562" cy="733" r="14" fill="WHITE"></circle>
+  <text x="562" y="735" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">6</text>
+
+  <circle class="ball" cx="562" cy="791" r="28" fill="BROWN"></circle>
+  <circle cx="562" cy="791" r="14" fill="WHITE"></circle>
+  <text x="562" y="793" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">7</text>
+
+  <line id="pool_cue" class="cue_line" x1="2073" y1="675" x2="3573" y2="675" stroke="black" stroke-width="25" visibility="visible"></line>
+  <line id="aim_line" class="cue_line" x1="1977" y1="675" x2="798" y2="675" length="7000" stroke="grey" stroke-width="4" visibility="visible"></line>
+</svg>
