@@ -219,6 +219,5 @@ class Game:
                             self.first_ball_hit = "True"
                     return
 
-
     def close(self):
         self.db.close()

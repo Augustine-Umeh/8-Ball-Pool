@@ -659,7 +659,7 @@ function shotpowerEventListeners() {
                         return;
                     }
                 }
-            }, 
+            },
             error: function (xhr, status, error) {
                 console.error("Error sending data:", error);
                 console.error("Status:", status);
@@ -787,4 +787,3 @@ function setupEventListeners() {
 //     defs.appendChild(gradient);
 //     svg.appendChild(defs);
 // }
-

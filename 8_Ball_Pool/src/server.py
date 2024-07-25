@@ -316,9 +316,6 @@ class MyHandler(BaseHTTPRequestHandler):
                 endResult.append('Cue ball made no contact with another ball')
                 curGame.scratch = True
             
-            if winner:
-                curGame.close()
-                
             # Send a response back to the client
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
