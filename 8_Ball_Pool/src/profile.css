@@ -175,3 +175,34 @@ body {
     margin: 15%;
     border-radius: 30px;
 }
+
+.friends-list-container {
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.friends-list-container h2 {
+    margin-bottom: 20px;
+}
+
+.friends-list-container .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.friends-list-actions {
+    margin-top: 20px;
+}
+
+.friends-list-actions .btn {
+    margin-right: 10px;
+}
+
+.d-none {
+    display: none;
+}

@@ -51,22 +51,52 @@ $(document).ready(function() {
             return;
         }
 
-        $.ajax({
-            url: '/friendsList',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ 
-                accountID: parseInt(accountID) 
-            }),
-            success: function(response) {
-                // Handle friends list
-                console.log("Friends: ", response.friends);
-                
-            },
-            error: function(response) {
-                console.error("Error: ", response.message);
-            }
-        });
+        // Toggle visibility of the friends list container
+        var friendsListContainer = $('#friendsListContainer');
+        if (friendsListContainer.hasClass('d-none')) {
+            // Show friends list container
+            $.ajax({
+                url: '/friendsList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 
+                    accountID: parseInt(accountID) 
+                }),
+                success: function(response) {
+                    // Handle friends list
+                    console.log("Friends: ", response.friends);
+                    
+                    // Populate friends list
+                    var friendsList = $('#friendsList');
+                    friendsList.empty();
+                    response.friends.forEach(function(friend) {
+                        friendsList.append(`<li class="list-group-item">${friend} <button class="btn btn-danger btn-sm float-end">Remove</button></li>`);
+                    });
+                    
+                    // Show the container
+                    friendsListContainer.removeClass('d-none');
+                },
+                error: function(response) {
+                    console.error("Error: ", response.message);
+                }
+            });
+        } else {
+            // Hide friends list container
+            friendsListContainer.addClass('d-none');
+        }
+    });
+
+    // Handle actions (Send Invite and Remove Friend)
+    $(document).on('click', '.btn-outline-primary', function() {
+        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0]; // Adjust extraction logic as needed
+        console.log("Send invite to:", friendName);
+        // Add AJAX call or other logic for sending invite
+    });
+
+    $(document).on('click', '.btn-outline-danger', function() {
+        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0]; // Adjust extraction logic as needed
+        console.log("Remove friend:", friendName);
+        // Add AJAX call or other logic for removing friend
     });
 
     $('#statsDropdown').on('click', function() {
@@ -109,6 +139,11 @@ $(document).ready(function() {
                 console.log(`Incomplete : ${incomplete}`);
                 console.log(`Total Games: ${totalGames}`);
                 
+                var statsList = $('#statsList');
+                statsList.empty();
+                statsList.append(`<li class="dropdown-item text-success">${wins} Wins</li>`);
+                statsList.append(`<li class="dropdown-item text-danger">${loses} Losses</li>`);
+                statsList.append(`<li class="dropdown-item text-warning">${incomplete} Incomplete</li>`);
             },
             error: function(response) {
                 console.error("Error: ", response.message);
