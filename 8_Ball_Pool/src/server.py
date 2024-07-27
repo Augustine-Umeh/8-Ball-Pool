@@ -95,7 +95,6 @@ class MyHandler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
             
             data = json.loads(post_data.decode('utf-8'))
-            
             accountID = data['accountID']
             
             friends = db.getFriends(accountID)
@@ -107,7 +106,146 @@ class MyHandler(BaseHTTPRequestHandler):
                 'friends': friends
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        elif self.path == '/gameInvite':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
             
+            data = json.loads(post_data.decode('utf-8'))
+            accountID = data['accountID']
+            accountName = data['accountName']
+            friendName = data['friendName']
+            
+            friendID = db.getID(friendName)
+            if friendID < 0:
+                raise ValueError("This friend doesn't exist")
+            
+            message = f"{accountName} invites you to a game"
+            db.addNotification(accountID, friendID, message)
+        
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'message': 'Invite sent'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+            
+        elif self.path == '/friendInvite':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            accountID = data['accountID']
+            accountName = data['accountName']
+            friendName = data['friendName']
+            
+            friendID = db.getID(friendName)
+            if friendID >= 0:
+                res = db.areFriends(accountID, friendID)
+                if res:
+                    output = f"{friendName} is already a friend"
+                else:
+                    message = f"{accountName} wants to be friends"
+                    db.addNotification(accountID, friendID, message)
+                    output = 'Invite sent'
+            else:
+                output = "This player doesn't exist"
+                
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'message': output
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        elif self.path == '/deleteFriend':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            accountName = data['accountName']
+            friendName = data['friendName']
+            
+            db.deleteFriend(accountName, friendName)
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'message': 'success'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+            
+        elif self.path == '/rejectGameInvite':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            notificationID = data['notificationID']
+            senderID = data['accountID']
+            friendName = data['friendName']
+            message = f'{friendName} rejected your game invite'
+            
+            receiverID = db.getID(friendName)
+            if receiverID < 0:
+                raise ValueError("This friend doesn't exist")
+
+            db.deleteNotification(notificationID)
+            db.addNotification(senderID, receiverID, message)
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'status': 'Invite rejected and sender notified'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        elif self.path == '/rejectFriendInvite':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            notificationID = data['notificationID']
+            senderID = data['accountID']
+            friendName = data['friendName']
+            message = f'{friendName} rejected your friend invite'
+            
+            receiverID = db.getID(friendName)
+            if receiverID < 0:
+                raise ValueError("This friend doesn't exist")
+            
+            db.deleteNotification(notificationID)
+            db.addNotification(senderID, receiverID, message)
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'status': 'Invite rejected and sender notified'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        elif self.path == '/notificationlist':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            accountID = data['accountID']
+            
+            notification = db.getNotifications(accountID)
+            
+            print()
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'notification': notification
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        
         elif self.path == '/stats':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)

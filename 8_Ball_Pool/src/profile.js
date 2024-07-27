@@ -46,11 +46,11 @@ $(document).ready(function() {
 
     $('#friendsList').on('click', function() {
         var accountID = localStorage.getItem('accountID');
-        if (accountID < 0) {
+        if (!accountID) {
             console.error("Account ID not found in localStorage.");
             return;
         }
-
+    
         // Toggle visibility of the friends list container
         var friendsListContainer = $('#friendsListContainer');
         if (friendsListContainer.hasClass('d-none')) {
@@ -64,15 +64,24 @@ $(document).ready(function() {
                 }),
                 success: function(response) {
                     // Handle friends list
-                    console.log("Friends: ", response.friends);
-                    
+                    var friends = response.friends;
+                    console.log("Friends: ", friends);
+    
                     // Populate friends list
                     var friendsList = $('#friendsList');
                     friendsList.empty();
-                    response.friends.forEach(function(friend) {
-                        friendsList.append(`<li class="list-group-item">${friend} <button class="btn btn-danger btn-sm float-end">Remove</button></li>`);
+                    friends.forEach(function(friend) {
+                        friendsList.append(
+                            `<li class="list-group-item">${friend} 
+                                <button class="sendInvite btn btn-primary" title="send game Invite">Invite</button>
+                                <button class="removeFriend btn btn-danger" title="remove from friend list">Remove</button>
+                            </li>`
+                        );
                     });
-                    
+    
+                    // Initialize tooltips
+                    $('[data-bs-toggle="tooltip"]').tooltip();
+    
                     // Show the container
                     friendsListContainer.removeClass('d-none');
                 },
@@ -84,19 +93,88 @@ $(document).ready(function() {
             // Hide friends list container
             friendsListContainer.addClass('d-none');
         }
+    });    
+
+    $('#sendFriendRequest').on('submit', function(event) {
+        event.preventDefault();
+        
+        var accountID = localStorage.getItem('accountID');
+        if (accountID < 0) {
+            console.error("Account ID not found in localStorage.");
+            return;
+        }
+        
+        var accountName = localStorage.getItem('accountName');
+        var friendName = $('#playerName').val();
+    
+        $.ajax({
+            url: '/friendInvite',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                accountName: String(accountName),
+                accountID: parseInt(accountID),
+                friendName: String(friendName)
+            }),
+            success: function(response) {
+                let message = response.message;
+                alert(message);
+            },
+            error: function(response) {
+                console.error("Error: ", response.message);
+            }
+        });
     });
+
+    // Example usage for rejecting game invite
+    $('#rejectGameInviteButton').on('click', function() {
+        var accountID = localStorage.getItem('accountID');
+        var notificationID; 
+        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0];
+        
+        rejectInvite(notificationID, accountID, friendName, '/rejectGameInvite');
+    });
+
+    // Example usage for rejecting friend invite
+    $('#rejectFriendInviteButton').on('click', function() {
+        var accountID = localStorage.getItem('accountID');
+        var notificationID; 
+        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0];
+        
+        rejectInvite(notificationID, accountID, friendName, '/rejectFriendInvite');
+    });
+
+    function rejectInvite(notificationID, senderID, friendName, endpoint) {
+        $.ajax({
+            url: endpoint,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                notificationID: notificationID,
+                accountID: senderID,
+                friendName: friendName
+            }),
+            success: function(response) {
+                console.log(response.status);
+                updateNotificationCount();
+            },
+            error: function(response) {
+                console.error("Error: ", response.message);
+            }
+        });
+    }
 
     // Handle actions (Send Invite and Remove Friend)
-    $(document).on('click', '.btn-outline-primary', function() {
-        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0]; // Adjust extraction logic as needed
+    $('#sendInvite').on('click', function() {
+        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0]; 
         console.log("Send invite to:", friendName);
-        // Add AJAX call or other logic for sending invite
+
     });
 
-    $(document).on('click', '.btn-outline-danger', function() {
-        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0]; // Adjust extraction logic as needed
+    $('#removeFriend').on('click', function() {
+        var friendName = $(this).closest('.list-group-item').text().trim().split(' ')[0]; 
         console.log("Remove friend:", friendName);
-        // Add AJAX call or other logic for removing friend
+
     });
 
     $('#statsDropdown').on('click', function() {
@@ -132,12 +210,6 @@ $(document).ready(function() {
                     }
                 }
                 incomplete = totalGames - (wins + loses);
-
-                console.log("Stats:");
-                console.log(`Wins: ${wins}`);
-                console.log(`Loses: ${loses}`);
-                console.log(`Incomplete : ${incomplete}`);
-                console.log(`Total Games: ${totalGames}`);
                 
                 var statsList = $('#statsList');
                 statsList.empty();
@@ -149,6 +221,40 @@ $(document).ready(function() {
                 console.error("Error: ", response.message);
             }
         });
+    });
+
+    function updateNotificationCount() {
+        var accountID = localStorage.getItem('accountID');
+        if (accountID < 0) {
+            console.error("Account ID not found in localStorage.");
+            return;
+        }
+
+        $.ajax({
+            url: '/notificationlist',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                accountID: parseInt(accountID) 
+            }),
+            success: function(response) {
+                let notification = response.notification
+                console.log(`noti: ${notification}`)
+                $('#notificationNumber').text(notification.length);
+            },
+            error: function(response) {
+                console.error("Error: ", response.message);
+            }
+        });
+    }
+    updateNotificationCount()
+
+    $('#notificationDropdownMenu').on('click', function() {
+        var accountID = localStorage.getItem('accountID');
+        if (accountID < 0) {
+            console.error("Account ID not found in localStorage.");
+            return;
+        }
     });
 
     $('#logOut').on('click', function() {

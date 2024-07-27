@@ -1,200 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-            crossorigin="anonymous"
-        />
-        <link rel="stylesheet" href="profile.css" />
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>8 Ball AI - Profile</title>
-    </head>
 
-    <body>
-        <div class="main">
-            <nav class="navbar navbar-expand-lg bg-body-tertiary">
-                <div class="container-fluid d-flex justify-content-between">
-                    <!-- Left Elements -->
-                    <div class="d-flex align-items-center">
-                        <button
-                            class="navbar-toggler"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbarNav"
-                            aria-controls="navbarNav"
-                            aria-expanded="false"
-                            aria-label="Toggle navigation"
-                        >
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="navbarNav">
-                            <ul class="navbar-nav">
-                                <li
-                                    class="nav-item dropdown"
-                                    title="view match outcomes"
-                                >
-                                    <button
-                                        class="btn custom-btn ms-3 me-3 dropdown-toggle"
-                                        id="statsDropdown"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                    >
-                                        Stats
-                                    </button>
-                                    <ul
-                                        class="dropdown-menu"
-                                        aria-labelledby="statsDropdown"
-                                        id="statsList"
-                                    >
-                                    </ul>
-                                </li>
-                                <li
-                                    class="nav-item"
-                                    title="view people you've played"
-                                >
-                                    <button class="btn custom-btn" id="friendsList">
-                                        Friends
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="profile.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>8 Ball AI - Profile</title>
+</head>
 
-                    <!-- Centered Logo -->
-                    <a
-                        class="navbar-brand d-flex align-items-center logo-adjust"
-                        title="Logo"
-                        href="/profile.html"
-                    >
-                        <img
-                            src="./assets/8-Ball-AI-Logo.svg"
-                            alt="8 Ball AI Logo"
-                            width="90"
-                            height="90"
-                            class="me-2"
-                        />
-                        <span>Ball AI</span>
-                    </a>
-
-                    <!-- Right Elements -->
-                    <div class="d-flex align-items-center">
-                        <div class="nav-item dropdown">
-                            <button
-                                class="btn text-reset dropdown-toggle hidden-arrow"
-                                id="navbarDropdownMenuLink"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="bottom"
-                                title="View game requests"
-                            >
-                                <i class="fas fa-bell bell-icon"></i>
-                                <span
-                                    class="badge rounded-pill badge-notification bg-danger"
-                                    >1</span
-                                >
-                            </button>
-                            <ul
-                                class="dropdown-menu dropdown-menu-end"
-                                aria-labelledby="navbarDropdownMenuLink"
-                            >
-                                <li class="dropdown-item">Some news</li>
-                                <li class="dropdown-item">Another news</li>
-                                <li class="dropdown-item">
-                                    Something else here
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-                            <button class="btn btn-logout ms-3 me-3" id="logOut">
-                                Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Interactive portion -->
-            <!-- Friends List Container -->
-            <div id="friendsListContainer" class="friends-list-container d-none">
-                <h2>Your Friends</h2>
-                <ul id="friendsList" class="list-group">
-                    <!-- Friends list will be dynamically populated here -->
-                </ul>
-                <div class="friends-list-actions">
-                    <button id="sendInvite" class="btn btn-primary">Send Invite</button>
-                    <button id="removeFriend" class="btn btn-danger">Remove Friend</button>
-                </div>
-            </div>
-            <div class="container-fluid">
-                <div class="row">
-                    <!-- Left Column (8/12 of the screen) -->
-                    <div class="col-8 text-center align-middle">
-                        <h1 class="">Create A Game</h1>
-                        <div class="container">
-                            <div class="position-relative">
-                                <img
-                                    id="8ball-bg"
-                                    src="./assets/8-Ball-AI-ProfileIcon.svg"
-                                    alt="8 Ball AI Logo"
-                                    class="img-fluid w-50 my-5"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            id="versus"
-                            class="d-flex flex-row mb-3 justify-content-center align-items-center mx-5"
-                        >
-                            <div class="border btn-group d-flex w-100">
-                                <button class="btn btn-success flex-fill">
-                                    AI
+<body>
+    <div class="main">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid d-flex justify-content-between">
+                <!-- Left Elements -->
+                <div class="d-flex align-items-center">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <button data-bs-toggle="dropdown" class="btn custom-btn ms-3 me-3 dropdown-toggle" id="statsDropdown"
+                                    data-bs-toggle="tooltip" title="view match outcomes" aria-expanded="false">
+                                    Stats
                                 </button>
-                                <div
-                                    class="border flex-fill d-flex align-items-center justify-content-center"
-                                >
-                                    Play Against
-                                </div>
-                                <button class="btn btn-success flex-fill">
+                                <ul class="dropdown-menu" aria-labelledby="statsDropdown" id="statsList">
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <button class="btn custom-btn" id="friendsList" title="view people you've played">
                                     Friends
                                 </button>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                     </div>
+                </div>
 
-                    <!-- Right Column (4/12 of the screen) -->
+                <!-- Centered Logo -->
+                <a class="navbar-brand d-flex align-items-center logo-adjust" title="Logo" href="/profile.html">
+                    <img src="./assets/8-Ball-AI-Logo.svg" alt="8 Ball AI Logo" width="90" height="90" class="me-2" />
+                    <span>Ball AI</span>
+                </a>
 
-                    <div
-                        class="col-4 border-start border-dark border-2 scrolling-column d-flex align-self-center flex-column overflow-auto"
-                    >
-                        <!-- Green rectangles -->
-                        <div class="scrolling-column align-middle">
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                            <div class="green-rectangle"></div>
-                        </div>
+                <!-- Right Elements -->
+                <div class="d-flex align-items-center">
+                    <div class="nav-item dropdown">
+                        <button class="btn text-reset dropdown-toggle hidden-arrow" id="notificationDropdownMenu"
+                            data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" title="View updates">
+                            <i class="fas fa-bell bell-icon"></i>
+                            <span id="notificationNumber" class="badge rounded-pill badge-notification bg-danger">
+                                <!-- number of notification -->
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                            <li class="dropdown-item">Some news</li>
+                            <li class="dropdown-item">Another news</li>
+                            <li class="dropdown-item"> Something else here</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <button class="btn btn-logout ms-3 me-3" id="logOut">
+                            Logout
+                        </button>
                     </div>
                 </div>
             </div>
-            
+        </nav>
+
+        <!-- Interactive portion -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Left Column (8/12 of the screen) -->
+                <div class="col-8 text-center align-middle">
+                    <!-- Friends List Container -->
+                    <div id="friendsListContainer" class="friends-list-container d-none">
+                        <form class="form-inline" id="sendFriendRequest">
+                            <input class="form-control mr-sm-2" id="playerName" type="search" placeholder="Search Player" aria-label="Search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Add friend</button>
+                        </form>
+                        <h2>Your Friends</h2>
+                        <ul id="friendsList" class="list-group">
+                            <!-- Friends list will be dynamically populated here -->
+                        </ul>
+                    </div>
+
+                    <h1 class="">Create A Game</h1>
+                    <div class="container">
+                        <div class="position-relative">
+                            <img id="8ball-bg" src="./assets/8-Ball-AI-ProfileIcon.svg" alt="8 Ball AI Logo"
+                                class="img-fluid w-50 my-5" />
+                        </div>
+                    </div>
+                    <div id="versus" class="d-flex flex-row mb-3 justify-content-center align-items-center mx-5">
+                        <div class="border btn-group d-flex w-100">
+                            <button class="btn btn-success flex-fill">
+                                AI
+                            </button>
+                            <div class="border flex-fill d-flex align-items-center justify-content-center">
+                                Play Against
+                            </div>
+                            <button class="btn btn-success flex-fill">
+                                Friends
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (4/12 of the screen) -->
+
+                <div
+                    class="col-4 border-start border-dark border-2 scrolling-column d-flex align-self-center flex-column overflow-auto">
+                    <!-- Green rectangles -->
+                    <div class="scrolling-column align-middle">
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                        <div class="green-rectangle"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="./profile.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/js/all.min.js"></script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"
-        ></script>
-    </body>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./profile.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
 </html>
