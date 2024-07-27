@@ -35,6 +35,16 @@ class Database:
             );
             """,
             """
+            CREATE TABLE IF NOT EXISTS Notifications (
+                NotificationID INTEGER PRIMARY KEY AUTOINCREMENT,
+                AccountID INTEGER,
+                FriendID INTEGER,
+                NotInfo TEXT,
+                FOREIGN KEY (AccountID) REFERENCES account(AccountID),
+                FOREIGN KEY (FriendID) REFERENCES account(AccountID)
+            );
+            """,
+            """
             CREATE TABLE IF NOT EXISTS Friends (
                 AccountID INTEGER,
                 FriendID INTEGER,
@@ -577,53 +587,6 @@ class Database:
         cursor.close()
         return True if created_game else False
     
-    def getScore(self, gameID, playerName):
-        cursor = self.conn.cursor()
-        gameID += 1
-
-        check_query = "SELECT 1 FROM Game WHERE GameID = ?"
-        cursor.execute(check_query, (gameID,))
-        if cursor.fetchone() is None:
-            cursor.close()
-            return -1
-
-        query = """
-        SELECT s.ShotID
-        FROM Shot s
-        WHERE s.PlayerName = ? AND s.GameID = ?
-        """
-        cursor.execute(query, (playerName, gameID))
-        shots = cursor.fetchall()
-
-        score = 0
-        for shot in shots:
-            shotID = shot[0]
-
-            query = """
-            SELECT t.TableID
-            FROM TableShot ts
-            JOIN TTable t ON ts.TableID = t.TableID
-            WHERE ts.ShotID = ?
-            """
-            cursor.execute(query, (shotID,))
-            tables = cursor.fetchall()
-
-            for table in tables:
-                tableID = table[0]
-                query = """
-                SELECT b.BallID
-                FROM Ball b
-                JOIN PositionsTable pt ON b.BallID = pt.BallID
-                WHERE pt.TableID = ?
-                """
-                cursor.execute(query, (tableID,))
-                balls = cursor.fetchall()
-
-                score += len(balls)
-
-        cursor.close()
-        return score
-    
     def getLastTable(self, accountID, gameID):
         accountID += 1
         gameID += 1
@@ -1081,8 +1044,83 @@ class Database:
         cursor.execute(stats_query, (accountID,))
         res = cursor.fetchall()
         
+        cursor.close()
         return res
+    
+    def getID(self, name):
+        cursor = self.conn.cursor()
         
+        id_query = "SELECT accountID FROM Account WHERE AccountName = ?"
+        cursor.execute(id_query, (name,))
+        res = cursor.fetchone()
+        
+        cursor.close() 
+        if res:
+            return res[0] - 1
+        return -1
+        
+    def areFriends(self, accountID, friendID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        friendID += 1
+        
+        check_friendQuery = "SELECT 1 FROM Friends WHERE AccountID = ? AND FriendID = ?"
+        cursor.execute(check_friendQuery, (accountID, friendID))
+        res = cursor.fetchone()
+        
+        cursor.close()
+        if res:
+            return True
+        return False
+        
+    def addNotification(self, accountID, friendID, message):
+        cursor = self.conn.cursor()
+        accountID += 1
+        friendID += 1
+        
+        check_query = "SELECT 1 FROM Notifications WHERE AccountID = ? AND  FriendID = ? AND NotInfo = ?"
+        cursor.execute(check_query, ((friendID, accountID, message)))
+        res = cursor.fetchone()
+        
+        if res:
+            return 
+        
+        insert_query = "INSERT INTO Notifications (AccountID, FriendID, NotInfo) VALUES (?, ?, ?)"
+        cursor.execute(insert_query, (friendID, accountID, message))
+        
+        self.conn.commit()
+        cursor.close()
+        
+    def getNotifications(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        
+        select_query = "SELECT NotificationID, FriendID, NotInfo FROM Notifications WHERE AccountID = ?"
+        cursor.execute(select_query, (accountID,))
+        notifications = cursor.fetchall()
+        
+        cursor.close()
+        return notifications
+        
+    def deleteNotification(self, notificationID):
+        cursor = self.conn.cursor()
+        
+        delete_query = "DELETE FROM Notifications WHERE NotificationID = ?"
+        cursor.execute(delete_query, (notificationID,))
+        
+        self.conn.commit()
+        cursor.close()
+
+    def clearNotifications(self, accountID):
+        cursor = self.conn.cursor()
+        accountID += 1
+        
+        delete_query = "DELETE FROM Notifications WHERE AccountID = ?"
+        cursor.execute(delete_query, (accountID,))
+        
+        self.conn.commit()
+        cursor.close()
+
     def close(self):
         # Commit any pending transaction and close the connection
         self.conn.commit()
