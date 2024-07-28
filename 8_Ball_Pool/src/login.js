@@ -16,6 +16,7 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.status === 'Account verified') {
                     localStorage.setItem('accountID', response.accountID);
+                    localStorage.setItem('accountName', accountName);
                     console.log("login account", response.accountID);
                     window.location.href = 'profile.html';
                 } else {
