@@ -13,7 +13,7 @@ body {
     background-color: #ffffff;
     border: 1px solid #999595;
     margin: 20px;
-    border-radius: 15px; /* Rounded edges */
+    border-radius: 19px; /* Rounded edges */
 }
 
 .navbar {
@@ -166,7 +166,7 @@ body {
 }
 
 .scrolling-column {
-    height: 60vh;
+    height: 64vh;
 }
 
 .green-rectangle {

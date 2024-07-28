@@ -10,6 +10,8 @@ $(document).ready(function () {
         return;
     }
 
+    $('#profile').text(`${accountName} - Stats, Friends & More`);
+
     $('#createGameForm').on('submit', function (event) {
         event.preventDefault();
 
@@ -315,6 +317,9 @@ $(document).ready(function () {
                     console.log("Logged out successfully");
 
                     localStorage.removeItem('accountID');
+                    localStorage.removeItem('accountName');
+                    localStorage.removeItem('player1Name');
+                    localStorage.removeItem('player2Name');
                     window.location.href = 'index.html';
                 }
             },

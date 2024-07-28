@@ -1,9 +1,13 @@
 $(document).ready(function () {
+
+    $('#loginPage').text('Welcome back - 🎱 ball');
+
     $("#loginForm").on("submit", function (event) {
         event.preventDefault();
         
         var accountName = $("#accountName").val();
         var accountPassword = $("#accountPassword").val();
+
 
         $.ajax({
             url: '/verifyAccount',
