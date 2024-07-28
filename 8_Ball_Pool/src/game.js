@@ -5,6 +5,7 @@ $(document).ready(function () {
     var gameName = localStorage.getItem("gameName");
     var accountID = parseInt(localStorage.getItem("accountID"));
 
+    $('#gamePage').text(gameName);
     $("#player1Name").text(player1Name);
     $("#player2Name").text(player2Name);
     $("#playerTurn").text(player1Name);
