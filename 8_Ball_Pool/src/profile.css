@@ -168,6 +168,7 @@ body {
 .scrolling-column {
     height: 60vh;
 }
+
 .green-rectangle {
     background-color: green;
     width: 70%;
@@ -176,33 +177,35 @@ body {
     border-radius: 30px;
 }
 
-.friends-list-container {
-    padding: 20px;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.form-control {
+    width: 70%;
 }
 
-.friends-list-container h2 {
-    margin-bottom: 20px;
+#statsList {
+    border-radius: 23px; 
 }
 
-.friends-list-container .list-group-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-}
-
-.friends-list-actions {
-    margin-top: 20px;
-}
-
-.friends-list-actions .btn {
-    margin-right: 10px;
-}
-
-.d-none {
+#friendsListContainer {
     display: none;
+}
+
+#friendsDropdown.show + #friendsListContainer {
+    display: block;
+}
+
+.list-group-item:first-child {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.notification-blue {
+    background-color: rgb(211, 228, 245);
+
+}
+
+@media (min-width: 450px) {
+    .wide-dropdown-menu {
+        width: 500px;
+        border-radius: 23px;
+    }
 }

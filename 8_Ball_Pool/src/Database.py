@@ -40,6 +40,8 @@ class Database:
                 AccountID INTEGER,
                 FriendID INTEGER,
                 NotInfo TEXT,
+                NotInfoID INTEGER,
+                isRead InTEGER,
                 FOREIGN KEY (AccountID) REFERENCES account(AccountID),
                 FOREIGN KEY (FriendID) REFERENCES account(AccountID)
             );
@@ -1024,7 +1026,7 @@ class Database:
 
             accountID = account[0]
             friendID = friend[0]
-
+            
             # Remove each other as friends
             cursor.execute("DELETE FROM Friends WHERE AccountID = ? AND FriendID = ?", (accountID, friendID))
             cursor.execute("DELETE FROM Friends WHERE AccountID = ? AND FriendID = ?", (friendID, accountID))
@@ -1058,7 +1060,20 @@ class Database:
         if res:
             return res[0] - 1
         return -1
+    
+    def getName(self, ID):
+        cursor = self.conn.cursor()
+        ID += 1
         
+        name_query = "SELECT accountName FROM Account WHERE AccountID = ?"
+        cursor.execute(name_query, (ID,))
+        res = cursor.fetchone()
+        
+        cursor.close() 
+        if res:
+            return res[0]
+        return None
+    
     def areFriends(self, accountID, friendID):
         cursor = self.conn.cursor()
         accountID += 1
@@ -1073,7 +1088,7 @@ class Database:
             return True
         return False
         
-    def addNotification(self, accountID, friendID, message):
+    def addNotification(self, accountID, friendID, message, notIfoID):
         cursor = self.conn.cursor()
         accountID += 1
         friendID += 1
@@ -1085,8 +1100,8 @@ class Database:
         if res:
             return 
         
-        insert_query = "INSERT INTO Notifications (AccountID, FriendID, NotInfo) VALUES (?, ?, ?)"
-        cursor.execute(insert_query, (friendID, accountID, message))
+        insert_query = "INSERT INTO Notifications (AccountID, FriendID, NotInfo, NotInfoID, isRead) VALUES (?, ?, ?, ?, ?)"
+        cursor.execute(insert_query, (friendID, accountID, message, notIfoID, 0))
         
         self.conn.commit()
         cursor.close()
@@ -1095,10 +1110,21 @@ class Database:
         cursor = self.conn.cursor()
         accountID += 1
         
-        select_query = "SELECT NotificationID, FriendID, NotInfo FROM Notifications WHERE AccountID = ?"
+        select_query = """
+            SELECT NotificationID, FriendID, NotInfo, NotInfoID, isRead
+            FROM Notifications
+            WHERE AccountID = ?
+            ORDER BY NotificationID DESC
+            LIMIT 10
+        """
         cursor.execute(select_query, (accountID,))
         notifications = cursor.fetchall()
         
+        if notifications:
+            update_query = "UPDATE Notifications SET isRead = ? WHERE accountID = ?"
+            cursor.execute(update_query, (1, accountID))
+        
+        self.conn.commit()
         cursor.close()
         return notifications
         
