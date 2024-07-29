@@ -44,6 +44,7 @@ class Database:
                 NotInfo TEXT,
                 NotInfoID INTEGER,
                 isRead InTEGER,
+                CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (AccountID) REFERENCES account(AccountID),
                 FOREIGN KEY (FriendID) REFERENCES account(AccountID)
             );
@@ -52,6 +53,7 @@ class Database:
             CREATE TABLE IF NOT EXISTS Friends (
                 AccountID INTEGER,
                 FriendID INTEGER,
+                CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (AccountID) REFERENCES Account(AccountID),
                 FOREIGN KEY (FriendID) REFERENCES Account(AccountID),
                 PRIMARY KEY (AccountID, FriendID)
