@@ -141,7 +141,7 @@ $(document).ready(function () {
         if (friendName === accountName) {
             alert("You can't invite yourself");
             return;
-        }
+        } 
 
         $.ajax({
             url: '/friendInvite',
