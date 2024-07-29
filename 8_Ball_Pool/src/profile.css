@@ -209,3 +209,48 @@ body {
         border-radius: 23px;
     }
 }
+
+.mode-play {
+    background-color: #339049;
+    border-color: #339049;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border-radius: 11px;
+    margin-right: 10px;
+    width: 400px;
+}
+
+.spacer {
+    width: 3px; 
+}
+
+.versus {
+    margin: 100px auto 0;
+    padding: 100px; 
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+#multiPlayerForm {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    margin-top: -180px;
+    margin-left: -170px;
+    width: 430px !important;
+}
+
+#gameName::placeholder {
+    color: #6c757d; 
+    opacity: 1; 
+}
+
+.optional-text {
+    color: #6c757d; 
+    font-size: 1.0rem;
+    margin-bottom: 20px;
+}

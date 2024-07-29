@@ -4,8 +4,10 @@ $(document).ready(function () {
     var gameID = parseInt(localStorage.getItem("gameID"));
     var gameName = localStorage.getItem("gameName");
     var accountID = parseInt(localStorage.getItem("accountID"));
-
-    $('#gamePage').text(gameName);
+    var playerTurn = localStorage.getItem("playerTurn");
+    console.log(playerTurn);
+    
+    $('#gamePage').text(`${gameName} - 🎱 Ball`);
     $("#player1Name").text(player1Name);
     $("#player2Name").text(player2Name);
     $("#playerTurn").text(player1Name);
@@ -642,6 +644,15 @@ function shotpowerEventListeners() {
                         .catch((error) => {
                             console.error("Error displaying SVGs:", error);
                         });
+                    
+                    var winner = response.winner
+                    if (winner) {
+                        const svgContainer = $(".shot-meter-container svg");
+                        svgContainer.hide()
+                        console.log(`${winner} is the winner`);
+                        console.log("Game over");
+                        return;
+                    }
 
                     console.log("Updates: ",);
                     if (sameTables) {
@@ -649,15 +660,6 @@ function shotpowerEventListeners() {
                     }
                     for (let i = 0; i < endResult.length; i++) {
                         console.log(endResult[i]);
-                    }
-
-                    winner = response.winner
-                    if (winner) {
-                        const svgContainer = $(".shot-meter-container svg");
-                        svgContainer.hide()
-                        console.log(`${winner} is the winner`);
-                        console.log("Game over");
-                        return;
                     }
                 }
             },
