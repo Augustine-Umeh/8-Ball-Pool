@@ -40,7 +40,7 @@
                                 <div class="dropdown-menu p-3 wide-dropdown-menu" aria-labelledby="friendsDropdown">
                                     <form class="d-flex mb-4" id="sendFriendRequest">
                                         <input class="form-control me-4" id="playerName" type="search"
-                                            placeholder="Search Player" aria-label="Search">
+                                            placeholder="Search Player" aria-label="Search" >
                                         <button class="btn btn-outline-success" type="submit">
                                             Add friend
                                         </button>
@@ -114,16 +114,16 @@
                             <form id="startGameForm">
 
                                 <div class="form-group d-flex">
-                                    <input type="text" class="form-control" id="player1" placeholder="Enter Player 1 name">
+                                    <input type="text" class="form-control" id="player1" placeholder="Enter Player 1 name" required><br><br>
                                 </div>
                                 <div class="form-group d-flex">
-                                    <input type="text" class="form-control" id="player2" placeholder="Enter Player 2 name">
+                                    <input type="text" class="form-control" id="player2" placeholder="Enter Player 2 name" required><br><br>
                                 </div>
                                 <div class="form-group d-flex">
                                     <input type="text" class="form-control me-2" id="gameName" placeholder="Enter Game Name">
                                     <h5 class="optional-text">(Optional)</h5>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Start Game</button>
+                                <button type="submit" class="btn btn-success">Start Game</button>
                             </form>
                         </div>
                     </div>
@@ -158,5 +158,4 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 </body>
-
 </html>

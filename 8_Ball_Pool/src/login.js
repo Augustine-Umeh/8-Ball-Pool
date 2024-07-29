@@ -22,7 +22,7 @@ $(document).ready(function () {
                     localStorage.setItem('accountID', response.accountID);
                     localStorage.setItem('accountName', accountName);
                     console.log("login account", response.accountID);
-                    window.location.href = 'profile.html';
+                    window.location.href = '/profile.html';
                 } else {
                     $("#message").text('Invalid account credentials. Please try again.');
                 }

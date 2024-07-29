@@ -141,7 +141,7 @@ $(document).ready(function () {
         if (friendName === accountName) {
             alert("You can't invite yourself");
             return;
-        }
+        } 
 
         $.ajax({
             url: '/friendInvite',
@@ -299,10 +299,8 @@ $(document).ready(function () {
     });
 
     $('#multiPlayer').on('click', function() {
-        // Hide the buttons
         $('#multiPlayer').hide();
     
-        // Show the form
         $('#multiPlayerForm').show();
         $('#player1').val(accountName)
     });
