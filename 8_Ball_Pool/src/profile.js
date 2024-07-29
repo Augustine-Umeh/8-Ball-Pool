@@ -299,10 +299,8 @@ $(document).ready(function () {
     });
 
     $('#multiPlayer').on('click', function() {
-        // Hide the buttons
         $('#multiPlayer').hide();
     
-        // Show the form
         $('#multiPlayerForm').show();
         $('#player1').val(accountName)
     });

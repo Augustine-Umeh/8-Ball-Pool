@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('#startGameForm').on('submit', function(e) {
+    $('#accountsession').on('submit', function(e) {
         e.preventDefault(); // Prevent the default form submission
 
         // Collect form data
