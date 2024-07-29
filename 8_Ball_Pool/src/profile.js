@@ -12,42 +12,6 @@ $(document).ready(function () {
 
     $('#profile').text(`${accountName} - Stats, Friends & More`);
 
-    $('#createGameForm').on('submit', function (event) {
-        event.preventDefault();
-
-        console.log("From Profile: ", accountID);
-        var gameName = $('#gameName').val();
-        var player1 = $('#player1').val();
-        var player2 = $('#player2').val();
-
-        $.ajax({
-            url: '/startGame',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                gameName: gameName,
-                p1Name: player1,
-                p2Name: player2,
-                accountID: parseInt(accountID) // Ensure accountID is sent as an integer
-            }),
-            success: function (response) {
-                if (response.status === 'Game Created successfully') {
-                    console.log("profile creates game good");
-                    localStorage.setItem('gameID', response.gameID);
-                    localStorage.setItem('player1Name', player1);
-                    localStorage.setItem('player2Name', player2);
-                    localStorage.setItem('gameName', response.gameName);
-                    window.location.href = 'game.html';
-                } else if (response.status === 'Error') {
-                    console.error("Error: ", response.message);
-                }
-            },
-            error: function (response) {
-                console.error("Error: ", response.message);
-            }
-        });
-    });
-
     $('#friendsDropdown').on('click', function () {
         $.ajax({
             url: '/friendsList',
@@ -168,6 +132,11 @@ $(document).ready(function () {
         event.preventDefault();
 
         var friendName = $('#playerName').val();
+
+        if (friendName === ''){
+            alert("You need to put a player name");
+            return;
+        }
 
         if (friendName === accountName) {
             alert("You can't invite yourself");
@@ -321,6 +290,56 @@ $(document).ready(function () {
                     localStorage.removeItem('player1Name');
                     localStorage.removeItem('player2Name');
                     window.location.href = 'index.html';
+                }
+            },
+            error: function (response) {
+                console.error("Error: ", response.message);
+            }
+        });
+    });
+
+    $('#multiPlayer').on('click', function() {
+        // Hide the buttons
+        $('#multiPlayer').hide();
+    
+        // Show the form
+        $('#multiPlayerForm').show();
+        $('#player1').val(accountName)
+    });
+
+    $('#startGameForm').on('submit', function (event) {
+        event.preventDefault();
+
+        var gameName = $('#gameName').val();
+        var player1 = $('#player1').val();
+        var player2 = $('#player2').val();
+
+        $.ajax({
+            url: '/startGame',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                gameName: gameName,
+                p1Name: player1,
+                p2Name: player2,
+                accountID: parseInt(accountID)
+            }),
+            success: function (response) {
+                if (response.status === 'Game Created successfully') {
+
+                    const randomNumber = Math.random();
+                    var PlayerTurn = randomNumber < 0.5 ? player1 : player2;
+
+                    console.log("profile creates game good");
+                    localStorage.setItem('gameID', response.gameID);
+                    localStorage.setItem('player1Name', player1);
+                    localStorage.setItem('player2Name', player2);
+                    localStorage.setItem('gameName', response.gameName);
+                    localStorage.setItem('PlayerTurn', PlayerTurn)
+
+                    window.location.href = 'game.html';
+                } else if (response.status === 'Error') {
+                    console.error("Error: ", response.message);
                 }
             },
             error: function (response) {

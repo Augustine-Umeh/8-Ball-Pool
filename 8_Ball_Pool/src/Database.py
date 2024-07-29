@@ -3,6 +3,7 @@ import phylib
 import os
 import math
 import json
+from collections import OrderedDict
 from Physics import Coordinate, Table, StillBall, RollingBall
 
 VEL_EPSILON = phylib.PHYLIB_VEL_EPSILON
@@ -10,6 +11,7 @@ VEL_EPSILON = phylib.PHYLIB_VEL_EPSILON
 class Database:
     def __init__(self, reset=False):
         self.db_path = "8ball.db"
+        self.madeHole = OrderedDict()
         
         if reset:
             # Delete existing database if reset True
@@ -101,7 +103,7 @@ class Database:
             """
             CREATE TABLE IF NOT EXISTS Shot (
                 ShotID INTEGER PRIMARY KEY AUTOINCREMENT,
-                PlayerName TEXT NOT NULL,
+                ShotTaker TEXT NOT NULL,
                 MadeHole TEXT,
                 GameID INTEGER NOT NULL,
                 FOREIGN KEY (GameID) REFERENCES Game(GameID)
@@ -673,7 +675,7 @@ class Database:
         self.conn.commit()
         cursor.close()
 
-    def createShot(self, accountID, gameID, playerName):
+    def createShot(self, accountID, gameID, ShotTaker):
         cursor = self.conn.cursor()
 
         accountID += 1
@@ -688,8 +690,8 @@ class Database:
 
         try:
             # Insert the new shot into the Shot table
-            insert_query = "INSERT INTO Shot (PlayerName, GameID) VALUES (?, ?)"
-            cursor.execute(insert_query, (playerName, gameID))
+            insert_query = "INSERT INTO Shot (ShotTaker, GameID) VALUES (?, ?)"
+            cursor.execute(insert_query, (ShotTaker, gameID))
 
             # Get the ID of the newly inserted shot
             shotID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
@@ -834,7 +836,7 @@ class Database:
             return None, -1
         
         select_query = """
-        SELECT PlayerName, MadeHole
+        SELECT ShotTaker, MadeHole
         FROM Shot
         WHERE ShotID = ? AND GameID = ?
         """

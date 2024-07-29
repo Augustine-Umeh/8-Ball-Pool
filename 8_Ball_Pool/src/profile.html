@@ -72,7 +72,8 @@
                                 <!-- number of notification -->
                             </span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end wide-dropdown-menu" aria-labelledby="navbarDropdownMenu">
+                        <ul class="dropdown-menu dropdown-menu-end wide-dropdown-menu"
+                            aria-labelledby="navbarDropdownMenu">
                             <!-- Notifications will be dynamically populated here -->
                         </ul>
                     </div>
@@ -97,17 +98,33 @@
                                 class="img-fluid w-50 my-5" />
                         </div>
                     </div>
-                    <div id="versus" class="d-flex flex-row mb-3 justify-content-center align-items-center mx-5">
-                        <div class="border btn-group d-flex w-100">
-                            <button class="btn btn-success flex-fill">
-                                AI
+                    <div class="versus d-flex flex-row mb-3 justify-content-center align-items-center mx-5">
+                        <div class="d-flex w-100 justify-content-between">
+                            <button id="AIPlay" class="mode-play btn btn-success" title="play against AI">
+                                Solo - Play
                             </button>
-                            <div class="border flex-fill d-flex align-items-center justify-content-center">
-                                Play Against
-                            </div>
-                            <button class="btn btn-success flex-fill">
-                                Friends
+                
+                            <div class="spacer"></div> <!-- Spacer element -->
+                
+                            <button id="multiPlayer" class="mode-play btn btn-success btn-sm" title="play against friends on this device">
+                                Local - Multiplayer
                             </button>
+                        </div>
+                        <div id="multiPlayerForm" class="w-100" style="display: none;">
+                            <form id="startGameForm">
+
+                                <div class="form-group d-flex">
+                                    <input type="text" class="form-control" id="player1" placeholder="Enter Player 1 name">
+                                </div>
+                                <div class="form-group d-flex">
+                                    <input type="text" class="form-control" id="player2" placeholder="Enter Player 2 name">
+                                </div>
+                                <div class="form-group d-flex">
+                                    <input type="text" class="form-control me-2" id="gameName" placeholder="Enter Game Name">
+                                    <h5 class="optional-text">(Optional)</h5>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Start Game</button>
+                            </form>
                         </div>
                     </div>
                 </div>
