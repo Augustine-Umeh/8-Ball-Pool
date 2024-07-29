@@ -11,6 +11,16 @@
 </head>
 
 <body>
+    <!-- Confirmation dialog -->
+    <div id="actionChecker" class="modal" style="display: none;">
+        <div class="modal-content">
+            <p id="actionCheckerText"></p>
+            <div class="button-container">
+                <button id="confirmAction" class="btn btn-danger me-2">Yes</button>
+                <button id="cancelAction" class="btn btn-success">No</button>
+            </div>
+        </div>
+    </div>
     <div class="main">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid d-flex justify-content-between">
@@ -40,7 +50,7 @@
                                 <div class="dropdown-menu p-3 wide-dropdown-menu" aria-labelledby="friendsDropdown">
                                     <form class="d-flex mb-4" id="sendFriendRequest">
                                         <input class="form-control me-4" id="playerName" type="search"
-                                            placeholder="Search Player" aria-label="Search" >
+                                            placeholder="Search Player" aria-label="Search">
                                         <button class="btn btn-outline-success" type="submit">
                                             Add friend
                                         </button>
@@ -50,6 +60,7 @@
                                         <!-- Friends will be dynamically populated here -->
                                     </ul>
                                 </div>
+                                
                             </li>
                         </ul>
                     </div>
@@ -103,24 +114,27 @@
                             <button id="AIPlay" class="mode-play btn btn-success" title="play against AI">
                                 Solo - Play
                             </button>
-                
+
                             <div class="spacer"></div> <!-- Spacer element -->
-                
-                            <button id="multiPlayer" class="mode-play btn btn-success btn-sm" title="play against friends on this device">
+
+                            <button id="multiPlayer" class="mode-play btn btn-success btn-sm"
+                                title="play against friends on this device">
                                 Local - Multiplayer
                             </button>
                         </div>
                         <div id="multiPlayerForm" class="w-100" style="display: none;">
                             <form id="startGameForm">
-
                                 <div class="form-group d-flex">
-                                    <input type="text" class="form-control" id="player1" placeholder="Enter Player 1 name" required><br><br>
+                                    <input type="text" class="form-control" id="player1"
+                                        placeholder="Enter Player 1 name" required>
                                 </div>
                                 <div class="form-group d-flex">
-                                    <input type="text" class="form-control" id="player2" placeholder="Enter Player 2 name" required><br><br>
+                                    <input type="text" class="form-control" id="player2"
+                                        placeholder="Enter Player 2 name" required>
                                 </div>
                                 <div class="form-group d-flex">
-                                    <input type="text" class="form-control me-2" id="gameName" placeholder="Enter Game Name">
+                                    <input type="text" class="form-control me-2" id="gameName"
+                                        placeholder="Enter Game Name">
                                     <h5 class="optional-text">(Optional)</h5>
                                 </div>
                                 <button type="submit" class="btn btn-success">Start Game</button>
@@ -158,4 +172,5 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 </body>
+
 </html>
