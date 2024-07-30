@@ -33,7 +33,8 @@ class Database:
             CREATE TABLE IF NOT EXISTS Account (
                 AccountID INTEGER PRIMARY KEY AUTOINCREMENT,
                 AccountName TEXT(64) NOT NULL,
-                AccountPassword VARCHAR(64) NOT NULL
+                AccountPassword VARCHAR(64) NOT NULL,
+                Status INTEGER DEFAULT 0
             );
             """,
             """
@@ -70,6 +71,7 @@ class Database:
                 Player2Category TEXT,
                 GameUsed BOOLEAN NOT NULL DEFAULT 0,
                 Winner TEXT,
+                CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
             );
             """,
@@ -532,6 +534,8 @@ class Database:
             "INSERT INTO Game (AccountID, GameName, Player1Name, Player2Name, GameUsed) VALUES (?, ?, ?, ?, ?)",
             (accountID, gameName, player1Name, player2Name, False)
         )
+        
+        self.updateUserStatus(accountID, 2)
         self.conn.commit()
 
         gameID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
@@ -549,6 +553,8 @@ class Database:
         cursor.execute(creation_query, (accountName, accountPassword))
         accountID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
         
+        self.updateUserStatus(accountID, 1)
+        
         self.conn.commit()
         cursor.close()
         return accountID - 1
@@ -564,6 +570,8 @@ class Database:
             return -1
         
         accountID = row[0]
+        
+        self.updateUserStatus(accountID, 1)
         
         cursor.close()
         return accountID - 1
@@ -1003,11 +1011,11 @@ class Database:
         if not friend_ids:
             return []
 
-        friends_query = "SELECT AccountName FROM Account WHERE AccountID IN ({})".format(
+        friends_query = "SELECT AccountName, Status FROM Account WHERE AccountID IN ({})".format(
             ",".join("?" for _ in friend_ids))
         cursor.execute(friends_query, friend_ids)
 
-        return [row[0] for row in cursor.fetchall()]
+        return [row for row in cursor.fetchall()]
 
     def deleteFriend(self, accountName, friendName):
         cursor = self.conn.cursor()
@@ -1106,6 +1114,16 @@ class Database:
         
         insert_query = "INSERT INTO Notifications (AccountID, FriendID, NotInfo, NotInfoID, isRead) VALUES (?, ?, ?, ?, ?)"
         cursor.execute(insert_query, (friendID, accountID, message, notIfoID, 0))
+        
+        self.conn.commit()
+        cursor.close()
+        
+    def updateUserStatus(self, accountID, status):
+        cursor = self.conn.cursor()
+        accountID += 1
+        
+        update_query = "UPDATE Account SET Status = ?"
+        cursor.execute(update_query, (status,))
         
         self.conn.commit()
         cursor.close()
