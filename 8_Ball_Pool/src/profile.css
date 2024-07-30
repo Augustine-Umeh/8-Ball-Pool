@@ -13,13 +13,16 @@ body {
     background-color: #ffffff;
     border: 1px solid #999595;
     margin: 20px;
-    border-radius: 19px; /* Rounded edges */
+    border-radius: 19px;
+    /* Rounded edges */
 }
 
 .navbar {
     padding-left: 0;
-    height: 90px; /* Adjust this value as needed */
-    line-height: 100px; /* Ensures vertical centering of contents */
+    height: 90px;
+    /* Adjust this value as needed */
+    line-height: 100px;
+    /* Ensures vertical centering of contents */
 }
 
 .navbar-brand {
@@ -48,9 +51,11 @@ body {
 }
 
 .custom-btn:hover {
-    background-color: #21552d; /* Darker shade for hover */
+    background-color: #21552d;
+    /* Darker shade for hover */
     border-color: #21552d;
-    color: white; /* Text color */
+    color: white;
+    /* Text color */
 }
 
 .dropdown-item {
@@ -58,12 +63,21 @@ body {
     padding: 10px 20px;
 }
 
+.dropdown-divider {
+    margin: 5px 0;
+    /* Adjust margin to control space between items */
+    border-top: 1px solid #ccc;
+    /* Customize the divider style */
+}
+
+
 .fa-bell {
     height: 30px;
 }
 
 .bell-icon:hover {
-    color: #908d8d; /* Change this to the desired hover color */
+    color: #908d8d;
+    /* Change this to the desired hover color */
 }
 
 .btn-logout {
@@ -113,18 +127,24 @@ body {
 
 @media (min-width: 768px) {
     .col-md-custom.left-column {
-        flex: 0 0 calc(66.4% - 15px); /* 8.4/12 * 100% */
-        max-width: calc(66.4% - 15px); /* 8.4/12 * 100% */
+        flex: 0 0 calc(66.4% - 15px);
+        /* 8.4/12 * 100% */
+        max-width: calc(66.4% - 15px);
+        /* 8.4/12 * 100% */
     }
 
     .col-md-custom.divider-column {
-        flex: 0 0 calc(2.3% - 15px); /* 0.3/12 * 100% */
-        max-width: calc(2.3% - 15px); /* 0.3/12 * 100% */
+        flex: 0 0 calc(2.3% - 15px);
+        /* 0.3/12 * 100% */
+        max-width: calc(2.3% - 15px);
+        /* 0.3/12 * 100% */
     }
 
     .col-md-custom.right-column {
-        flex: 0 0 calc(31.3% - 15px); /* 3.6/12 * 100% */
-        max-width: calc(31.3% - 15px); /* 3.6/12 * 100% */
+        flex: 0 0 calc(31.3% - 15px);
+        /* 3.6/12 * 100% */
+        max-width: calc(31.3% - 15px);
+        /* 3.6/12 * 100% */
     }
 }
 
@@ -136,30 +156,37 @@ body {
 }
 
 .img-container {
-    margin-top: -270px; /* Adjust to move the container up */
+    margin-top: -270px;
+    /* Adjust to move the container up */
 }
 
 .center-image {
-    max-width: 1129px; /* Adjust the size as needed */
+    max-width: 1129px;
+    /* Adjust the size as needed */
     width: 100%;
 }
 
 .play-against {
-    margin-top: -70px; /* Adjust to move the text up or down */
+    margin-top: -70px;
+    /* Adjust to move the text up or down */
 }
 
 .rectangle-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 600px; /* Adjust the width as needed */
-    height: 300px; /* Adjust the height as needed */
+    width: 600px;
+    /* Adjust the width as needed */
+    height: 300px;
+    /* Adjust the height as needed */
     background-color: green;
-    opacity: 1; /* Adjust the opacity as needed */
+    opacity: 1;
+    /* Adjust the opacity as needed */
 }
 
 .scrolling-column-container {
-    height: 50vh; /* Set height to half of the viewport height */
+    height: 50vh;
+    /* Set height to half of the viewport height */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -182,14 +209,14 @@ body {
 }
 
 #statsList {
-    border-radius: 23px; 
+    border-radius: 23px;
 }
 
 #friendsListContainer {
     display: none;
 }
 
-#friendsDropdown.show + #friendsListContainer {
+#friendsDropdown.show+#friendsListContainer {
     display: block;
 }
 
@@ -222,35 +249,38 @@ body {
 }
 
 .spacer {
-    width: 3px; 
+    width: 3px;
 }
 
 .versus {
     margin: 100px auto 0;
-    padding: 100px; 
+    padding: 100px;
+}
+
+#multiPlayerForm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f4efef;
+    width: 430px !important;
+    z-index: 1050;
 }
 
 .form-group {
     margin-bottom: 15px;
 }
 
-#multiPlayerForm {
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-    margin-top: -180px;
-    margin-left: -170px;
-    width: 430px !important;
-}
-
 #gameName::placeholder {
-    color: #6c757d; 
-    opacity: 1; 
+    color: #6c757d;
+    opacity: 1;
 }
 
 .optional-text {
-    color: #6c757d; 
+    color: #6c757d;
     font-size: 1.0rem;
     margin-bottom: 20px;
 }
@@ -286,7 +316,7 @@ body {
 
 .modal-content p {
     margin-top: 20px;
-    font-size: 1.1rem;;
+    font-size: 1.1rem;
 }
 
 .modal-content button {
@@ -297,4 +327,44 @@ body {
 .non-clickable {
     pointer-events: none;
     cursor: default;
+}
+
+.dropdown-menu .dropdown-item {
+    font-size: 1.3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 87px;
+}
+
+.noti_drop {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    height: 87px;
+}
+
+.friend-and-button {
+    font-size: 1.2rem;
+    height: 46px;
+}
+
+.friend-status {
+    height: 39px
+}
+
+#cancelIcon {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+#cancelIcon:hover {
+    transform: scale(1.5);
+}
+
+.cancelButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }

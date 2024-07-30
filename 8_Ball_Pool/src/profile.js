@@ -83,10 +83,34 @@ $(document).ready(function () {
                     );
                 } else {
                     friends.forEach(function (friend) {
+                        let statusIcon, statusText;
+                        switch (friend[1]) {
+                            case 1:
+                                statusIcon = './assets/8-Ball-AI-online.svg';
+                                statusText = 'Online';
+                                break;
+                            case 2:
+                                statusIcon = './assets/8-Ball-AI-inGame.svg';
+                                statusText = 'In Game';
+                                break;
+                            default: 
+                                statusIcon = './assets/8-Ball-AI-offline.svg';
+                                statusText = 'Offline';
+                        }
+            
                         friendsList.append(
-                            `<li class="list-group-item d-flex justify-content-between align-items-center">${friend} 
-                                <button class="gameInvite btn btn-primary" title="send game Invite">Invite</button>
-                                <button class="removeFriend btn btn-danger" title="remove from friends list">Remove</button>
+                            `<li class="list-group-item friend-drop">
+                                <div class="d-flex justify-content-between align-items-center friend-and-button">
+                                    <span class="friend-name">${friend[0]}</span>
+                                    <div class="mt-4">
+                                        <button class="gameInvite btn btn-primary btn-sm" title="send game invite">Invite</button>
+                                        <button class="removeFriend btn btn-danger btn-sm" title="remove from friends list">Remove</button>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center friend-status">
+                                    <img src="${statusIcon}" alt="${statusText}" width="20" height="20" class="me-2" />
+                                    <p class="mb-0">${statusText}</p>
+                                </div>
                             </li>`
                         );
                     });
@@ -97,7 +121,7 @@ $(document).ready(function () {
                 });
 
                 $('.removeFriend').on('click', function () {
-                    var friendName = $(this).closest('li').contents().first().text().trim();
+                    var friendName = $(this).closest('li').find('.friend-name').text().trim();
                     var button = $(this);
                     
                     $('body').addClass('blur-background');
@@ -191,33 +215,34 @@ $(document).ready(function () {
                 var notifications = response.notifications;
                 var notificationList = $('.dropdown-menu.dropdown-menu-end');
                 notificationList.empty();
-
+    
                 var recentNoti = notifications.filter(notification => notification[4] === 0).length;
+                
+                const timestamp = new Date().toLocaleString(); // Get current date and time as a readable string
 
                 // Check if there are notifications
                 if (notifications.length === 0) {
-                    console.log(`count: ${notifications.length}`)
-                    notificationList.append('<li class="dropdown-item non-clickable">No new notifications</li>');
+                    notificationList.append('<li class="list-group-item noti_drop non-clickable">No new notifications</li>');
                 } else {
-                    notifications.forEach(function (notification) {
+                    notifications.forEach(function (notification, index) {
                         if (notification[3] === 2) {
                             if (notification[4] === 0) {
                                 notificationList.append(
-                                    `<li class="dropdown-item d-flex justify-content-between align-items-center notification-blue" data-id="${notification[0]}" data-friendid="${notification[1]}">
+                                    `<li class="list-group-item noti_drop d-flex justify-content-between align-items-center notification-blue" data-id="${notification[0]}" data-friendid="${notification[1]}">
                                         ${notification[2]}
                                         <div>
-                                            <button class="acceptInvite btn btn-primary" title="accept invite">Accept</button>
-                                            <button class="declineInvite btn btn-danger" title="decline invite">Decline</button>
+                                            <button class="acceptInvite btn btn-primary btn-sm" title="accept invite">Accept</button>
+                                            <button class="declineInvite btn btn-danger btn-sm" title="decline invite">Decline</button>
                                         </div>
                                     </li>`
                                 );
                             } else {
                                 notificationList.append(
-                                    `<li class="dropdown-item d-flex justify-content-between align-items-center" data-id="${notification[0]}" data-friendid="${notification[1]}">
+                                    `<li class="list-group-item noti_drop d-flex justify-content-between align-items-center" data-id="${notification[0]}" data-friendid="${notification[1]}">
                                         ${notification[2]}
                                         <div>
-                                            <button class="acceptInvite btn btn-primary" title="accept invite">Accept</button>
-                                            <button class="declineInvite btn btn-danger" title="decline invite">Decline</button>
+                                            <button class="acceptInvite btn btn-primary btn-sm" title="accept invite">Accept</button>
+                                            <button class="declineInvite btn btn-danger btn-sm" title="decline invite">Decline</button>
                                         </div>
                                     </li>`
                                 );
@@ -225,37 +250,46 @@ $(document).ready(function () {
                         } else {
                             if (notification[4] === 0) {
                                 notificationList.append(
-                                    `<li class="dropdown-item notification-blue non-clickable" data-id="${notification[0]}">
+                                    `<li class="list-group-item noti_drop notification-blue non-clickable" data-id="${notification[0]}">
                                         ${notification[2]}
                                     </li>`
                                 );
                             } else {
                                 notificationList.append(
-                                    `<li class="dropdown-item non-clickable" data-id="${notification[0]}">
+                                    `<li class="list-group-item noti_drop non-clickable" data-id="${notification[0]}">
                                         ${notification[2]}
                                     </li>`
                                 );
                             }
                         }
+    
+                        // Add a divider after each item except the last one
+                        if (index < notifications.length - 1) {
+                            notificationList.append('<hr class="dropdown-divider">');
+                        }
                     });
-
+    
                     $('.acceptInvite').on('click', function (event) {
-                        event.stopPropagation(); // Prevent the dropdown from closing
+                        event.stopPropagation(); 
+                        
                         var notificationID = $(this).closest('li').data('id');
                         var friendID = $(this).closest('li').data('friendid');
+    
                         handleNotificationAction('acceptInvite', notificationID, accountID, friendID);
                         $(this).closest('li').remove();
                     });
-
+    
                     $('.declineInvite').on('click', function (event) {
-                        event.stopPropagation(); // Prevent the dropdown from closing
+                        event.stopPropagation();
+    
                         var notificationID = $(this).closest('li').data('id');
                         var friendID = $(this).closest('li').data('friendid');
+    
                         handleNotificationAction('declineInvite', notificationID, accountID, friendID);
                         $(this).closest('li').remove();
                     });
                 }
-
+    
                 // Update the notification number
                 $('#notificationNumber').text(recentNoti);
             },
@@ -323,50 +357,54 @@ $(document).ready(function () {
     });
 
     $('#multiPlayer').on('click', function () {
-        $('#multiPlayer').hide();
-
+        $('body').addClass('blur-background');
         $('#multiPlayerForm').show();
         $('#player1').val(accountName)
-    });
 
-    $('#startGameForm').on('submit', function (event) {
-        event.preventDefault();
-
-        var gameName = $('#gameName').val();
-        var player1 = $('#player1').val();
-        var player2 = $('#player2').val();
-
-        $.ajax({
-            url: '/startGame',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                gameName: gameName,
-                p1Name: player1,
-                p2Name: player2,
-                accountID: parseInt(accountID)
-            }),
-            success: function (response) {
-                if (response.status === 'Game Created successfully') {
-
-                    const randomNumber = Math.random();
-                    var PlayerTurn = randomNumber < 0.5 ? player1 : player2;
-
-                    console.log("profile creates game good");
-                    localStorage.setItem('gameID', response.gameID);
-                    localStorage.setItem('player1Name', player1);
-                    localStorage.setItem('player2Name', player2);
-                    localStorage.setItem('gameName', response.gameName);
-                    localStorage.setItem('PlayerTurn', PlayerTurn)
-
-                    window.location.href = 'game.html';
-                } else if (response.status === 'Error') {
+        $('#cancelIcon').on('click', function() {
+            $('body').removeClass('blur-background');
+            $('#multiPlayerForm').hide();
+        });
+    
+        $('#startGameForm').on('submit', function (event) {
+            event.preventDefault();
+    
+            var gameName = $('#gameName').val();
+            var player1 = $('#player1').val();
+            var player2 = $('#player2').val();
+    
+            $.ajax({
+                url: '/startGame',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    gameName: gameName,
+                    p1Name: player1,
+                    p2Name: player2,
+                    accountID: parseInt(accountID)
+                }),
+                success: function (response) {
+                    if (response.status === 'Game Created successfully') {
+    
+                        const randomNumber = Math.random();
+                        var PlayerTurn = randomNumber < 0.5 ? player1 : player2;
+    
+                        console.log("profile creates game good");
+                        localStorage.setItem('gameID', response.gameID);
+                        localStorage.setItem('player1Name', player1);
+                        localStorage.setItem('player2Name', player2);
+                        localStorage.setItem('gameName', response.gameName);
+                        localStorage.setItem('PlayerTurn', PlayerTurn)
+    
+                        window.location.href = 'game.html';
+                    } else if (response.status === 'Error') {
+                        console.error("Error: ", response.message);
+                    }
+                },
+                error: function (response) {
                     console.error("Error: ", response.message);
                 }
-            },
-            error: function (response) {
-                console.error("Error: ", response.message);
-            }
+            });
         });
     });
 });

@@ -306,6 +306,7 @@ class MyHandler(BaseHTTPRequestHandler):
             data = json.loads(post_data.decode('utf-8'))
             accountID = data['accountID']
             
+            db.updateUserStatus(accountID, 0)
             
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
