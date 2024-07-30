@@ -222,7 +222,7 @@ $(document).ready(function () {
 
                 // Check if there are notifications
                 if (notifications.length === 0) {
-                    notificationList.append('<li class="list-group-item noti_drop non-clickable">No new notifications</li>');
+                    notificationList.append('<li class="list-group-item justify-content-center noti_drop non-clickable">No new notifications</li>');
                 } else {
                     notifications.forEach(function (notification, index) {
                         if (notification[3] === 2) {

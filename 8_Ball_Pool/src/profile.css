@@ -248,13 +248,17 @@ body {
     width: 400px;
 }
 
+.w-50 {
+    width: 64% !important;
+}
+
 .spacer {
     width: 3px;
 }
 
 .versus {
-    margin: 100px auto 0;
-    padding: 100px;
+    margin: 10px auto 0;
+    padding: 50px;
 }
 
 #multiPlayerForm {
@@ -367,4 +371,16 @@ body {
     position: absolute;
     top: 10px;
     right: 10px;
+}
+
+.game-text {
+    color: #170707d1;
+}
+
+.history-text {
+    color: #0c00004f;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 350px;
 }

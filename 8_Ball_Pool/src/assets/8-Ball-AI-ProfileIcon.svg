@@ -85,6 +85,6 @@
   <circle cx="562" cy="791" r="14" fill="WHITE"></circle>
   <text x="562" y="793" font-family="Arial" font-size="23" fill="black" text-anchor="middle" dominant-baseline="middle" pointer-events="none">7</text>
 
-  <line id="pool_cue" class="cue_line" x1="2073" y1="675" x2="3573" y2="675" stroke="black" stroke-width="25" visibility="visible"></line>
+  <line id="pool_cue" class="cue_line" x1="2073" y1="675" x2="2685" y2="675" stroke="black" stroke-width="25" visibility="visible"></line>
   <line id="aim_line" class="cue_line" x1="1977" y1="675" x2="798" y2="675" length="7000" stroke="grey" stroke-width="4" visibility="visible"></line>
 </svg>

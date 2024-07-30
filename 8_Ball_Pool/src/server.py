@@ -62,6 +62,8 @@ class MyHandler(BaseHTTPRequestHandler):
 
             accountID = db.createAccount(accountName, accountPassword)
 
+            db.updateUserStatus(accountID, 1)
+            
             self.send_response(201)  
             self.send_header('Content-type', 'application/json')
             self.end_headers()
@@ -80,7 +82,8 @@ class MyHandler(BaseHTTPRequestHandler):
             accountPassword = data.get('accountPassword')
 
             accountID = db.verifyAccount(accountName, accountPassword)
-
+            db.updateUserStatus(accountID, 1)
+            
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
@@ -339,6 +342,8 @@ class MyHandler(BaseHTTPRequestHandler):
                     gameID = curGame.gameID
                     gameName = curGame.gameName
                     
+                db.updateUserStatus(accountID, 2)
+                
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
@@ -479,6 +484,7 @@ class MyHandler(BaseHTTPRequestHandler):
             name, decision = curGame.isGameEnd()
             if decision == 'winner':
                 winner = name
+                db.updateUserStatus(accountID, 1)
                 
             if curGame.first_ball_hit == 'False':
                 curGame.scratch = True

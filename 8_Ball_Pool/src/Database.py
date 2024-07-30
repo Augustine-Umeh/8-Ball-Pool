@@ -34,7 +34,7 @@ class Database:
                 AccountID INTEGER PRIMARY KEY AUTOINCREMENT,
                 AccountName TEXT(64) NOT NULL,
                 AccountPassword VARCHAR(64) NOT NULL,
-                Status INTEGER DEFAULT 0
+                Status INTEGER NOT NULL DEFAULT 0
             );
             """,
             """
@@ -535,7 +535,6 @@ class Database:
             (accountID, gameName, player1Name, player2Name, False)
         )
         
-        self.updateUserStatus(accountID, 2)
         self.conn.commit()
 
         gameID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
@@ -553,8 +552,6 @@ class Database:
         cursor.execute(creation_query, (accountName, accountPassword))
         accountID = cursor.execute("SELECT last_insert_rowid()").fetchone()[0]
         
-        self.updateUserStatus(accountID, 1)
-        
         self.conn.commit()
         cursor.close()
         return accountID - 1
@@ -570,8 +567,6 @@ class Database:
             return -1
         
         accountID = row[0]
-        
-        self.updateUserStatus(accountID, 1)
         
         cursor.close()
         return accountID - 1
@@ -900,7 +895,7 @@ class Database:
         self.conn.commit()
         cursor.close()
         
-    def listGames(self, accountID):
+    def retrieveGames(self, accountID):
         cursor = self.conn.cursor()
         accountID += 1
 
@@ -910,7 +905,7 @@ class Database:
         cursor.close()
         return [(gameID - 1, gameName) for gameID, gameName in results]
 
-    def getBalls(self, gameID, tableID) -> list:
+    def getBalls(self, gameID, tableID):
         cursor = self.conn.cursor()
         try:
             query = """
@@ -1122,8 +1117,8 @@ class Database:
         cursor = self.conn.cursor()
         accountID += 1
         
-        update_query = "UPDATE Account SET Status = ?"
-        cursor.execute(update_query, (status,))
+        update_query = "UPDATE Account SET Status = ? WHERE AccountID = ?"
+        cursor.execute(update_query, (status, accountID))
         
         self.conn.commit()
         cursor.close()
