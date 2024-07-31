@@ -899,11 +899,47 @@ class Database:
         cursor = self.conn.cursor()
         accountID += 1
 
-        cursor.execute("SELECT GameID, GameName FROM Game WHERE AccountID = ? AND GameUsed = 0", (accountID,))
-        results = cursor.fetchall()
+        cursor.execute("""
+            SELECT 
+                g.GameID, 
+                g.GameName, 
+                g.Player1Name, 
+                g.Player2Name, 
+                g.Player1Category, 
+                g.Player2Category, 
+                g.Winner 
+            FROM Game g
+            WHERE g.AccountID = ? AND g.GameUsed > 0
+        """, (accountID,))
+        games = cursor.fetchall()
+
+        results = []
+
+        for game in games:
+            gameID, gameName, player1Name, player2Name, player1Category, player2Category, winner = game
+            
+            cursor.execute("""
+                SELECT t.TableID 
+                FROM TTable t
+                WHERE t.GameID = ?
+                ORDER BY t.Time DESC
+                LIMIT 1
+            """, (gameID,))
+            table_row = cursor.fetchone()
+            
+            tableID = table_row[0] if table_row else None
+
+            table_svg = None
+            if tableID:
+                table_data = self.readTable(accountID - 1, gameID - 1, tableID - 1)
+                
+                table = Table()
+                table_svg = table.custom_svg(table_data)
+
+            results.append((gameID - 1, gameName, player1Name, player2Name, table_svg, player1Category, player2Category, winner))
 
         cursor.close()
-        return [(gameID - 1, gameName) for gameID, gameName in results]
+        return results
 
     def getBalls(self, gameID, tableID):
         cursor = self.conn.cursor()

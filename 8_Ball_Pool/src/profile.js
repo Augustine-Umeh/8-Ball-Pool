@@ -407,4 +407,51 @@ $(document).ready(function () {
             });
         });
     });
+
+    retrieveGameHistory();
+    function retrieveGameHistory(){
+        $.ajax({
+            url: '/retrieveGames',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                accountID: parseInt(accountID)
+            }),
+            success: function (response) {
+                var historyContent = $('#historyContent');
+                historyContent.empty(); 
+    
+                var tables = response.tables;
+    
+                if (tables.length === 0) {
+                    historyContent.append('<h1 class="history-text">No Game History</h1>');
+                } else {
+                    tables.forEach(function (table) {
+                        var gameID = table[0];
+                        var gameName = table[1];
+                        var player1 = table[2];
+                        var player2 = table[3];
+                        var tableSVG = table[4];
+                        var player1Category = table[5];
+                        var player2Category = table[6];
+                        var winner = table[7];
+    
+                        var svgContent = tableSVG ? `<div class="game-svg">${tableSVG}</div>` : '';
+                        var winnerText = winner ? `<p>Winner: ${winner}</p>` : '';
+    
+                        var gameHistoryItem = `
+                            <div class="game-history-item">
+                                ${svgContent}
+                            </div>
+                        `;
+                        historyContent.append(gameHistoryItem);
+                    });
+                }
+            },
+            error: function (response) {
+                console.error("Error: ", response.message);
+            }
+        });
+    }
+    
 });
