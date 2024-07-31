@@ -220,7 +220,7 @@ body {
     display: block;
 }
 
-.list-group-item:first-child {
+.list-group-item:nth-child(2) {
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 }
@@ -382,16 +382,48 @@ body {
     align-items: center;
     display: flex;
     justify-content: center;
-    margin-top: 350px;
+    margin-top: 410px;
 }
 
-.game-svg #table:first-child{
+.game-svg #table:first-child {
     margin-top: 5px;
 }
 
-.game-svg #table{
+.game-svg #table {
     margin-left: 30px;
     width: 584px;
     height: 299px;
     margin-bottom: 32px;
+}
+
+.game-svg-container {
+    position: relative;
+    display: inline-block;
+}
+
+.gameInfo {
+    display: none;
+    position: absolute;
+    bottom: 10.9%;
+    right: 0.4%;
+    background-color: rgba(0, 0, 0, 0.77);
+    color: white;
+    padding: 10px;
+    z-index: 1000;
+    height: 289.1px;
+    width: 578px;
+}
+
+.game-svg-container:hover .gameInfo {
+    display: block;
+}
+
+.gameInfo .gameName {
+    text-align: center;
+    margin-top: 10px
+}
+
+.gameInfo .PlayerNames {
+    display: flex;
+    margin-right: 20px;
 }
