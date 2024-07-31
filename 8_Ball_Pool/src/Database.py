@@ -905,8 +905,7 @@ class Database:
                 g.GameName, 
                 g.Player1Name, 
                 g.Player2Name, 
-                g.Player1Category, 
-                g.Player2Category, 
+                g.Player1Category,
                 g.GameUsed,
                 g.Winner 
             FROM Game g
@@ -918,7 +917,7 @@ class Database:
         results = []
 
         for game in games:
-            gameID, gameName, player1Name, player2Name, player1Category, player2Category, gameUsed, winner = game
+            gameID, gameName, player1Name, player2Name, player1Category, gameUsed, winner = game
             
             select_query = """
                 SELECT MAX(t.TableID) 
@@ -937,7 +936,7 @@ class Database:
                 table = Table()
                 table_svg = table.custom_svg(table_data)
 
-            results.append((gameID - 1, gameName, player1Name, player2Name, table_svg, player1Category, player2Category, gameUsed, winner))
+            results.append((gameName, player1Name, player2Name, table_svg, player1Category, gameUsed, winner))
 
         cursor.close()
         return results
