@@ -77,11 +77,12 @@ $(document).ready(function () {
 
                 if (friends.length === 0) {
                     friendsList.append(
-                        `<li class="d-flex justify-content-between align-items-center non-clickable">
-                            No friends
+                        `<li class="d-flex justify-content-center align-items-center non-clickable">
+                            <h2 class="mt-5 mb-4">No friends😢</h2>
                         </li>`
                     );
                 } else {
+                    friendsList.append('<h2 class="mt-4">Friends</h2>');
                     friends.forEach(function (friend) {
                         let statusIcon, statusText;
                         switch (friend[1]) {
@@ -93,11 +94,11 @@ $(document).ready(function () {
                                 statusIcon = './assets/8-Ball-AI-inGame.svg';
                                 statusText = 'In Game';
                                 break;
-                            default: 
+                            default:
                                 statusIcon = './assets/8-Ball-AI-offline.svg';
                                 statusText = 'Offline';
                         }
-            
+
                         friendsList.append(
                             `<li class="list-group-item friend-drop">
                                 <div class="d-flex justify-content-between align-items-center friend-and-button">
@@ -123,12 +124,12 @@ $(document).ready(function () {
                 $('.removeFriend').on('click', function () {
                     var friendName = $(this).closest('li').find('.friend-name').text().trim();
                     var button = $(this);
-                    
+
                     $('body').addClass('blur-background');
                     $('#actionChecker').show();
                     $('#actionCheckerText').text(`Are you sure you want to remove ${friendName}`)
 
-                    $('#confirmAction').on('click', function() {
+                    $('#confirmAction').on('click', function () {
                         $.ajax({
                             url: '/removeFriend',
                             type: 'POST',
@@ -150,7 +151,7 @@ $(document).ready(function () {
                         });
                     });
 
-                    $('#cancelAction').on('click', function() {
+                    $('#cancelAction').on('click', function () {
                         $('#actionChecker').hide();
                         $('body').removeClass('blur-background');
                     });
@@ -215,9 +216,9 @@ $(document).ready(function () {
                 var notifications = response.notifications;
                 var notificationList = $('.dropdown-menu.dropdown-menu-end');
                 notificationList.empty();
-    
+
                 var recentNoti = notifications.filter(notification => notification[4] === 0).length;
-                
+
                 const timestamp = new Date().toLocaleString(); // Get current date and time as a readable string
 
                 // Check if there are notifications
@@ -262,34 +263,34 @@ $(document).ready(function () {
                                 );
                             }
                         }
-    
+
                         // Add a divider after each item except the last one
                         if (index < notifications.length - 1) {
                             notificationList.append('<hr class="dropdown-divider">');
                         }
                     });
-    
+
                     $('.acceptInvite').on('click', function (event) {
-                        event.stopPropagation(); 
-                        
+                        event.stopPropagation();
+
                         var notificationID = $(this).closest('li').data('id');
                         var friendID = $(this).closest('li').data('friendid');
-    
+
                         handleNotificationAction('acceptInvite', notificationID, accountID, friendID);
                         $(this).closest('li').remove();
                     });
-    
+
                     $('.declineInvite').on('click', function (event) {
                         event.stopPropagation();
-    
+
                         var notificationID = $(this).closest('li').data('id');
                         var friendID = $(this).closest('li').data('friendid');
-    
+
                         handleNotificationAction('declineInvite', notificationID, accountID, friendID);
                         $(this).closest('li').remove();
                     });
                 }
-    
+
                 // Update the notification number
                 $('#notificationNumber').text(recentNoti);
             },
@@ -325,7 +326,7 @@ $(document).ready(function () {
         $('#actionChecker').show();
         $('#actionCheckerText').text(`Are you sure you want to Log out`);
 
-        $('#confirmAction').on('click', function() {
+        $('#confirmAction').on('click', function () {
             $.ajax({
                 url: '/logOut',
                 type: 'POST',
@@ -350,7 +351,7 @@ $(document).ready(function () {
             });
         });
 
-        $('#cancelAction').on('click', function() {
+        $('#cancelAction').on('click', function () {
             $('#actionChecker').hide();
             $('body').removeClass('blur-background');
         });
@@ -361,18 +362,18 @@ $(document).ready(function () {
         $('#multiPlayerForm').show();
         $('#player1').val(accountName)
 
-        $('#cancelIcon').on('click', function() {
+        $('#cancelIcon').on('click', function () {
             $('body').removeClass('blur-background');
             $('#multiPlayerForm').hide();
         });
-    
+
         $('#startGameForm').on('submit', function (event) {
             event.preventDefault();
-    
+
             var gameName = $('#gameName').val();
             var player1 = $('#player1').val();
             var player2 = $('#player2').val();
-    
+
             $.ajax({
                 url: '/startGame',
                 type: 'POST',
@@ -385,17 +386,17 @@ $(document).ready(function () {
                 }),
                 success: function (response) {
                     if (response.status === 'Game Created successfully') {
-    
+
                         const randomNumber = Math.random();
                         var PlayerTurn = randomNumber < 0.5 ? player1 : player2;
-    
+
                         console.log("profile creates game good");
                         localStorage.setItem('gameID', response.gameID);
                         localStorage.setItem('player1Name', player1);
                         localStorage.setItem('player2Name', player2);
                         localStorage.setItem('gameName', response.gameName);
                         localStorage.setItem('PlayerTurn', PlayerTurn)
-    
+
                         window.location.href = 'game.html';
                     } else if (response.status === 'Error') {
                         console.error("Error: ", response.message);
@@ -409,7 +410,7 @@ $(document).ready(function () {
     });
 
     retrieveGameHistory();
-    function retrieveGameHistory(){
+    function retrieveGameHistory() {
         $.ajax({
             url: '/retrieveGames',
             type: 'POST',
@@ -419,10 +420,10 @@ $(document).ready(function () {
             }),
             success: function (response) {
                 var historyContent = $('#historyContent');
-                historyContent.empty(); 
-    
+                historyContent.empty();
+
                 var tables = response.tables;
-    
+
                 if (tables.length === 0) {
                     historyContent.append('<h1 class="history-text">No Game History</h1>');
                 } else {
@@ -434,11 +435,21 @@ $(document).ready(function () {
                         var tableSVG = table[4];
                         var player1Category = table[5];
                         var player2Category = table[6];
-                        var winner = table[7];
-    
-                        var svgContent = tableSVG ? `<div class="game-svg">${tableSVG}</div>` : '';
-                        var winnerText = winner ? `<p>Winner: ${winner}</p>` : '';
-    
+                        var gameUsed = table[7];
+                        var winner = table[8];
+
+                        var svgContent = tableSVG
+                            ?   `<div class="game-svg-container">
+                                    <div class="game-svg" ${gameUsed < 2 ? 'style="cursor: pointer;"' : ''}>${tableSVG}</div>
+                                    <div class="gameInfo">
+                                        <h2 class="gameName">${gameName}</h1><br>
+                                        <h5 class="PlayerNames">Player 1: ${player1}</h5>
+                                        <h5 class="PlayerNames">Player 2: ${player2}</h5>
+                                        ${gameUsed === 2 ? `${winner} won this game` : ''}
+                                    </div>
+                                </div>`
+                            : '';
+
                         var gameHistoryItem = `
                             <div class="game-history-item">
                                 ${svgContent}
@@ -446,6 +457,7 @@ $(document).ready(function () {
                         `;
                         historyContent.append(gameHistoryItem);
                     });
+
                 }
             },
             error: function (response) {
@@ -453,5 +465,4 @@ $(document).ready(function () {
             }
         });
     }
-    
 });

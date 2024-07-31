@@ -899,7 +899,7 @@ class Database:
         cursor = self.conn.cursor()
         accountID += 1
 
-        cursor.execute("""
+        select_query = """
             SELECT 
                 g.GameID, 
                 g.GameName, 
@@ -907,36 +907,37 @@ class Database:
                 g.Player2Name, 
                 g.Player1Category, 
                 g.Player2Category, 
+                g.GameUsed,
                 g.Winner 
             FROM Game g
             WHERE g.AccountID = ? AND g.GameUsed > 0
-        """, (accountID,))
+        """
+        cursor.execute(select_query, (accountID,))
         games = cursor.fetchall()
 
         results = []
 
         for game in games:
-            gameID, gameName, player1Name, player2Name, player1Category, player2Category, winner = game
+            gameID, gameName, player1Name, player2Name, player1Category, player2Category, gameUsed, winner = game
             
-            cursor.execute("""
-                SELECT t.TableID 
+            select_query = """
+                SELECT MAX(t.TableID) 
                 FROM TTable t
                 WHERE t.GameID = ?
-                ORDER BY t.Time DESC
-                LIMIT 1
-            """, (gameID,))
+            """
+            cursor.execute(select_query, (gameID,))
             table_row = cursor.fetchone()
             
             tableID = table_row[0] if table_row else None
-
             table_svg = None
-            if tableID:
+            
+            if tableID >= 0:
                 table_data = self.readTable(accountID - 1, gameID - 1, tableID - 1)
                 
                 table = Table()
                 table_svg = table.custom_svg(table_data)
 
-            results.append((gameID - 1, gameName, player1Name, player2Name, table_svg, player1Category, player2Category, winner))
+            results.append((gameID - 1, gameName, player1Name, player2Name, table_svg, player1Category, player2Category, gameUsed, winner))
 
         cursor.close()
         return results
