@@ -369,6 +369,8 @@ $(document).ready(function () {
 
         $('#startGameForm').on('submit', function (event) {
             event.preventDefault();
+            $('#multiPlayerForm').hide();
+            $('body').removeClass('blur-background');
 
             var gameName = $('#gameName').val();
             var player1 = $('#player1').val();
@@ -428,24 +430,46 @@ $(document).ready(function () {
                     historyContent.append('<h1 class="history-text">No Game History</h1>');
                 } else {
                     tables.forEach(function (table) {
-                        var gameID = table[0];
-                        var gameName = table[1];
-                        var player1 = table[2];
-                        var player2 = table[3];
-                        var tableSVG = table[4];
-                        var player1Category = table[5];
-                        var player2Category = table[6];
-                        var gameUsed = table[7];
-                        var winner = table[8];
+                        var gameName = table[0];
+                        var player1 = table[1];
+                        var player2 = table[2];
+                        var tableSVG = table[3];
+                        var player1Category = table[4];
+                        var gameUsed = table[5];
+                        var winner = table[6];
+                        var recap = 1;
+
+                        var player1Balls = '';
+                        var player2Balls = '';
+
+                        if (player1Category) {
+                            if (player1Category === 'stripe') {
+                                player1Balls = '<img id="playerBalls" src="./assets/8-Ball-AI-LowBalls.svg" alt="Low Balls">';
+                                player2Balls = '<img id="playerBalls" src="./assets/8-Ball-AI-HighBalls.svg" alt="High Balls">';
+                            } else {
+                                player1Balls = '<img id="playerBalls" src="./assets/8-Ball-AI-HighBalls.svg" alt="High Balls">';
+                                player2Balls = '<img id="playerBalls" src="./assets/8-Ball-AI-LowBalls.svg" alt="Low Balls">';
+                            }
+                        }
 
                         var svgContent = tableSVG
-                            ?   `<div class="game-svg-container">
-                                    <div class="game-svg" ${gameUsed < 2 ? 'style="cursor: pointer;"' : ''}>${tableSVG}</div>
+                            ? `<div class="game-svg-container">
+                                    <div class="game-svg">${tableSVG}</div>
                                     <div class="gameInfo">
-                                        <h2 class="gameName">${gameName}</h1><br>
-                                        <h5 class="PlayerNames">Player 1: ${player1}</h5>
-                                        <h5 class="PlayerNames">Player 2: ${player2}</h5>
-                                        ${gameUsed === 2 ? `${winner} won this game` : ''}
+                                        <h2 class="gameName">${gameName}</h2><br>
+                                        <div class="d-flex player-names-container">
+                                            <h5 class="PlayerNames">Player 1: ${player1}</h5><br>
+                                            ${player1Balls}
+                                            <h5 class="PlayerNames">Player 2: ${player2}</h5><br>
+                                            ${player2Balls}
+                                        </div>
+                                        ${gameUsed === 2 ? `${winner} won this game` : 
+                                        `${recap ? `<p class="text-center mt-1">Recap: ${recap}</p>` : ''}
+                                        <h5 class="text-center mt-3">Player Turn: </h5>
+                                        <p class="text-center">Click to continue this game</p><br>
+                                        <div class="text-center">
+                                            <button id="continueGame" class="btn btn-success">Yes</button>
+                                        </div>`}
                                     </div>
                                 </div>`
                             : '';

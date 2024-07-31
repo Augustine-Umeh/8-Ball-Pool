@@ -405,13 +405,22 @@ body {
     display: none;
     position: absolute;
     bottom: 10.9%;
-    right: 0.4%;
+    right: 10.5%;
     background-color: rgba(0, 0, 0, 0.77);
     color: white;
     padding: 10px;
     z-index: 1000;
     height: 289.1px;
-    width: 578px;
+    width: 577.3px;
+}
+
+.game-svg-container:hover {
+    display: block;
+    transform: scale(1.02);
+}
+
+.game-svg-container {
+    transition: transform 0.38s;
 }
 
 .game-svg-container:hover .gameInfo {
@@ -420,10 +429,26 @@ body {
 
 .gameInfo .gameName {
     text-align: center;
-    margin-top: 10px
+    margin-top: 5px
 }
 
-.gameInfo .PlayerNames {
+.gameInfo .player-names-container {
     display: flex;
-    margin-right: 20px;
+    justify-content: center; /* Centers the content horizontally */
+    gap: 330px; 
+    margin-top: -20px;
+}
+
+.PlayerNames {
+    bottom: 0;
+}
+
+#continueGame {
+    margin-top: -30px;
+}
+
+#playerBalls {
+    width: 200px;
+    height: 30px;
+    gap: 10px
 }
