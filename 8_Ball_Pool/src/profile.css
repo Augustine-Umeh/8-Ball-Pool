@@ -186,14 +186,14 @@ body {
 
 .scrolling-column-container {
     height: 50vh;
-    /* Set height to half of the viewport height */
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .scrolling-column {
-    height: 64vh;
+    height: 80vh;
+    margin-top: 20px;
 }
 
 .green-rectangle {
@@ -383,4 +383,15 @@ body {
     display: flex;
     justify-content: center;
     margin-top: 350px;
+}
+
+.game-svg #table:first-child{
+    margin-top: 5px;
+}
+
+.game-svg #table{
+    margin-left: 30px;
+    width: 584px;
+    height: 299px;
+    margin-bottom: 32px;
 }

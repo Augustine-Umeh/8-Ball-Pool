@@ -318,6 +318,23 @@ class MyHandler(BaseHTTPRequestHandler):
                 'status': 'Logged out successfully'
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        elif self.path == '/retrieveGames':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            data = json.loads(post_data.decode('utf-8'))
+            accountID = int(data['accountID'])
+            
+            tables = db.retrieveGames(accountID)
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {
+                'tables': tables
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
             
         elif self.path == '/startGame':
             content_length = int(self.headers['Content-Length'])
@@ -368,9 +385,8 @@ class MyHandler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
 
             data = json.loads(post_data.decode('utf-8'))
-            accountID = int(data.get('accountID'))
-            gameID = int(data.get('gameID'))
-            # ballNumbers = data['ballNumbers']
+            accountID = int(data['accountID'])
+            gameID = int(data['gameID'])
             
             try:
                 unfinished_game = db.checkUnfinishedGame(accountID, gameID)
